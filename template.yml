@@ -1,0 +1,25 @@
+metadataBlock:
+  - name: 
+    dataverseAlias: 
+    displayName: 
+datasetField:
+  - name:
+    title:
+    description:
+    watermark:
+    fieldType:
+    displayOrder:
+    displayFormat:
+    advancedSearchField:
+    allowControlledVocabulary:
+    allowmultiples:
+    facetable:
+    displayoncreate:
+    required:
+    parent:
+    metadatablock_id:
+controlledVocabulary:
+  - DatasetField:
+    Value:
+    identifier:
+    displayOrder:
