@@ -3,7 +3,7 @@
 https://guides.dataverse.org/en/latest/admin/metadatacustomization.html
 """
 #!/usr/bin/env python
-
+import click
 from yaml import load, CLoader
 
 permissible_keywords = ["metadataBlock", "datasetField", "controlledVocabulary"]
@@ -104,10 +104,12 @@ def validate_yaml(data, verbose):
         validate_entry(data[kw], kw, verbose)
 
 
-def main():
-    verbose = True
-    with open("tests/minimal_working_example.yml", "r") as yml_file:
-        # with open("tests/typo_in_key.yml", "r") as yml_file:
+
+@click.command()
+@click.argument("file_path")
+@click.option("--verbose", "-v", is_flag=True, help="Print performed checks to stdout.")
+def main(file_path,verbose):
+    with open(file_path, "r") as yml_file:
         data = load(yml_file.read(), Loader=CLoader)
     validate_yaml(data, verbose)
 
