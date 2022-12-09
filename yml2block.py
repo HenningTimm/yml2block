@@ -46,7 +46,7 @@ permissible_keys = {
         "required",
         "parent",
         "metadatablock_id",
-        "termURI"
+        "termURI",
     ],
     "controlledVocabulary": [
         "DatasetField",
@@ -58,8 +58,7 @@ permissible_keys = {
 
 
 def validate_keywords(keywords, verbose):
-    """Assure that the top-level keywords of the YAML file are well-behaved.
-    """
+    """Assure that the top-level keywords of the YAML file are well-behaved."""
     if verbose:
         print("Validating top-level keywords:", end=" ")
     # Prevent typos and additional entries
@@ -106,7 +105,6 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
 def write_metadata_block(yml_metadata, output_path, verbose):
     if verbose:
         print(f"Writing output file to: {output_path}")
-    
 
 
 def validate_yaml(data, verbose):
@@ -120,7 +118,9 @@ def validate_yaml(data, verbose):
 @click.command()
 @click.argument("file_path")
 @click.option("--verbose", "-v", is_flag=True, help="Print performed checks to stdout.")
-@click.option("--outfile", "-o", nargs=1, help="Path to where the output file will be written.")
+@click.option(
+    "--outfile", "-o", nargs=1, help="Path to where the output file will be written."
+)
 def main(file_path, verbose, outfile):
     if outfile is None:
         path, _ext = os.path.splitext(file_path)
@@ -133,8 +133,9 @@ def main(file_path, verbose, outfile):
         data = load(yml_file.read(), Loader=CLoader)
 
     validate_yaml(data, verbose)
-    
+
     write_metadata_block(data, outfile, verbose)
-    
+
+
 if __name__ == "__main__":
     main()
