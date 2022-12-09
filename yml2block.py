@@ -3,6 +3,7 @@
 https://guides.dataverse.org/en/latest/admin/metadatacustomization.html
 """
 #!/usr/bin/env python
+import os
 import click
 from yaml import load, CLoader
 
@@ -76,6 +77,10 @@ def validate_keywords(keywords, verbose):
 
 
 def validate_entry(yaml_chunk, tsv_keyword, verbose):
+    """Validate a record, based on its type.
+
+    Check that all required keys are there.
+    """
     if verbose:
         print(f"Validating entries for {tsv_keyword}:", end=" ")
 
@@ -98,21 +103,38 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
         print("SUCCESS!")
 
 
+def write_metadata_block(yml_metadata, output_path, verbose):
+    if verbose:
+        print(f"Writing output file to: {output_path}")
+    
+
+
 def validate_yaml(data, verbose):
     validate_keywords(data.keys(), verbose)
     for kw, content in data.items():
         validate_entry(data[kw], kw, verbose)
-
+    if verbose:
+        print("\nAll Checks passed!\n\n")
 
 
 @click.command()
 @click.argument("file_path")
 @click.option("--verbose", "-v", is_flag=True, help="Print performed checks to stdout.")
-def main(file_path,verbose):
+@click.option("--outfile", "-o", nargs=1, help="Path to where the output file will be written.")
+def main(file_path, verbose, outfile):
+    if outfile is None:
+        path, _ext = os.path.splitext(file_path)
+        outfile = f"{path}.tsv"
+
+    if verbose:
+        print(f"Checking input file: {file_path}\n\n")
+
     with open(file_path, "r") as yml_file:
         data = load(yml_file.read(), Loader=CLoader)
+
     validate_yaml(data, verbose)
-
-
+    
+    write_metadata_block(data, outfile, verbose)
+    
 if __name__ == "__main__":
     main()
