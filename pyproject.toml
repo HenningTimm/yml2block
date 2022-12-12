@@ -1,0 +1,34 @@
+[tool.poetry]
+name = "yml2block"
+version = "0.1.0"
+description = "Converts yaml files describing dataverse metadata blocks into tsv files understood by dataverse."
+license = "MIT"
+authors = [
+    "Henning Timm <henning.timm@tu-dortmund.de>"
+]
+repository = "https://github.com/HenningTimm/yml2block"
+readme = "README.md"
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Utilities",
+]
+packages = [
+    { include = "yml2block" },
+]
+
+[tool.poetry.scripts]
+yml2block = 'yml2block.yml2block:main'
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pyyaml = "^6.0"  # Earlier versions might work, but are untested.
+click = "^8.1"  # Earlier versions might work, but are untested.
