@@ -9,6 +9,16 @@ from yaml import load, CLoader
 
 permissible_keywords = ["metadataBlock", "datasetField", "controlledVocabulary"]
 
+
+def kw_order(kw):
+    """Provide the canonical sort order expected by dataverse.
+
+    Usage: `sorted(entries, key=kw_order)`
+    """
+    mdb_order = {key: i for i, key in enumerate(permissible_keywords)}
+    return mdb_order[k]
+
+
 required_keys = {
     "metadataBlock": ["name", "displayName"],
     "datasetField": [
