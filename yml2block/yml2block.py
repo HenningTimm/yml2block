@@ -1,15 +1,16 @@
-"""
+#!/usr/bin/env python
+"""This script converts a yaml definition of a dataverse metadata schema into
+a metadata block understood by dataverse.
 
 https://guides.dataverse.org/en/latest/admin/metadatacustomization.html
 """
-#!/usr/bin/env python
 import os
 import sys
 import click
 from yaml import load, CLoader
 
+# Note: The order of entries in this list defines the enforced order in the output file
 permissible_keywords = ["metadataBlock", "datasetField", "controlledVocabulary"]
-
 
 def kw_order(kw):
     """Provide the canonical sort order expected by dataverse.
@@ -69,7 +70,9 @@ permissible_keys = {
 
 
 def validate_keywords(keywords, verbose):
-    """Assure that the top-level keywords of the YAML file are well-behaved."""
+    """Assure that the top-level keywords of the YAML file are well-behaved.
+
+    Fail with an assertion if they do not comply."""
     if verbose:
         print("Validating top-level keywords:", end=" ")
     # Prevent typos and additional entries
@@ -90,6 +93,7 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
     """Validate a record, based on its type.
 
     Check that all required keys are there.
+    Fail with an assertion if a violation is detected.
     """
     if verbose:
         print(f"Validating entries for {tsv_keyword}:", end=" ")
@@ -114,6 +118,9 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
 
 
 def write_metadata_block(yml_metadata, output_path, verbose):
+    """Write a validated nested dictionary of yml_metadata into
+    a dataverse tsv metadata block file.
+    """
     if verbose:
         print(f"Writing output file to: {output_path}")
 
@@ -163,6 +170,9 @@ def write_metadata_block(yml_metadata, output_path, verbose):
 
 
 def validate_yaml(data, verbose):
+    """Check if the given yaml file is valid.
+    Underlying checks will fail with an assertion if they don't.
+    """
     validate_keywords(data.keys(), verbose)
     for kw, content in data.items():
         validate_entry(data[kw], kw, verbose)
