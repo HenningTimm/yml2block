@@ -12,6 +12,7 @@ from yaml import load, CLoader
 # Note: The order of entries in this list defines the enforced order in the output file
 permissible_keywords = ["metadataBlock", "datasetField", "controlledVocabulary"]
 
+
 def kw_order(kw):
     """Provide the canonical sort order expected by dataverse.
 
