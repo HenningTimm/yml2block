@@ -116,6 +116,50 @@ def write_metadata_block(yml_metadata, output_path, verbose):
     if verbose:
         print(f"Writing output file to: {output_path}")
 
+    with open(output_path, "w") as out_file:
+        for bn, content in yml_metadata.items():
+            block_name = f"#{bn}"
+            block_headers = []
+            block_lines = []
+
+            for block_line in content:
+                new_line = [""]
+
+                for key, value in block_line.items():
+                    if key not in block_headers:
+                        block_headers.append(key)
+
+                    # TODO: Consider screening for True, False, None
+                    # before and replace them.
+                    # TODO: This is an excellent contender to be replaced by a
+                    # Python 3.10 match statement.
+                    if value is True:
+                        # This catches all value that YAML considers truthy
+                        # and are `true`
+                        new_line.append("TRUE")
+                    elif value is False:
+                        # This catches all value that YAML considers truthy
+                        # and are `false`
+                        new_line.append("FALSE")
+                    elif value is None:
+                        # This catches empty values, which yaml reports
+                        # as a Python None
+                        new_line.append("")
+                    elif str(value):
+                        # This could be more specific using int() and float()
+                        # The conversion of `value` to a string happens to
+                        # catch `0` values, which evaluate to `False` under
+                        # the python `bool()` function.
+                        new_line.append(str(value))
+                    else:
+                        # This should never happend
+                        print(f"Invalid entry '{value}'", file=sys.stderr)
+                block_lines.append("\t".join(new_line))
+            block_header = "\t".join([block_name] + block_headers)
+
+            print(block_header, file=out_file)
+            print("\n".join(block_lines), file=out_file)
+
 
 def validate_yaml(data, verbose):
     validate_keywords(data.keys(), verbose)
