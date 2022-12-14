@@ -16,7 +16,7 @@ def kw_order(kw):
     Usage: `sorted(entries, key=kw_order)`
     """
     mdb_order = {key: i for i, key in enumerate(permissible_keywords)}
-    return mdb_order[k]
+    return mdb_order[kw]
 
 
 required_keys = {
