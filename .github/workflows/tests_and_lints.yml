@@ -11,15 +11,22 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - uses: psf/black@stable
+        with:
+          options: "--check --verbose"
+          src: "yml2block/"
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
+      - name: Install poetry
         run: |
           python -m pip install --upgrade pip
-          pip install black click pyyaml
-      - name: Lint with black
+          pip install poetry
+      - name: Install dependencies with poetry
         run: |
-          black --check --verbose .
+          poetry install
+      - name: Test that execution works
+        run: |
+          yml2block --help
           
