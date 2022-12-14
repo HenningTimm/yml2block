@@ -4,6 +4,7 @@ https://guides.dataverse.org/en/latest/admin/metadatacustomization.html
 """
 #!/usr/bin/env python
 import os
+import sys
 import click
 from yaml import load, CLoader
 
