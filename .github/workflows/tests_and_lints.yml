@@ -28,5 +28,5 @@ jobs:
           poetry install
       - name: Test that execution works
         run: |
-          ls -lah && yml2block --help
+          python yml2block/yml2block.py --help
           
