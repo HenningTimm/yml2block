@@ -140,8 +140,6 @@ def write_metadata_block(yml_metadata, output_path, verbose):
 
                     # TODO: Consider screening for True, False, None
                     # before and replace them.
-                    # TODO: This is an excellent contender to be replaced by a
-                    # Python 3.10 match statement.
                     if value is True:
                         # This catches all value that YAML considers truthy
                         # and are `true`
