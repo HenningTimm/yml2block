@@ -1,10 +1,11 @@
+---
 metadataBlock:
   - name: InvalidExample
-    dataverseAlias: 
+    dataverseAlias:
     displayName: Invalid
 datasetField:
   - name: Description
-    title: Description 
+    title: Description
     description: This field describes.
     watermark:
     fieldType: textbox
@@ -38,12 +39,12 @@ controlledVocabulary:
   - DatasetField: AnswerYes
     Value: "Yes"
     identifier: answer_positive
-    displayOrder: 
-  - DatasetField:  AnswerNo
+    displayOrder:
+  - DatasetField: AnswerNo
     Value: "No"
     identifier: answer_negative
     displayOrder:
-  - DatasetField:  AnswerMaybeSo
+  - DatasetField: AnswerMaybeSo
     Value: "Maybe"
     identifier: answer_unclear
     displayOrder:
