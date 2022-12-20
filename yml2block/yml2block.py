@@ -108,7 +108,9 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
     # Get these litsts once to prevent repeated dictionary accesses
     permissible = permissible_keys[tsv_keyword]
     required = required_keys[tsv_keyword]
-        
+
+    longest_row = 0
+
     if tsv_keyword in ["metadataBlock", "datasetField"]:
         if v := unique_names(yaml_chunk):
             violations.extend(v)
@@ -122,11 +124,17 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
             assert key in permissible, "Invalid key"
             assert not isinstance(value, dict), "Nested dictionaries are not allowed"
 
+        # Compute the highest number of columns in the block
+        row_length = len(item.keys()) if tsv_keyword == "metadataBlock" else len(item.keys()) + 1
+        longest_row = max(longest_row, row_length)
+
     if verbose and len(violations) == 0:
         print("SUCCESS!")
     if violations:
         print("FAILURE! Detected violations:")
         print("\n".join([str(v) for v in violations]))
+
+    return longest_row
 
 
 def write_metadata_block(yml_metadata, output_path, verbose):
@@ -151,8 +159,6 @@ def write_metadata_block(yml_metadata, output_path, verbose):
 
                     # TODO: Consider screening for True, False, None
                     # before and replace them.
-                    # TODO: This is an excellent contender to be replaced by a
-                    # Python 3.10 match statement.
                     if value is True:
                         # This catches all value that YAML considers truthy
                         # and are `true`
@@ -187,10 +193,13 @@ def validate_yaml(data, verbose):
     Underlying checks will fail with an assertion if they don't.
     """
     validate_keywords(data.keys(), verbose)
+    longest_row = 0
     for kw, content in data.items():
-        validate_entry(data[kw], kw, verbose)
+        block_row_max = validate_entry(data[kw], kw, verbose)
+        longest_row = max(longest_row, block_row_max)
     if verbose:
         print("\nAll Checks passed!\n\n")
+    return longest_row
 
 
 @click.command()
@@ -210,7 +219,7 @@ def main(file_path, verbose, outfile):
     with open(file_path, "r") as yml_file:
         data = load(yml_file.read(), Loader=CLoader)
 
-    validate_yaml(data, verbose)
+    print(f"Longest row has {validate_yaml(data, verbose)} columns")
 
     write_metadata_block(data, outfile, verbose)
 
