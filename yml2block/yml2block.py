@@ -9,67 +9,7 @@ import sys
 import click
 from yaml import load, CLoader
 
-from rules import unique_names, block_content_is_list
-
-# Note: The order of entries in this list defines the enforced order in the output file
-permissible_keywords = ["metadataBlock", "datasetField", "controlledVocabulary"]
-
-
-def kw_order(kw):
-    """Provide the canonical sort order expected by dataverse.
-
-    Usage: `sorted(entries, key=kw_order)`
-    """
-    mdb_order = {key: i for i, key in enumerate(permissible_keywords)}
-    return mdb_order[kw]
-
-
-required_keys = {
-    "metadataBlock": ["name", "displayName"],
-    "datasetField": [
-        "name",
-        "title",
-        "description",
-        "fieldType",
-        "displayOrder",
-        "advancedSearchField",
-        "allowControlledVocabulary",
-        "allowmultiples",
-        "facetable",
-        "displayoncreate",
-        "required",
-        "metadatablock_id",
-    ],
-    "controlledVocabulary": ["DatasetField", "Value"],
-}
-
-permissible_keys = {
-    "metadataBlock": ["name", "dataverseAlias", "displayName", "blockURI"],
-    "datasetField": [
-        "name",
-        "title",
-        "description",
-        "watermark",
-        "fieldType",
-        "displayOrder",
-        "displayFormat",
-        "advancedSearchField",
-        "allowControlledVocabulary",
-        "allowmultiples",
-        "facetable",
-        "displayoncreate",
-        "required",
-        "parent",
-        "metadatablock_id",
-        "termURI",
-    ],
-    "controlledVocabulary": [
-        "DatasetField",
-        "Value",
-        "identifier",
-        "displayOrder",
-    ],
-}
+import rules
 
 
 def validate_keywords(keywords, verbose):
@@ -102,19 +42,19 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
         print(f"Validating entries for {tsv_keyword}:", end=" ")
 
     violations = []
-    for lint in (block_content_is_list,):
+    for lint in (rules.block_content_is_list,):
         violations.extend(lint(yaml_chunk))
 
     # Get these litsts once to prevent repeated dictionary accesses
-    permissible = permissible_keys[tsv_keyword]
-    required = required_keys[tsv_keyword]
+    permissible = rules.permissible_keys[tsv_keyword]
+    required = rules.required_keys[tsv_keyword]
 
     longest_row = 0
 
     if tsv_keyword in ["metadataBlock", "datasetField"]:
-        if v := unique_names(yaml_chunk):
+        if v := rules.unique_names(yaml_chunk):
             violations.extend(v)
-    
+
     for item in yaml_chunk:
         found_keys = item.keys()
         # Assure all required keys are there

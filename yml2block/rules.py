@@ -2,6 +2,68 @@
 """
 from collections import Counter
 
+
+# Note: The order of entries in this list defines the enforced order in the output file
+# Note: These are referred to as top-level keywords.
+permissible_keywords = ["metadataBlock", "datasetField", "controlledVocabulary"]
+
+required_keys = {
+    "metadataBlock": ["name", "displayName"],
+    "datasetField": [
+        "name",
+        "title",
+        "description",
+        "fieldType",
+        "displayOrder",
+        "advancedSearchField",
+        "allowControlledVocabulary",
+        "allowmultiples",
+        "facetable",
+        "displayoncreate",
+        "required",
+        "metadatablock_id",
+    ],
+    "controlledVocabulary": ["DatasetField", "Value"],
+}
+
+permissible_keys = {
+    "metadataBlock": ["name", "dataverseAlias", "displayName", "blockURI"],
+    "datasetField": [
+        "name",
+        "title",
+        "description",
+        "watermark",
+        "fieldType",
+        "displayOrder",
+        "displayFormat",
+        "advancedSearchField",
+        "allowControlledVocabulary",
+        "allowmultiples",
+        "facetable",
+        "displayoncreate",
+        "required",
+        "parent",
+        "metadatablock_id",
+        "termURI",
+    ],
+    "controlledVocabulary": [
+        "DatasetField",
+        "Value",
+        "identifier",
+        "displayOrder",
+    ],
+}
+
+
+def kw_order(kw):
+    """Provide the canonical sort order expected by dataverse.
+
+    Usage: `sorted(entries, key=kw_order)`
+    """
+    mdb_order = {key: i for i, key in enumerate(permissible_keywords)}
+    return mdb_order[kw]
+
+
 class LintViolation:
     def __init__(self, level, rule, message):
         self.level = level
