@@ -19,17 +19,19 @@ def validate_keywords(keywords, verbose):
     if verbose:
         print("Validating top-level keywords:", end=" ")
     # Prevent typos and additional entries
-    assert all(kw in permissible_keywords for kw in keywords), "Invalid key"
+    violations = []
+    for lint in [
+        rules.top_level_keywords_valid,
+        rules.top_level_keywords_unique,
+        rules.top_level_keywords_complete,
+    ]:
+        violations.extend(lint(keywords))
 
-    unique_keys = set(keywords)
-    # Prevent duplicate entries
-    assert len(unique_keys) == len(keywords), "Duplicate key"
-    # Assure all entries are set
-    # NOTE: This can be relaxed later to >0 and <=3 if we
-    # are willing to skip over empty entries
-    assert len(unique_keys) == 3, "Missing key"
-    if verbose:
+    if verbose and len(violations) == 0:
         print("SUCCESS!")
+    if violations:
+        print("FAILURE! Detected violations:")
+        print("\n".join([str(v) for v in violations]))
 
 
 def validate_entry(yaml_chunk, tsv_keyword, verbose):

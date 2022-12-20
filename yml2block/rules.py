@@ -106,4 +106,72 @@ def block_content_is_list(yaml_chunk):
     if isinstance(yaml_chunk, list):
         return []
     else:
-        return [LintViolation("ERROR", "block_content_is_list", "Entry is not a list",)]
+        return [
+            LintViolation(
+                "ERROR",
+                "block_content_is_list",
+                "Entry is not a list",
+            )
+        ]
+
+
+def top_level_keywords_valid(keywords):
+    """Make sure that the top-level keywords are spelled correctly and no additonal
+    ones are present.
+
+    top-level keyword level lint
+    """
+    if all(kw in permissible_keywords for kw in keywords):
+        return []
+    else:
+        [
+            LintViolation(
+                "ERROR",
+                "top_level_keywords_valid",
+                f"Keyword list {keywords} differs from {permissible_keywords}",
+            )
+        ]
+
+
+def top_level_keywords_unique(keywords):
+    """Make sure no keyword is specified twice.
+
+    NOTE: This is most likely also enforced by the YAML parser,
+    but adds an additional layer of security here.
+
+    top-level keyword level lint
+    """
+    unique_keys = set(keywords)
+    if len(unique_keys) == len(keywords):
+        return []
+    else:
+        return [
+            LintViolation(
+                "ERROR",
+                "top_level_keywords_unique",
+                f"Keyword list {keywords} contains duplicate keys.",
+            )
+        ]
+
+
+def top_level_keywords_complete(keywords):
+    """Make sure all required top-level keywords are present.
+
+    top-level keyword level lint
+    """
+    unique_keys = set(keywords)
+    # NOTE: This can be relaxed later to >0 and <=3 or to a membership test
+    # if we are willing to skip over empty entries.
+    # It can probably be merged with top_level_keywords_valid since only two
+    # combinations ("metadataBlock"+"datasetField"+"controlledVocabulary" and
+    # "metadataBlock"+"datasetField") are valid. But we need to verify this first.
+    if len(unique_keys) == 3:
+        return []
+    else:
+        return [
+            LintViolation(
+                "ERROR",
+                "top_level_keywords_complete",
+                f"Keyword list {keywords} does not contain enough entries.",
+            )
+        ]
