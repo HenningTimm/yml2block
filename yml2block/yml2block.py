@@ -9,6 +9,8 @@ import sys
 import click
 from yaml import load, CLoader
 
+from rules import unique_names, block_content_is_list
+
 # Note: The order of entries in this list defines the enforced order in the output file
 permissible_keywords = ["metadataBlock", "datasetField", "controlledVocabulary"]
 
@@ -99,12 +101,18 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
     if verbose:
         print(f"Validating entries for {tsv_keyword}:", end=" ")
 
-    assert isinstance(yaml_chunk, list), "Entry is not a list"
+    violations = []
+    for lint in (block_content_is_list,):
+        violations.extend(lint(yaml_chunk))
 
     # Get these litsts once to prevent repeated dictionary accesses
     permissible = permissible_keys[tsv_keyword]
     required = required_keys[tsv_keyword]
-
+        
+    if tsv_keyword in ["metadataBlock", "datasetField"]:
+        if v := unique_names(yaml_chunk):
+            violations.extend(v)
+    
     for item in yaml_chunk:
         found_keys = item.keys()
         # Assure all required keys are there
@@ -114,8 +122,11 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
             assert key in permissible, "Invalid key"
             assert not isinstance(value, dict), "Nested dictionaries are not allowed"
 
-    if verbose:
+    if verbose and len(violations) == 0:
         print("SUCCESS!")
+    if violations:
+        print("FAILURE! Detected violations:")
+        print("\n".join([str(v) for v in violations]))
 
 
 def write_metadata_block(yml_metadata, output_path, verbose):
