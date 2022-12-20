@@ -67,7 +67,9 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
             assert not isinstance(value, dict), "Nested dictionaries are not allowed"
 
         # Compute the highest number of columns in the block
-        row_length = len(item.keys()) if tsv_keyword == "metadataBlock" else len(item.keys()) + 1
+        row_length = (
+            len(item.keys()) if tsv_keyword == "metadataBlock" else len(item.keys()) + 1
+        )
         longest_row = max(longest_row, row_length)
 
     if verbose and len(violations) == 0:
