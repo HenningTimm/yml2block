@@ -16,19 +16,23 @@ def validate_keywords(keywords, verbose):
     """Assure that the top-level keywords of the YAML file are well-behaved.
 
     Fail with an assertion if they do not comply."""
-    if verbose:
+    if verbose == 1:
         print("Validating top-level keywords:", end=" ")
-    # Prevent typos and additional entries
+    elif verbose >= 2:
+        print(f"Validating top-level keywords:\n{keywords}")
+
     violations = []
     for lint in [
         rules.top_level_keywords_valid,
         rules.top_level_keywords_unique,
         rules.top_level_keywords_complete,
     ]:
+        if verbose >= 2:
+            print(f"Running lint: {lint.__name__}")
         violations.extend(lint(keywords))
 
     if verbose and len(violations) == 0:
-        print("SUCCESS!")
+        print("SUCCESS!" if verbose == 1 else "SUCCESS!\n")
     if violations:
         print("FAILURE! Detected violations:")
         print("\n".join([str(v) for v in violations]))
@@ -40,8 +44,10 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
     Check that all required keys are there.
     Fail with an assertion if a violation is detected.
     """
-    if verbose:
+    if verbose == 1:
         print(f"Validating entries for {tsv_keyword}:", end=" ")
+    elif verbose >= 2:
+        print(f"Validating entries for {tsv_keyword}:\n{yaml_chunk}")
 
     violations = []
     for lint in (rules.block_content_is_list,):
@@ -73,7 +79,7 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
         longest_row = max(longest_row, row_length)
 
     if verbose and len(violations) == 0:
-        print("SUCCESS!")
+        print("SUCCESS!" if verbose == 1 else "SUCCESS!\n")
     if violations:
         print("FAILURE! Detected violations:")
         print("\n".join([str(v) for v in violations]))
@@ -148,11 +154,12 @@ def validate_yaml(data, verbose):
 
 @click.command()
 @click.argument("file_path")
-@click.option("--verbose", "-v", is_flag=True, help="Print performed checks to stdout.")
+@click.option("--verbose", "-v", count=True, help="Print performed checks to stdout.")
 @click.option(
     "--outfile", "-o", nargs=1, help="Path to where the output file will be written."
 )
 def main(file_path, verbose, outfile):
+
     if outfile is None:
         path, _ext = os.path.splitext(file_path)
         outfile = f"{path}.tsv"
