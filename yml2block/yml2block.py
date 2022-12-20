@@ -171,6 +171,7 @@ def write_metadata_block(yml_metadata, output_path, verbose):
                     else:
                         # This should never happend
                         print(f"Invalid entry '{value}'", file=sys.stderr)
+                # TODO: Pad new lines to longest column
                 block_lines.append("\t".join(new_line))
             block_header = "\t".join([block_name] + block_headers)
 
