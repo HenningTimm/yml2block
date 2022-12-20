@@ -105,6 +105,8 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
     permissible = permissible_keys[tsv_keyword]
     required = required_keys[tsv_keyword]
 
+    longest_row = 0
+
     for item in yaml_chunk:
         found_keys = item.keys()
         # Assure all required keys are there
@@ -114,8 +116,14 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
             assert key in permissible, "Invalid key"
             assert not isinstance(value, dict), "Nested dictionaries are not allowed"
 
+        # Compute the highest number of columns in the block
+        row_length = len(item.keys()) if tsv_keyword == "metadataBlock" else len(item.keys()) + 1
+        longest_row = max(longest_row, row_length)
+
     if verbose:
         print("SUCCESS!")
+
+    return longest_row
 
 
 def write_metadata_block(yml_metadata, output_path, verbose):
@@ -124,6 +132,8 @@ def write_metadata_block(yml_metadata, output_path, verbose):
     """
     if verbose:
         print(f"Writing output file to: {output_path}")
+
+
 
     with open(output_path, "w") as out_file:
         for bn, content in yml_metadata.items():
@@ -173,10 +183,13 @@ def validate_yaml(data, verbose):
     Underlying checks will fail with an assertion if they don't.
     """
     validate_keywords(data.keys(), verbose)
+    longest_row = 0
     for kw, content in data.items():
-        validate_entry(data[kw], kw, verbose)
+        block_row_max = validate_entry(data[kw], kw, verbose)
+        longest_row = max(longest_row, block_row_max)
     if verbose:
         print("\nAll Checks passed!\n\n")
+    return longest_row
 
 
 @click.command()
@@ -196,7 +209,7 @@ def main(file_path, verbose, outfile):
     with open(file_path, "r") as yml_file:
         data = load(yml_file.read(), Loader=CLoader)
 
-    validate_yaml(data, verbose)
+    print(f"Longest row has {validate_yaml(data, verbose)} columns")
 
     write_metadata_block(data, outfile, verbose)
 
