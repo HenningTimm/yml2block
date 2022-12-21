@@ -175,3 +175,60 @@ def top_level_keywords_complete(keywords):
                 f"Keyword list {keywords} does not contain enough entries.",
             )
         ]
+
+
+def required_keys_present(list_item, tsv_keyword):
+    """Make sure the keywords required for the current top-level item are present.
+
+    second-level list entry lint
+    """
+    found_keys = list_item.keys()
+    required = required_keys[tsv_keyword]
+    # Assure all required keys are there
+    if len(set(required) - set(found_keys)) == 0:
+        return []
+    else:
+        return [
+            LintViolation(
+                "ERROR",
+                "required_keys_present",
+                f"List of required keys {required} and found keys {found_keys} differ.",
+            )
+        ]
+
+
+def no_invalid_keys_present(list_item, tsv_keyword):
+    """Make sure no invalid keys are present.
+
+    second-level list entry lint
+    """
+    permissible = permissible_keys[tsv_keyword]
+    violations = []
+    for (key, value) in list_item.items():
+        if key not in permissible:
+            violations.append(
+                LintViolation(
+                    "ERROR",
+                    "no_invalid_keys_present",
+                    f"Invalid key {key} present in block {tsv_keyword}.",
+                )
+            )
+    return violations
+
+
+def no_substructures_present(list_item, tsv_keyword):
+    """Make sure list items do not contain dicts, tuples lists etc.
+
+    second-level list entry lint
+    """
+    violations = []
+    for (key, value) in item.items():
+        if type(value) in (dict, tuple, list):
+            violations.append(
+                LintViolation(
+                    "ERROR",
+                    "no_substructures_present",
+                    f"Key {key} in block {tsv_keyword} has a subtructure of type {type(value)}. Only strings, booleans, an numericals are allowed here.",
+                )
+            )
+    return violations

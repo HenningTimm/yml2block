@@ -41,8 +41,8 @@ def validate_keywords(keywords, verbose):
 def validate_entry(yaml_chunk, tsv_keyword, verbose):
     """Validate a record, based on its type.
 
-    Check that all required keys are there.
-    Fail with an assertion if a violation is detected.
+    Perform second level list item lints.
+    Return a list of errors if violations are detected.
     """
     if verbose == 1:
         print(f"Validating entries for {tsv_keyword}:", end=" ")
@@ -53,10 +53,6 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
     for lint in (rules.block_content_is_list,):
         violations.extend(lint(yaml_chunk))
 
-    # Get these litsts once to prevent repeated dictionary accesses
-    permissible = rules.permissible_keys[tsv_keyword]
-    required = rules.required_keys[tsv_keyword]
-
     longest_row = 0
 
     if tsv_keyword in ["metadataBlock", "datasetField"]:
@@ -64,13 +60,14 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
             violations.extend(v)
 
     for item in yaml_chunk:
-        found_keys = item.keys()
-        # Assure all required keys are there
-        assert len(set(required) - set(found_keys)) == 0, "Missing required key"
-
-        for (key, value) in item.items():
-            assert key in permissible, "Invalid key"
-            assert not isinstance(value, dict), "Nested dictionaries are not allowed"
+        for lint in (
+            rules.required_keys_present,
+            rules.no_invalid_keys_present,
+            rules.no_substructures_present,
+        ):
+            if verbose >= 2:
+                print(f"Running lint: {lint.__name__}")
+            violations.extend(lint(item, tsv_keyword))
 
         # Compute the highest number of columns in the block
         row_length = (
@@ -140,7 +137,7 @@ def write_metadata_block(yml_metadata, output_path, verbose):
 
 def validate_yaml(data, verbose):
     """Check if the given yaml file is valid.
-    Underlying checks will fail with an assertion if they don't.
+    Underlying checks will return lists of LintViolations if they don't.
     """
     validate_keywords(data.keys(), verbose)
     longest_row = 0
