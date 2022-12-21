@@ -80,7 +80,7 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
         print("FAILURE! Detected violations:")
         print("\n".join([str(v) for v in violations]))
 
-    return longest_row
+    return violations, longest_row
 
 
 def write_metadata_block(yml_metadata, output_path, verbose):
@@ -140,12 +140,14 @@ def validate_yaml(data, verbose):
     """
     validate_keywords(data.keys(), verbose)
     longest_row = 0
+    violations = []
     for kw, content in data.items():
-        block_row_max = validate_entry(data[kw], kw, verbose)
+        block_violations, block_row_max = validate_entry(data[kw], kw, verbose)
+        violations.extend(block_violations)
         longest_row = max(longest_row, block_row_max)
     if verbose:
         print("\nAll Checks passed!\n\n")
-    return longest_row
+    return violations, longest_row
 
 
 @click.command()
@@ -166,10 +168,15 @@ def main(file_path, verbose, outfile):
     with open(file_path, "r") as yml_file:
         data = load(yml_file.read(), Loader=CLoader)
 
-    print(f"Longest row has {validate_yaml(data, verbose)} columns")
+    violations, longest_row = validate_yaml(data, verbose)
+    if verbose >= 2:
+        print(f"Longest row has {longest_row} columns")
 
-    write_metadata_block(data, outfile, verbose)
-
+    if len(violations) == 0:
+        write_metadata_block(data, outfile, verbose)
+    else:
+        print(f"A total of {len(violations)} lint(s) failed.")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
