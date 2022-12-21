@@ -50,12 +50,12 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
         print(f"Validating entries for {tsv_keyword}:\n{yaml_chunk}")
 
     violations = []
-    for lint in (rules.block_content_is_list, ):
+    for lint in (rules.block_content_is_list,):
         violations.extend(lint(yaml_chunk))
 
     longest_row = 0
 
-    for lint in (rules.unique_names, ):
+    for lint in (rules.unique_names,):
         violations.extend(lint(yaml_chunk, tsv_keyword))
 
     for item in yaml_chunk:
@@ -156,7 +156,11 @@ def validate_yaml(data, verbose):
 @click.option(
     "--outfile", "-o", nargs=1, help="Path to where the output file will be written."
 )
-@click.option("--check", is_flag=True, help="Only check the yaml file and do not write any output.")
+@click.option(
+    "--check",
+    is_flag=True,
+    help="Only check the yaml file and do not write any output.",
+)
 def main(file_path, verbose, outfile, check):
 
     if outfile is None:
@@ -181,6 +185,7 @@ def main(file_path, verbose, outfile, check):
     else:
         print(f"A total of {len(violations)} lint(s) failed.")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
