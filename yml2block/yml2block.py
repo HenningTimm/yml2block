@@ -50,14 +50,13 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
         print(f"Validating entries for {tsv_keyword}:\n{yaml_chunk}")
 
     violations = []
-    for lint in (rules.block_content_is_list,):
+    for lint in (rules.block_content_is_list, ):
         violations.extend(lint(yaml_chunk))
 
     longest_row = 0
 
-    if tsv_keyword in ["metadataBlock", "datasetField"]:
-        if v := rules.unique_names(yaml_chunk):
-            violations.extend(v)
+    for lint in (rules.unique_names, ):
+        violations.extend(lint(yaml_chunk, tsv_keyword))
 
     for item in yaml_chunk:
         for lint in (

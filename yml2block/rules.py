@@ -77,11 +77,13 @@ class LintViolation:
         return self.__repr__()
 
 
-def unique_names(yaml_chunk):
+def unique_names(yaml_chunk, tsv_keyword):
     """Make sure that each name in the block is only used once.
 
     block content level lint
     """
+    if tsv_keyword not in ["metadataBlock", "datasetField"]:
+        return []
     names = Counter()
     for item in yaml_chunk:
         names.update([item["name"]])
@@ -222,7 +224,7 @@ def no_substructures_present(list_item, tsv_keyword):
     second-level list entry lint
     """
     violations = []
-    for (key, value) in item.items():
+    for (key, value) in list_item.items():
         if type(value) in (dict, tuple, list):
             violations.append(
                 LintViolation(
