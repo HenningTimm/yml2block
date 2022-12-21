@@ -156,7 +156,8 @@ def validate_yaml(data, verbose):
 @click.option(
     "--outfile", "-o", nargs=1, help="Path to where the output file will be written."
 )
-def main(file_path, verbose, outfile):
+@click.option("--check", is_flag=True, help="Only check the yaml file and do not write any output.")
+def main(file_path, verbose, outfile, check):
 
     if outfile is None:
         path, _ext = os.path.splitext(file_path)
@@ -172,7 +173,7 @@ def main(file_path, verbose, outfile):
     if verbose >= 2:
         print(f"Longest row has {longest_row} columns")
 
-    if len(violations) == 0:
+    if len(violations) == 0 and not check:
         write_metadata_block(data, outfile, verbose)
     else:
         print(f"A total of {len(violations)} lint(s) failed.")
