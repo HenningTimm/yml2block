@@ -146,7 +146,7 @@ def validate_yaml(data, verbose):
         violations.extend(block_violations)
         longest_row = max(longest_row, block_row_max)
     if verbose:
-        print("\nAll Checks passed!\n\n")
+        print("\nAll block-level checks passed!\n\n")
     return violations, longest_row
 
 
@@ -173,8 +173,11 @@ def main(file_path, verbose, outfile, check):
     if verbose >= 2:
         print(f"Longest row has {longest_row} columns")
 
-    if len(violations) == 0 and not check:
-        write_metadata_block(data, outfile, verbose)
+    if len(violations) == 0:
+        if verbose:
+            print("All checks passed!")
+        if not check:
+            write_metadata_block(data, outfile, verbose)
     else:
         print(f"A total of {len(violations)} lint(s) failed.")
         sys.exit(1)
