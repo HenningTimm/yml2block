@@ -62,7 +62,13 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
         permissible = rules.permissible_keys[tsv_keyword]
         required = rules.required_keys[tsv_keyword]
     except KeyError:
-        return 0, [rules.LintViolation("ERROR", "entry_invalid_keyword", f"Cannot check entry for keyword '{tsv_keyword}'. Skipping entry.")]
+        return 0, [
+            rules.LintViolation(
+                "ERROR",
+                "entry_invalid_keyword",
+                f"Cannot check entry for keyword '{tsv_keyword}'. Skipping entry.",
+            )
+        ]
 
     longest_row = 0
 
@@ -147,7 +153,9 @@ def write_metadata_block(yml_metadata, output_path, longest_line, verbose):
             block_header_fragments = [block_name] + block_headers
             # Pad header to longest column
             if len(block_header_fragments) < longest_line:
-                block_header_fragments.extend([""] * (longest_line - len(block_header_fragments)))
+                block_header_fragments.extend(
+                    [""] * (longest_line - len(block_header_fragments))
+                )
             block_header = "\t".join(block_header_fragments)
 
             print(block_header, file=out_file)
