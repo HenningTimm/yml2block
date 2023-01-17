@@ -55,9 +55,11 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
         violations.extend(lint(yaml_chunk))
 
     # Get these lists once to prevent repeated dictionary accesses
-    print(rules.permissible_keys)
-    permissible = rules.permissible_keys[tsv_keyword]
-    required = rules.required_keys[tsv_keyword]
+    try:
+        permissible = rules.permissible_keys[tsv_keyword]
+        required = rules.required_keys[tsv_keyword]
+    except KeyError:
+        return 0, [rules.LintViolation("ERROR", "entry_invalid_keyword", f"Cannot check entry for keyword '{tsv_keyword}'. Skipping entry.")]
 
     longest_row = 0
 
