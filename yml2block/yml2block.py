@@ -37,6 +37,9 @@ def validate_keywords(keywords, verbose):
     if violations:
         print("FAILURE! Detected violations:")
         print("\n".join([str(v) for v in violations]))
+        return violations
+    else:
+        return []
 
 
 def validate_entry(yaml_chunk, tsv_keyword, verbose):
@@ -84,11 +87,11 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
 
     if verbose and len(violations) == 0:
         print("SUCCESS!" if verbose == 1 else "SUCCESS!\n")
-    if violations:
+    if verbose and violations:
         print("FAILURE! Detected violations:")
         print("\n".join([str(v) for v in violations]))
 
-    return longest_row
+    return longest_row, violations
 
 
 def write_metadata_block(yml_metadata, output_path, longest_line, verbose):
@@ -155,14 +158,14 @@ def validate_yaml(data, verbose):
     """Check if the given yaml file is valid.
     Underlying checks will fail with an assertion if they don't.
     """
-    validate_keywords(data.keys(), verbose)
+    violations = validate_keywords(data.keys(), verbose)
     longest_row = 0
     for kw, content in data.items():
-        block_row_max = validate_entry(data[kw], kw, verbose)
+        block_row_max, entry_violations = validate_entry(data[kw], kw, verbose)
+        violations.extend(entry_violations)
         longest_row = max(longest_row, block_row_max)
-    if verbose:
-        print("\nAll Checks passed!\n\n")
-    return longest_row
+
+    return longest_row, violations
 
 
 @click.command()
@@ -183,9 +186,18 @@ def main(file_path, verbose, outfile):
     with open(file_path, "r") as yml_file:
         data = load(yml_file.read(), Loader=CLoader)
 
-    print(f"Longest row has {validate_yaml(data, verbose)} columns")
+    longest_row, lint_violations = validate_yaml(data, verbose)
 
-    write_metadata_block(data, outfile, verbose)
+    if len(lint_violations) == 0:
+        if verbose:
+            print("\nAll Checks passed!\n\n")
+        write_metadata_block(data, outfile, longest_row, verbose)
+    else:
+        print(f"\n{len(lint_violations)} errors occurred\n\n")
+        for violation in lint_violations:
+            print(violation)
+        print("Errors detected. Could not convert to TSV.")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
