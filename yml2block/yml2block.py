@@ -91,7 +91,7 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
     return longest_row
 
 
-def write_metadata_block(yml_metadata, output_path, verbose):
+def write_metadata_block(yml_metadata, output_path, longest_line, verbose):
     """Write a validated nested dictionary of yml_metadata into
     a dataverse tsv metadata block file.
     """
@@ -134,9 +134,18 @@ def write_metadata_block(yml_metadata, output_path, verbose):
                     else:
                         # This should never happend
                         print(f"Invalid entry '{value}'", file=sys.stderr)
-                # TODO: Pad new lines to longest column
+
+                # Pad new lines to longest column
+                if len(new_line) < longest_line:
+                    new_line.extend([""] * (longest_line - len(new_line)))
+
                 block_lines.append("\t".join(new_line))
-            block_header = "\t".join([block_name] + block_headers)
+
+            block_header_fragments = [block_name] + block_headers
+            # Pad header to longest column
+            if len(block_header_fragments) < longest_line:
+                block_header_fragments.extend([""] * (longest_line - len(block_header_fragments)))
+            block_header = "\t".join(block_header_fragments)
 
             print(block_header, file=out_file)
             print("\n".join(block_lines), file=out_file)
