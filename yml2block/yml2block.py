@@ -29,7 +29,9 @@ def validate_keywords(keywords, verbose):
     ]:
         if verbose >= 2:
             print(f"Running lint: {lint.__name__}")
-        violations.extend(lint(keywords))
+
+        if lint_results := lint(keywords):
+            violations.extend(lint_results)
 
     if verbose and len(violations) == 0:
         print("SUCCESS!" if verbose == 1 else "SUCCESS!\n")
