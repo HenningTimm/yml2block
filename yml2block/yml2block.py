@@ -9,131 +9,90 @@ import sys
 import click
 from yaml import load, CLoader
 
-# Note: The order of entries in this list defines the enforced order in the output file
-permissible_keywords = ["metadataBlock", "datasetField", "controlledVocabulary"]
-
-
-def kw_order(kw):
-    """Provide the canonical sort order expected by dataverse.
-
-    Usage: `sorted(entries, key=kw_order)`
-    """
-    mdb_order = {key: i for i, key in enumerate(permissible_keywords)}
-    return mdb_order[kw]
-
-
-required_keys = {
-    "metadataBlock": ["name", "displayName"],
-    "datasetField": [
-        "name",
-        "title",
-        "description",
-        "fieldType",
-        "displayOrder",
-        "advancedSearchField",
-        "allowControlledVocabulary",
-        "allowmultiples",
-        "facetable",
-        "displayoncreate",
-        "required",
-        "metadatablock_id",
-    ],
-    "controlledVocabulary": ["DatasetField", "Value"],
-}
-
-permissible_keys = {
-    "metadataBlock": ["name", "dataverseAlias", "displayName", "blockURI"],
-    "datasetField": [
-        "name",
-        "title",
-        "description",
-        "watermark",
-        "fieldType",
-        "displayOrder",
-        "displayFormat",
-        "advancedSearchField",
-        "allowControlledVocabulary",
-        "allowmultiples",
-        "facetable",
-        "displayoncreate",
-        "required",
-        "parent",
-        "metadatablock_id",
-        "termURI",
-    ],
-    "controlledVocabulary": [
-        "DatasetField",
-        "Value",
-        "identifier",
-        "displayOrder",
-    ],
-}
+import rules
 
 
 def validate_keywords(keywords, verbose):
     """Assure that the top-level keywords of the YAML file are well-behaved.
 
     Fail with an assertion if they do not comply."""
-    if verbose:
+    if verbose == 1:
         print("Validating top-level keywords:", end=" ")
-    # Prevent typos and additional entries
-    assert all(kw in permissible_keywords for kw in keywords), "Invalid key"
+    elif verbose >= 2:
+        print(f"Validating top-level keywords:\n{keywords}")
 
-    unique_keys = set(keywords)
-    # Prevent duplicate entries
-    assert len(unique_keys) == len(keywords), "Duplicate key"
-    # Assure all entries are set
-    # NOTE: This can be relaxed later to >0 and <=3 if we
-    # are willing to skip over empty entries
-    assert len(unique_keys) == 3, "Missing key"
-    if verbose:
-        print("SUCCESS!")
+    violations = []
+    for lint in [
+        rules.top_level_keywords_valid,
+        rules.top_level_keywords_unique,
+        rules.top_level_keywords_complete,
+    ]:
+        if verbose >= 2:
+            print(f"Running lint: {lint.__name__}")
+
+        violations.extend(lint(keywords))
+
+    if verbose and len(violations) == 0:
+        print("SUCCESS!" if verbose == 1 else "SUCCESS!\n")
+    if violations:
+        print("FAILURE! Detected violations:")
+        print("\n".join([str(v) for v in violations]))
+        return violations
+    else:
+        return []
 
 
 def validate_entry(yaml_chunk, tsv_keyword, verbose):
     """Validate a record, based on its type.
 
-    Check that all required keys are there.
-    Fail with an assertion if a violation is detected.
+    Perform second level list item lints.
+    Return a list of errors if violations are detected.
     """
-    if verbose:
+    if verbose == 1:
         print(f"Validating entries for {tsv_keyword}:", end=" ")
+    elif verbose >= 2:
+        print(f"Validating entries for {tsv_keyword}:\n{yaml_chunk}")
 
-    assert isinstance(yaml_chunk, list), "Entry is not a list"
-
-    # Get these litsts once to prevent repeated dictionary accesses
-    permissible = permissible_keys[tsv_keyword]
-    required = required_keys[tsv_keyword]
+    violations = []
+    for lint in (rules.block_content_is_list,):
+        violations.extend(lint(yaml_chunk))
 
     longest_row = 0
 
-    for item in yaml_chunk:
-        found_keys = item.keys()
-        # Assure all required keys are there
-        assert len(set(required) - set(found_keys)) == 0, "Missing required key"
+    for lint in (rules.unique_names,):
+        violations.extend(lint(yaml_chunk, tsv_keyword))
 
-        for (key, value) in item.items():
-            assert key in permissible, "Invalid key"
-            assert not isinstance(value, dict), "Nested dictionaries are not allowed"
+    for item in yaml_chunk:
+        for lint in (
+            rules.required_keys_present,
+            rules.no_invalid_keys_present,
+            rules.no_substructures_present,
+        ):
+            if verbose >= 2:
+                print(f"Running lint: {lint.__name__}")
+            violations.extend(lint(item, tsv_keyword))
 
         # Compute the highest number of columns in the block
-        row_length = len(item.keys()) if tsv_keyword == "metadataBlock" else len(item.keys()) + 1
+        row_length = (
+            len(item.keys()) if tsv_keyword == "metadataBlock" else len(item.keys()) + 1
+        )
         longest_row = max(longest_row, row_length)
 
-    if verbose:
-        print("SUCCESS!")
+    if verbose and len(violations) == 0:
+        print("SUCCESS!" if verbose == 1 else "SUCCESS!\n")
+    if verbose and violations:
+        print("FAILURE! Detected violations:")
+        print("\n".join([str(v) for v in violations]))
 
-    return longest_row
+    return longest_row, violations
 
 
-def write_metadata_block(yml_metadata, output_path, verbose):
+def write_metadata_block(yml_metadata, output_path, longest_line, verbose):
     """Write a validated nested dictionary of yml_metadata into
     a dataverse tsv metadata block file.
     """
     if verbose:
         print(f"Writing output file to: {output_path}")
-
-
 
     with open(output_path, "w") as out_file:
         for bn, content in yml_metadata.items():
@@ -171,9 +130,20 @@ def write_metadata_block(yml_metadata, output_path, verbose):
                     else:
                         # This should never happend
                         print(f"Invalid entry '{value}'", file=sys.stderr)
-                # TODO: Pad new lines to longest column
+
+                # Pad new lines to longest column
+                if len(new_line) < longest_line:
+                    new_line.extend([""] * (longest_line - len(new_line)))
+
                 block_lines.append("\t".join(new_line))
-            block_header = "\t".join([block_name] + block_headers)
+
+            block_header_fragments = [block_name] + block_headers
+            # Pad header to longest column
+            if len(block_header_fragments) < longest_line:
+                block_header_fragments.extend(
+                    [""] * (longest_line - len(block_header_fragments))
+                )
+            block_header = "\t".join(block_header_fragments)
 
             print(block_header, file=out_file)
             print("\n".join(block_lines), file=out_file)
@@ -181,25 +151,31 @@ def write_metadata_block(yml_metadata, output_path, verbose):
 
 def validate_yaml(data, verbose):
     """Check if the given yaml file is valid.
-    Underlying checks will fail with an assertion if they don't.
+    Underlying checks will return lists of LintViolations if they don't.
     """
-    validate_keywords(data.keys(), verbose)
+    violations = validate_keywords(data.keys(), verbose)
     longest_row = 0
     for kw, content in data.items():
-        block_row_max = validate_entry(data[kw], kw, verbose)
+        block_row_max, entry_violations = validate_entry(data[kw], kw, verbose)
+        violations.extend(entry_violations)
         longest_row = max(longest_row, block_row_max)
-    if verbose:
-        print("\nAll Checks passed!\n\n")
-    return longest_row
+
+    return longest_row, violations
 
 
 @click.command()
 @click.argument("file_path")
-@click.option("--verbose", "-v", is_flag=True, help="Print performed checks to stdout.")
+@click.option("--verbose", "-v", count=True, help="Print performed checks to stdout.")
 @click.option(
     "--outfile", "-o", nargs=1, help="Path to where the output file will be written."
 )
-def main(file_path, verbose, outfile):
+@click.option(
+    "--check",
+    is_flag=True,
+    help="Only check the yaml file and do not write any output.",
+)
+def main(file_path, verbose, outfile, check):
+
     if outfile is None:
         path, _ext = os.path.splitext(file_path)
         outfile = f"{path}.tsv"
@@ -210,9 +186,19 @@ def main(file_path, verbose, outfile):
     with open(file_path, "r") as yml_file:
         data = load(yml_file.read(), Loader=CLoader)
 
-    print(f"Longest row has {validate_yaml(data, verbose)} columns")
+    longest_row, lint_violations = validate_yaml(data, verbose)
 
-    write_metadata_block(data, outfile, verbose)
+    if len(lint_violations) == 0:
+        if verbose:
+            print("\nAll Checks passed!\n\n")
+        if not check:
+            write_metadata_block(data, outfile, longest_row, verbose)
+    else:
+        print(f"A total of {len(lint_violations)} lint(s) failed.")
+        for violation in lint_violations:
+            print(violation)
+        print("Errors detected. Could not convert to TSV.")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
