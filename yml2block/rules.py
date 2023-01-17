@@ -185,7 +185,16 @@ def required_keys_present(list_item, tsv_keyword):
     second-level list entry lint
     """
     found_keys = list_item.keys()
-    required = required_keys[tsv_keyword]
+    try:
+        required = required_keys[tsv_keyword]
+    except KeyError:
+        return [
+            LintViolation(
+                "ERROR",
+                "required_keys_present",
+                f"Cannot check entry for invalid keyword '{tsv_keyword}'. Skipping entry.",
+            )
+        ]
     # Assure all required keys are there
     if len(set(required) - set(found_keys)) == 0:
         return []
@@ -204,7 +213,17 @@ def no_invalid_keys_present(list_item, tsv_keyword):
 
     second-level list entry lint
     """
-    permissible = permissible_keys[tsv_keyword]
+    try:
+        permissible = permissible_keys[tsv_keyword]
+    except KeyError:
+        return [
+            LintViolation(
+                "ERROR",
+                "no_invalid_keys_present",
+                f"Cannot check entry for invalid keyword '{tsv_keyword}'. Skipping entry.",
+            )
+        ]
+
     violations = []
     for (key, value) in list_item.items():
         if key not in permissible:
