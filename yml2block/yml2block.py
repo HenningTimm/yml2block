@@ -57,19 +57,6 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
     for lint in (rules.block_content_is_list,):
         violations.extend(lint(yaml_chunk))
 
-    # Get these lists once to prevent repeated dictionary accesses
-    try:
-        permissible = rules.permissible_keys[tsv_keyword]
-        required = rules.required_keys[tsv_keyword]
-    except KeyError:
-        return 0, [
-            rules.LintViolation(
-                "ERROR",
-                "entry_invalid_keyword",
-                f"Cannot check entry for keyword '{tsv_keyword}'. Skipping entry.",
-            )
-        ]
-
     longest_row = 0
 
     for lint in (rules.unique_names,):
@@ -207,7 +194,7 @@ def main(file_path, verbose, outfile, check):
         if not check:
             write_metadata_block(data, outfile, longest_row, verbose)
     else:
-        print(f"A total of {len(violations)} lint(s) failed.")
+        print(f"A total of {len(lint_violations)} lint(s) failed.")
         for violation in lint_violations:
             print(violation)
         print("Errors detected. Could not convert to TSV.")
