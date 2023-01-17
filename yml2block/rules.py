@@ -124,7 +124,7 @@ def top_level_keywords_valid(keywords):
     if all(kw in permissible_keywords for kw in keywords):
         return []
     else:
-        [
+        return [
             LintViolation(
                 "ERROR",
                 "top_level_keywords_valid",

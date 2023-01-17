@@ -30,8 +30,7 @@ def validate_keywords(keywords, verbose):
         if verbose >= 2:
             print(f"Running lint: {lint.__name__}")
 
-        if lint_results := lint(keywords):
-            violations.extend(lint_results)
+        violations.extend(lint(keywords))
 
     if verbose and len(violations) == 0:
         print("SUCCESS!" if verbose == 1 else "SUCCESS!\n")
@@ -55,7 +54,8 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
     for lint in (rules.block_content_is_list,):
         violations.extend(lint(yaml_chunk))
 
-    # Get these litsts once to prevent repeated dictionary accesses
+    # Get these lists once to prevent repeated dictionary accesses
+    print(rules.permissible_keys)
     permissible = rules.permissible_keys[tsv_keyword]
     required = rules.required_keys[tsv_keyword]
 
