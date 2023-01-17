@@ -8,6 +8,7 @@ To use `yml2block` you will need the following Python packages
 
 - pyyaml
 - click
+- poetry (for installation)
 
 and use Python 3.10 or newer. 
 
@@ -24,7 +25,7 @@ This will install `yml2block` in your current Python environment
 and give you access to the `yml2block` command line entry point.
 
 ## Usage
-You can call the script directly using `Python` from the cloned repository folder:
+You can call the script directly (without installation) using `Python` from the cloned repository folder:
 
 ```bash
 yml2block $ python yml2block/yml2block.py --help
