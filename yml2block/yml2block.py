@@ -45,8 +45,8 @@ def validate_keywords(keywords, verbose):
 def validate_entry(yaml_chunk, tsv_keyword, verbose):
     """Validate a record, based on its type.
 
-    Check that all required keys are there.
-    Fail with an assertion if a violation is detected.
+    Perform second level list item lints.
+    Return a list of errors if violations are detected.
     """
     if verbose == 1:
         print(f"Validating entries for {tsv_keyword}:", end=" ")
@@ -72,18 +72,18 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
 
     longest_row = 0
 
-    if tsv_keyword in ["metadataBlock", "datasetField"]:
-        if v := rules.unique_names(yaml_chunk):
-            violations.extend(v)
+    for lint in (rules.unique_names,):
+        violations.extend(lint(yaml_chunk, tsv_keyword))
 
     for item in yaml_chunk:
-        found_keys = item.keys()
-        # Assure all required keys are there
-        assert len(set(required) - set(found_keys)) == 0, "Missing required key"
-
-        for (key, value) in item.items():
-            assert key in permissible, "Invalid key"
-            assert not isinstance(value, dict), "Nested dictionaries are not allowed"
+        for lint in (
+            rules.required_keys_present,
+            rules.no_invalid_keys_present,
+            rules.no_substructures_present,
+        ):
+            if verbose >= 2:
+                print(f"Running lint: {lint.__name__}")
+            violations.extend(lint(item, tsv_keyword))
 
         # Compute the highest number of columns in the block
         row_length = (
@@ -164,7 +164,7 @@ def write_metadata_block(yml_metadata, output_path, longest_line, verbose):
 
 def validate_yaml(data, verbose):
     """Check if the given yaml file is valid.
-    Underlying checks will fail with an assertion if they don't.
+    Underlying checks will return lists of LintViolations if they don't.
     """
     violations = validate_keywords(data.keys(), verbose)
     longest_row = 0
@@ -182,7 +182,12 @@ def validate_yaml(data, verbose):
 @click.option(
     "--outfile", "-o", nargs=1, help="Path to where the output file will be written."
 )
-def main(file_path, verbose, outfile):
+@click.option(
+    "--check",
+    is_flag=True,
+    help="Only check the yaml file and do not write any output.",
+)
+def main(file_path, verbose, outfile, check):
 
     if outfile is None:
         path, _ext = os.path.splitext(file_path)
@@ -199,9 +204,10 @@ def main(file_path, verbose, outfile):
     if len(lint_violations) == 0:
         if verbose:
             print("\nAll Checks passed!\n\n")
-        write_metadata_block(data, outfile, longest_row, verbose)
+        if not check:
+            write_metadata_block(data, outfile, longest_row, verbose)
     else:
-        print(f"\n{len(lint_violations)} errors occurred\n\n")
+        print(f"A total of {len(violations)} lint(s) failed.")
         for violation in lint_violations:
             print(violation)
         print("Errors detected. Could not convert to TSV.")
