@@ -28,7 +28,7 @@ jobs:
           poetry install
       - name: Test virtualenvs
         run: |
-          poetry shell
+          source $(poetry env info --path)/bin/activate
       - name: Test that execution works
         run: |
           python yml2block/yml2block.py --help
