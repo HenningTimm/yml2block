@@ -7,7 +7,7 @@ https://guides.dataverse.org/en/latest/admin/metadatacustomization.html
 import os
 import sys
 import click
-from yaml import load, CLoader
+from ruamel.yaml import YAML
 
 import rules
 
@@ -184,7 +184,10 @@ def main(file_path, verbose, outfile, check):
         print(f"Checking input file: {file_path}\n\n")
 
     with open(file_path, "r") as yml_file:
-        data = load(yml_file.read(), Loader=CLoader)
+        yaml = YAML(typ="safe")
+        data = yaml.load(yml_file)
+
+        # data = load(yml_file.read(), Loader=CLoader)
 
     longest_row, lint_violations = validate_yaml(data, verbose)
 
