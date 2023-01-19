@@ -6,7 +6,7 @@ metadata schema into a Dataverse metadata block TSV file.
 
 To use `yml2block` you will need the following Python packages
 
-- pyyaml
+- ruamel.yaml
 - click
 - poetry (for installation)
 

@@ -94,7 +94,7 @@ def unique_names(yaml_chunk, tsv_keyword):
                 LintViolation(
                     "ERROR",
                     "unique_names",
-                    f"Name {name} occurs {count} times. Names have to be unique.",
+                    f"Name '{name}' occurs {count} times. Names have to be unique.",
                 )
             )
     return errors
@@ -130,7 +130,7 @@ def top_level_keywords_valid(keywords):
             LintViolation(
                 "ERROR",
                 "top_level_keywords_valid",
-                f"Keyword list {keywords} differs from {permissible_keywords}",
+                f"Keyword list '{keywords}' differs from '{permissible_keywords}'",
             )
         ]
 
@@ -151,7 +151,7 @@ def top_level_keywords_unique(keywords):
             LintViolation(
                 "ERROR",
                 "top_level_keywords_unique",
-                f"Keyword list {keywords} contains duplicate keys.",
+                f"Keyword list '{keywords}' contains duplicate keys.",
             )
         ]
 
@@ -203,7 +203,7 @@ def required_keys_present(list_item, tsv_keyword):
             LintViolation(
                 "ERROR",
                 "required_keys_present",
-                f"List of required keys {required} and found keys {found_keys} differ.",
+                f"List of required keys '{required}' and found keys '{found_keys}' differ.",
             )
         ]
 
