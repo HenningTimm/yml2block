@@ -28,8 +28,7 @@ jobs:
           poetry install
       - name: Test virtualenvs
         run: |
-          pyenv virtualenvs
-          which python
+          poetry shell
       - name: Test that execution works
         run: |
           python yml2block/yml2block.py --help
