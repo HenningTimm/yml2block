@@ -24,7 +24,7 @@ def test_duplicate_names_detected():
     result = runner.invoke(
         yml2block.__main__.main, ["tests/invalid/duplicate_name.yml", "--check"]
     )
-    assert result.exit_code == 0, result.output
+    assert result.exit_code == 1, result.output
 
 
 def test_duplicate_top_level_key_detected():
@@ -34,7 +34,7 @@ def test_duplicate_top_level_key_detected():
         yml2block.__main__.main,
         ["tests/invalid/duplicate_top-level_key.yml", "--check"],
     )
-    assert result.exit_code == 0, result.output
+    assert result.exit_code == 1, result.output
 
 
 def test_typo_in_key_key_detected():
