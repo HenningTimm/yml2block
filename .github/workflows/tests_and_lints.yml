@@ -25,17 +25,11 @@ jobs:
           pip install poetry
       - name: Install dependencies with poetry
         run: |
-          poetry install
-      # - name: Test virtualenvs
-      #   run: |
-      #     source $(poetry env info --path)/bin/activate
-      # - name: Test import
-      #   run: |
-      #     python -c "from ruamel_yaml import YAML"
-      # - name: Test import
-      #   run: |
-      #     python -c "from ruamel.yaml import YAML"  
-      - name: Test that execution works
+          poetry install --extras tests
+      - name: Test that direct execution works
         run: |
           poetry run python yml2block/yml2block.py --help
+      - name: Run integration tests
+        run: |
+          pytest tests/integration_tests.py
           
