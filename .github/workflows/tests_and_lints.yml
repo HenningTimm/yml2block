@@ -28,7 +28,7 @@ jobs:
           poetry install --extras tests
       - name: Test that direct execution works
         run: |
-          poetry run python yml2block/yml2block.py --help
+          poetry run python yml2block --help
       - name: Run integration tests
         run: |
           pytest tests/integration_tests.py
