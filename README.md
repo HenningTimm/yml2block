@@ -28,7 +28,7 @@ and give you access to the `yml2block` command line entry point.
 You can call the script directly (without installation) using `Python` from the cloned repository folder:
 
 ```bash
-yml2block $ python yml2block/yml2block.py --help
+yml2block $ python yml2block --help
 ```
 
 If you followed the installation instructions using poetry shown above,
