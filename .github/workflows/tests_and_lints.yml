@@ -31,5 +31,5 @@ jobs:
           poetry run python yml2block --help
       - name: Run integration tests
         run: |
-          poetry run pytest tests/integration_tests.py
+          poetry run pytest -v tests/integration_tests.py
           
