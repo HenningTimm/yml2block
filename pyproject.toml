@@ -32,3 +32,6 @@ python = "^3.10"
 # Package names with '.' need quotes to make poetry happy
 "ruamel.yaml" = "^0.17.21"  # Earlier versions might work, but are untested.
 click = "^8.1"  # Earlier versions might work, but are untested.
+
+[tool.poetry.extras]
+pytest = "^7.2"  # Earlier versions might work, but are untested.
