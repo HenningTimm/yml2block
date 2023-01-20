@@ -8,9 +8,11 @@ import os
 import sys
 import click
 from ruamel.yaml import YAML
+from ruamel.yaml.constructor import DuplicateKeyError
 
 from yml2block import validation
 from yml2block import output
+from yml2block import rules
 
 
 @click.command()
@@ -35,11 +37,18 @@ def main(file_path, verbose, outfile, check):
 
     with open(file_path, "r") as yml_file:
         yaml = YAML(typ="safe")
-        data = yaml.load(yml_file)
-
-        # data = load(yml_file.read(), Loader=CLoader)
-
-    longest_row, lint_violations = validation.validate_yaml(data, verbose)
+        try:
+            data = yaml.load(yml_file)
+            longest_row, lint_violations = validation.validate_yaml(data, verbose)
+        except DuplicateKeyError as dke:
+            longest_row = 0
+            lint_violations = [
+                rules.LintViolation(
+                    "ERROR",
+                    "top_level_keywords_valid",
+                    dke.problem,
+                )
+            ]
 
     if len(lint_violations) == 0:
         if verbose:
