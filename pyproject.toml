@@ -33,5 +33,8 @@ python = "^3.10"
 "ruamel.yaml" = "^0.17.21"  # Earlier versions might work, but are untested.
 click = "^8.1"  # Earlier versions might work, but are untested.
 
+# Optional dependencies
+pytest = { version = "^7.2", optional = True }   # Earlier versions might work, but are untested.
+
 [tool.poetry.extras]
-pytest = "^7.2"  # Earlier versions might work, but are untested.
+tests = ["pytest"]
