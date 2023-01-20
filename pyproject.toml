@@ -34,7 +34,7 @@ python = "^3.10"
 click = "^8.1"  # Earlier versions might work, but are untested.
 
 # Optional dependencies
-pytest = { version = "^7.2", optional = True }   # Earlier versions might work, but are untested.
+pytest = { version = "^7.2", optional = true }   # Earlier versions might work, but are untested.
 
 [tool.poetry.extras]
 tests = ["pytest"]
