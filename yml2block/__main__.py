@@ -20,20 +20,20 @@ def guess_input_type(input_path):
     """Guess the input type from the file name."""
     _, ext = os.path.splitext(input_path)
     ext = ext.lower()
-    if ext == "tsv":
+    if ext == ".tsv":
         return ("tsv", [])
-    elif ext == "csv":
+    elif ext == ".csv":
         return (
             "csv",
             [
                 rules.LintViolation(
                     "WARNING",
                     "guess_input_type",
-                    f"Invalid file extension '{csv}'. Will be treated as tsv. Currently non-tab separators are not supported.",
+                    f"Invalid file extension '{ext}'. Will be treated as tsv. Currently non-tab separators are not supported.",
                 )
             ],
         )
-    elif ext in ("yml", "yaml"):
+    elif ext in (".yml", ".yaml"):
         return ("yaml", [])
     else:
         return (
@@ -42,7 +42,7 @@ def guess_input_type(input_path):
                 rules.LintViolation(
                     "ERROR",
                     "guess_input_type",
-                    f"Invalid file extension '{ext}'. Only tsv and yaml files are supported.",
+                    f"Invalid file extension '{ext}'. Only .tsv and .yaml/.yml files are supported.",
                 )
             ],
         )
