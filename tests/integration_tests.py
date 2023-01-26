@@ -44,3 +44,11 @@ def test_typo_in_key_key_detected():
         yml2block.__main__.main, ["tests/invalid/typo_in_key.yml", "--check"]
     )
     assert result.exit_code == 1, result.output
+
+def test_wrong_extensions_fail():
+    """Ensure that files that do not end in tsv, csv, yml or yaml fail."""
+    runner = CliRunner()
+    result = runner.invoke(
+        yml2block.__main__.main, ["tests/invalid/minimal_example.xlsx", "--check"]
+    )
+    assert result.exit_code == 1, result.output
