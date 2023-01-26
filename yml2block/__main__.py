@@ -13,6 +13,39 @@ from ruamel.yaml.constructor import DuplicateKeyError
 from yml2block import validation
 from yml2block import output
 from yml2block import rules
+from yml2block import tsv_input
+
+
+def guess_input_type(input_path):
+    """Guess the input type from the file name."""
+    _, ext = os.path.splitext(input_path)
+    ext = ext.lower()
+    if ext == "tsv":
+        return ("tsv", [])
+    elif ext == "csv":
+        return (
+            "csv",
+            [
+                rules.LintViolation(
+                    "WARNING",
+                    "guess_input_type",
+                    f"Invalid file extension '{csv}'. Will be treated as tsv. Currently non-tab separators are not supported.",
+                )
+            ],
+        )
+    elif ext in ("yml", "yaml"):
+        return ("yaml", [])
+    else:
+        return (
+            False,
+            [
+                rules.LintViolation(
+                    "ERROR",
+                    "guess_input_type",
+                    f"Invalid file extension '{ext}'. Only tsv and yaml files are supported.",
+                )
+            ],
+        )
 
 
 @click.command()
@@ -35,20 +68,23 @@ def main(file_path, verbose, outfile, check):
     if verbose:
         print(f"Checking input file: {file_path}\n\n")
 
+    lint_violations = []
+
     with open(file_path, "r") as yml_file:
         yaml = YAML(typ="safe")
         try:
             data = yaml.load(yml_file)
-            longest_row, lint_violations = validation.validate_yaml(data, verbose)
+            longest_row, file_lint_violations = validation.validate_yaml(data, verbose)
         except DuplicateKeyError as dke:
             longest_row = 0
-            lint_violations = [
+            file_lint_violations = [
                 rules.LintViolation(
                     "ERROR",
                     "top_level_keywords_valid",
                     dke.problem,
                 )
             ]
+    lint_violations.extend(file_lint_violations)
 
     if len(lint_violations) == 0:
         if verbose:
