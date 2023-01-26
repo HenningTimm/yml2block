@@ -70,20 +70,29 @@ def main(file_path, verbose, outfile, check):
 
     lint_violations = []
 
-    with open(file_path, "r") as yml_file:
-        yaml = YAML(typ="safe")
-        try:
-            data = yaml.load(yml_file)
-            longest_row, file_lint_violations = validation.validate_yaml(data, verbose)
-        except DuplicateKeyError as dke:
-            longest_row = 0
-            file_lint_violations = [
-                rules.LintViolation(
-                    "ERROR",
-                    "top_level_keywords_valid",
-                    dke.problem,
-                )
-            ]
+    input_type, file_ext_violations = guess_input_type(file_path)
+    lint_violations.extend(file_ext_violations)
+
+    if input_type == "yaml":
+        with open(file_path, "r") as yml_file:
+            yaml = YAML(typ="safe")
+            try:
+                data = yaml.load(yml_file)
+                longest_row, file_lint_violations = validation.validate_yaml(data, verbose)
+            except DuplicateKeyError as dke:
+                longest_row = 0
+                file_lint_violations = [
+                    rules.LintViolation(
+                        "ERROR",
+                        "top_level_keywords_valid",
+                        dke.problem,
+                    )
+                ]
+    else input_type in ("tsv", "csv"):
+        data, tsv_parsing_violations = tsv_input.read_tsv(file_path)
+        lint_violations.extend(tsv_parsing_violations)
+        longest_row, file_lint_violations = validation.validate_yaml(data, verbose)
+
     lint_violations.extend(file_lint_violations)
 
     if len(lint_violations) == 0:
