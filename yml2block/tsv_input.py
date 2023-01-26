@@ -1,3 +1,8 @@
+"""This module provides a parser to convert a Dataverse TSV file into the same
+dictionary-based representation used for YAML input.
+"""
+
+
 def _trim_to_header(line, length):
     """Trim leading and trailing tabs from a tsv chunk to given nr of columns.
 

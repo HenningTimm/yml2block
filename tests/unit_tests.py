@@ -1,8 +1,8 @@
 from yml2block.__main__ import guess_input_type
 
+
 def test_input_guessing_valid_tsv():
-    """Are valid paths to TSV files handled correctly?
-    """
+    """Are valid paths to TSV files handled correctly?"""
     valid_tsv_paths = [
         "foo.tsv",
         "foo.Tsv",
@@ -25,9 +25,9 @@ def test_input_guessing_valid_tsv():
         assert len(violations) == 0
         assert guessed_type == "tsv"
 
+
 def test_input_guessing_valid_csv():
-    """Are valid paths to CSV files handled correctly?
-    """
+    """Are valid paths to CSV files handled correctly?"""
     valid_csv_paths = [
         "foo.csv",
         "foo.Csv",
@@ -51,9 +51,9 @@ def test_input_guessing_valid_csv():
         assert violations[0].level == "WARNING"
         assert guessed_type == "csv"
 
+
 def test_input_guessing_valid_yaml():
-    """Are valid paths to YML and YAML files handled correctly?
-    """
+    """Are valid paths to YML and YAML files handled correctly?"""
     valid_yml_paths = [
         "foo.yml",
         "foo.Yml",
@@ -91,9 +91,9 @@ def test_input_guessing_valid_yaml():
         assert len(violations) == 0
         assert guessed_type == "yaml"
 
+
 def test_input_guessing_invalid_extension():
-    """Are invalid extensions handled correctly?
-    """
+    """Are invalid extensions handled correctly?"""
     invalid_extension_paths = [
         "foo.yam",
         "foo.xls",
@@ -109,7 +109,7 @@ def test_input_guessing_invalid_extension():
         "bar/foo.sdf",
         "/bar/foo.äöü",
         "/bar/foo.123",
-        "/bar/foo.foo",        
+        "/bar/foo.foo",
     ]
     for path in invalid_extension_paths:
         guessed_type, violations = guess_input_type(path)

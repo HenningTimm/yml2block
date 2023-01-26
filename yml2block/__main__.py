@@ -78,7 +78,9 @@ def main(file_path, verbose, outfile, check):
             yaml = YAML(typ="safe")
             try:
                 data = yaml.load(yml_file)
-                longest_row, file_lint_violations = validation.validate_yaml(data, verbose)
+                longest_row, file_lint_violations = validation.validate_yaml(
+                    data, verbose
+                )
             except DuplicateKeyError as dke:
                 longest_row = 0
                 file_lint_violations = [
@@ -88,10 +90,13 @@ def main(file_path, verbose, outfile, check):
                         dke.problem,
                     )
                 ]
-    else input_type in ("tsv", "csv"):
+    elif input_type in ("tsv", "csv"):
         data, tsv_parsing_violations = tsv_input.read_tsv(file_path)
         lint_violations.extend(tsv_parsing_violations)
         longest_row, file_lint_violations = validation.validate_yaml(data, verbose)
+    else:
+        file_lint_violations = []
+        longest_row = 0
 
     lint_violations.extend(file_lint_violations)
 
