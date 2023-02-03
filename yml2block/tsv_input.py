@@ -1,6 +1,8 @@
 """This module provides a parser to convert a Dataverse TSV file into the same
 dictionary-based representation used for YAML input.
 """
+import csv
+import io
 
 
 def _trim_to_header(line, length):
@@ -16,33 +18,39 @@ def _trim_to_header(line, length):
 
 
 def read_tsv(tsv_path):
-    with open(md_block_csv, "r") as raw_file:
+    with open(tsv_path, "r") as raw_file:
         mdb_lines = raw_file.readlines()
 
-    # Extract all keyword lines
-    keyword_lines = [line for line in mdb_lines if line.startswith("#")]
+    full_file = open("computational_workflow.tsv", "r").readlines()
+    break_points = [i for i, l in enumerate(full_file) if l.startswith("#")]
+    split_blocks = (
+        full_file[break_points[0] : break_points[1]],
+        full_file[break_points[1] : break_points[2]],
+        full_file[break_points[2] :],
+    )
 
-    kw_indices = {}
-    for kw_line in keyword_lines:
-        mdb_keyword, *header_fields = kw_line.strip("\n\t").split("\t")
+    def _parse(block):
+        """Parse a CSV block into a dictionary."""
+        # Wrap the joined lines in a StringIO buffer so it behaves
+        # like a file an can be read by the csv DictReader
+        joined = io.StringIO("\n".join(block))
+        return csv.DictReader(joined, delimiter="\t")
 
-        # Some header fields in the metadata blocks supplied by the
-        # Dataverse repo have additional whitespaces.
-        # most notably the fieldType column has a leading space
-        # in most metadata blocks. This stripping weakens the lint,
-        # but ensures that the files provided by dataverse check out
-        # as valid.
-        header_fields = [hf.strip(" ") for hf in header_fields]
+    md_fields, ds_fields, vocab_fields = [_parse(block) for block in split_blocks]
 
-        # Keep the position of the keyword in the lines
-        # to later split the blocks.
-        kw_indices[mdb_keyword] = mdb_lines.index(kw_line)
+    def print_dict(d):
+        for r in d:
+            print(r)
 
-    # Compute boundaries between different sections (name, fields, vocab)
-    # of the metadata block
-    ds_fields_start = kw_indices["#datasetField"] + 1
-    if "#controlledVocabulary" in kw_indices:
-        ds_fields_stop = kw_indices["#controlledVocabulary"]
-    else:
-        # In case no controlled vocab was defined, read to the end
-        ds_fields_stop = None
+    print_dict(md_fields)
+    print_dict(ds_fields)
+    print_dict(vocab_fields)
+
+    # clip off keyword
+
+    # Run top_level_keywords_valid here to make sure that the generated
+    # data structure behaves as expected down the line
+
+    # create dict that maps keywords to lists of dicts
+    # Validate that nothing is in the leftover fields
+    # Alert about whitespaces
