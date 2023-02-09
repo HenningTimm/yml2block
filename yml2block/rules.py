@@ -225,7 +225,7 @@ def no_invalid_keys_present(list_item, tsv_keyword):
         ]
 
     violations = []
-    for (key, value) in list_item.items():
+    for key, value in list_item.items():
         if key not in permissible:
             violations.append(
                 LintViolation(
@@ -243,7 +243,7 @@ def no_substructures_present(list_item, tsv_keyword):
     second-level list entry lint
     """
     violations = []
-    for (key, value) in list_item.items():
+    for key, value in list_item.items():
         if type(value) in (dict, tuple, list):
             violations.append(
                 LintViolation(
