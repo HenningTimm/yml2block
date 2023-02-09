@@ -12,6 +12,7 @@ def _identify_break_points(full_file):
     """Identify where to split the metadata block into its three subsections"""
     violations = []
 
+    # Split slong lines starting with '#'
     break_points = [i for i, l in enumerate(full_file) if l.startswith("#")]
     if len(break_points) == 3:
         split_blocks = (
@@ -38,7 +39,7 @@ def _identify_break_points(full_file):
 
 
 def read_tsv(tsv_path):
-    """Read in a Dataverse TSV metadata block file."""
+    """Read in a Dataverse TSV metadata block file and convert it into a python diytionary structure."""
     violations = []
     data = dict()
 
@@ -96,12 +97,5 @@ def read_tsv(tsv_path):
             data[toplevel_key] = []
 
         data[toplevel_key].append(row_as_dict)
-
-    # Run top_level_keywords_valid here to make sure that the generated
-    # data structure behaves as expected down the line
-
-    # create dict that maps keywords to lists of dicts
-    # Validate that nothing is in the leftover fields
-    # Alert about whitespaces
 
     return data, violations
