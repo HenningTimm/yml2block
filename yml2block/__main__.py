@@ -7,13 +7,12 @@ https://guides.dataverse.org/en/latest/admin/metadatacustomization.html
 import os
 import sys
 import click
-from ruamel.yaml import YAML
-from ruamel.yaml.constructor import DuplicateKeyError
 
 from yml2block import validation
 from yml2block import output
 from yml2block import rules
 from yml2block import tsv_input
+from yml2block import yaml_input
 
 
 def guess_input_type(input_path):
@@ -74,22 +73,9 @@ def main(file_path, verbose, outfile, check):
     lint_violations.extend(file_ext_violations)
 
     if input_type == "yaml":
-        with open(file_path, "r") as yml_file:
-            yaml = YAML(typ="safe")
-            try:
-                data = yaml.load(yml_file)
-                longest_row, file_lint_violations = validation.validate_yaml(
-                    data, verbose
-                )
-            except DuplicateKeyError as dke:
-                longest_row = 0
-                file_lint_violations = [
-                    rules.LintViolation(
-                        "ERROR",
-                        "top_level_keywords_valid",
-                        dke.problem,
-                    )
-                ]
+        data, yaml_parsing_violations = yaml_input.read_yaml(file_path)
+        lint_violations.extend(yaml_parsing_violations)
+        longest_row, file_lint_violations = validation.validate_yaml(data, verbose)
     elif input_type in ("tsv", "csv"):
         data, tsv_parsing_violations = tsv_input.read_tsv(file_path)
         lint_violations.extend(tsv_parsing_violations)
