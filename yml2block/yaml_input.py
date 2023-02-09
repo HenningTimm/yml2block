@@ -4,9 +4,10 @@ from ruamel.yaml import YAML
 from ruamel.yaml.constructor import DuplicateKeyError
 
 from yml2block.rules import LintViolation
+from yml2block import validation
 
 
-def read_yaml(file_path):
+def read_yaml(file_path, verbose):
     """Read in a yaml file and convert it into a python dictionary structure."""
     with open(file_path, "r") as yml_file:
         yaml = YAML(typ="safe")
@@ -23,4 +24,4 @@ def read_yaml(file_path):
                     dke.problem,
                 )
             ]
-    return longest_row, file_lint_violations
+    return data, longest_row, file_lint_violations
