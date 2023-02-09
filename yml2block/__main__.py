@@ -27,7 +27,6 @@ from yml2block import rules
     help="Only check the yaml file and do not write any output.",
 )
 def main(file_path, verbose, outfile, check):
-
     if outfile is None:
         path, _ext = os.path.splitext(file_path)
         outfile = f"{path}.tsv"
