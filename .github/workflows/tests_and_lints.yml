@@ -29,6 +29,9 @@ jobs:
       - name: Test that direct execution works
         run: |
           poetry run python yml2block --help
+      - name: Run unit tests
+        run: |
+          poetry run pytest -v tests/unit_tests.py
       - name: Run integration tests
         run: |
           poetry run pytest -v tests/integration_tests.py

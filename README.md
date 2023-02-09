@@ -44,6 +44,10 @@ you can also call `yml2block` directly:
 The path to the input file containing the metadata schema in YAML format
 is given as the positional parameter.
 
+If a path to a tsv file is given as the positional parameter, this file
+will only be linted as if the `--check` parameter was passed.
+No output is written in this case.
+
 ### Output
 By default, the output will be written to the same path as the input file,
 replacing the `.yml`/ `.yaml` suffix with `.tsv`.

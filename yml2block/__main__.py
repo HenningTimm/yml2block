@@ -7,12 +7,44 @@ https://guides.dataverse.org/en/latest/admin/metadatacustomization.html
 import os
 import sys
 import click
-from ruamel.yaml import YAML
-from ruamel.yaml.constructor import DuplicateKeyError
 
 from yml2block import validation
 from yml2block import output
 from yml2block import rules
+from yml2block import tsv_input
+from yml2block import yaml_input
+
+
+def guess_input_type(input_path):
+    """Guess the input type from the file name."""
+    _, ext = os.path.splitext(input_path)
+    ext = ext.lower()
+    if ext == ".tsv":
+        return ("tsv", [])
+    elif ext == ".csv":
+        return (
+            "csv",
+            [
+                rules.LintViolation(
+                    "WARNING",
+                    "guess_input_type",
+                    f"Invalid file extension '{ext}'. Will be treated as tsv. Currently non-tab separators are not supported.",
+                )
+            ],
+        )
+    elif ext in (".yml", ".yaml"):
+        return ("yaml", [])
+    else:
+        return (
+            False,
+            [
+                rules.LintViolation(
+                    "ERROR",
+                    "guess_input_type",
+                    f"Invalid file extension '{ext}'. Only .tsv and .yaml/.yml files are supported.",
+                )
+            ],
+        )
 
 
 @click.command()
@@ -34,25 +66,29 @@ def main(file_path, verbose, outfile, check):
     if verbose:
         print(f"Checking input file: {file_path}\n\n")
 
-    with open(file_path, "r") as yml_file:
-        yaml = YAML(typ="safe")
-        try:
-            data = yaml.load(yml_file)
-            longest_row, lint_violations = validation.validate_yaml(data, verbose)
-        except DuplicateKeyError as dke:
-            longest_row = 0
-            lint_violations = [
-                rules.LintViolation(
-                    "ERROR",
-                    "top_level_keywords_valid",
-                    dke.problem,
-                )
-            ]
+    lint_violations = []
+
+    input_type, file_ext_violations = guess_input_type(file_path)
+    lint_violations.extend(file_ext_violations)
+
+    if input_type == "yaml":
+        data, longest_row, file_lint_violations = yaml_input.read_yaml(
+            file_path, verbose
+        )
+    elif input_type in ("tsv", "csv"):
+        data, tsv_parsing_violations = tsv_input.read_tsv(file_path)
+        lint_violations.extend(tsv_parsing_violations)
+        longest_row, file_lint_violations = validation.validate_yaml(data, verbose)
+    else:
+        file_lint_violations = []
+        longest_row = 0
+
+    lint_violations.extend(file_lint_violations)
 
     if len(lint_violations) == 0:
         if verbose:
             print("\nAll Checks passed!\n\n")
-        if not check:
+        if (not check) and (input_type == "yaml"):
             output.write_metadata_block(data, outfile, longest_row, verbose)
     else:
         print(f"A total of {len(lint_violations)} lint(s) failed.")

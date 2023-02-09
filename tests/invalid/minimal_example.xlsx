@@ -1,0 +1,49 @@
+---
+metadataBlock:
+  - name: ValidExample
+    dataverseAlias:
+    displayName: Valid
+datasetField:
+  - name: Description
+    title: Description
+    description: This field describes.
+    watermark:
+    fieldType: textbox
+    displayOrder:
+    displayFormat:
+    advancedSearchField: true
+    allowControlledVocabulary: false
+    allowmultiples: false
+    facetable: false
+    displayoncreate: true
+    required: true
+    parent:
+    metadatablock_id: ValidExample
+  - name: Answer
+    title: Answer
+    description:
+    watermark:
+    fieldType: text
+    displayOrder:
+    displayFormat:
+    advancedSearchField: true
+    allowControlledVocabulary: true
+    allowmultiples: true
+    facetable: true
+    displayoncreate: true
+    required: true
+    parent:
+    metadatablock_id: ValidExample
+controlledVocabulary:
+  - DatasetField: AnswerYes
+    Value: "Yes"
+    identifier: answer_positive
+    displayOrder:
+  - DatasetField: AnswerNo
+    Value: "No"
+    identifier: answer_negative
+    displayOrder:
+  - DatasetField: AnswerMaybeSo
+    Value: "Maybe"
+    identifier: answer_unclear
+    displayOrder:

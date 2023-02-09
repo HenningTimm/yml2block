@@ -16,9 +16,7 @@ def validate_yaml(data, verbose):
 
 
 def validate_keywords(keywords, verbose):
-    """Assure that the top-level keywords of the YAML file are well-behaved.
-
-    Fail with an assertion if they do not comply."""
+    """Assure that the top-level keywords of the YAML file are well-behaved."""
     if verbose == 1:
         print("Validating top-level keywords:", end=" ")
     elif verbose >= 2:
