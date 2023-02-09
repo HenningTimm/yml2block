@@ -103,7 +103,7 @@ def main(file_path, verbose, outfile, check):
     if len(lint_violations) == 0:
         if verbose:
             print("\nAll Checks passed!\n\n")
-        if not check:
+        if (not check) and (input_type == "yaml"):
             output.write_metadata_block(data, outfile, longest_row, verbose)
     else:
         print(f"A total of {len(lint_violations)} lint(s) failed.")
