@@ -121,26 +121,28 @@ def test_input_guessing_invalid_extension():
 
 def test_prefix_splitting_one_group():
     kws = ["fooBarBaz", "fooBarTest", "fooBarBest"]
-    expected_groups = [["fooBarBaz", "fooBarTest", "fooBarBest"]]
+    expected_groups = {
+        "fooBar": ["fooBarBaz", "fooBarTest", "fooBarBest"],
+    }
 
-    result = split_by_common_prefixes(kws)
+    result = split_by_common_prefixes(kws, verbose=True)
 
     assert result == expected_groups
 
 
 def test_prefix_splitting_no_prefix():
     kws = ["1FooBar", "2FooBar", "3FooBar"]
-    expected_groups = [
-        [
+    expected_groups = {
+        "1FooBar": [
             "1FooBar",
         ],
-        [
+        "2FooBar": [
             "2FooBar",
         ],
-        [
+        "3FooBar": [
             "3FooBar",
         ],
-    ]
+    }
 
     result = split_by_common_prefixes(kws)
 
@@ -149,18 +151,18 @@ def test_prefix_splitting_no_prefix():
 
 def test_prefix_splitting_multiple_groups():
     kws = ["1FooBar", "FooBar", "3FooBar", "FooBarBaz"]
-    expected_groups = [
-        [
+    expected_groups = {
+        "1FooBar": [
             "1FooBar",
         ],
-        [
+        "FooBar": [
             "FooBar",
             "FooBarBaz",
         ],
-        [
+        "3FooBar": [
             "3FooBar",
         ],
-    ]
+    }
 
     result = split_by_common_prefixes(kws)
 
@@ -181,3 +183,36 @@ def test_prefix_splitting_threshold():
     expected_groups_threshold_3 = [["Foo1", "Foo2", "Foo3"]]
     result_threshold_3 = split_by_common_prefixes(kws, threshold=3)
     assert result_threshold_3 == expected_groups_threshold_3
+
+def test_prefix_splitting_longest_binding():
+    kws = [
+        "FoobarAttr1",
+        "FoobarAttr2",
+        "FoobarAlt1",
+        "FoobarAlt2",
+        "FoobarOpt1",
+        "FoobarOpt2",
+        "FoobarOtp3", # This typo is intentional
+        "1Foobar",
+    ]
+    expected_groups = {
+        "FoobarAttr": [
+            "FoobarAttr1",
+            "FoobarAttr2",
+        ],
+        "FoobarAlt": [
+            "FoobarAlt1",
+            "FoobarAlt2",
+        ],
+        "FoobarOpt": [
+            "FoobarOpt1",
+            "FoobarOpt2",
+        ],
+        # This typo is intentional
+        "FoobarOtp3": [
+            "FoobarOtp3"
+        ],
+    }
+
+    result = split_by_common_prefixes(kws)
+    assert expected_groups == result
