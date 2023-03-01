@@ -13,6 +13,7 @@ from yml2block import output
 from yml2block import rules
 from yml2block import tsv_input
 from yml2block import yaml_input
+from yml2block import prefix_analysis
 
 
 def guess_input_type(input_path):

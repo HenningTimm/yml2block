@@ -1,4 +1,5 @@
 from yml2block.__main__ import guess_input_type
+from yml2block.prefix_analysis import split_by_common_prefixes
 
 
 def test_input_guessing_valid_tsv():
@@ -116,3 +117,67 @@ def test_input_guessing_invalid_extension():
         assert len(violations) == 1
         assert violations[0].level == "ERROR"
         assert guessed_type == False
+
+
+def test_prefix_splitting_one_group():
+    kws = ["fooBarBaz", "fooBarTest", "fooBarBest"]
+    expected_groups = [["fooBarBaz", "fooBarTest", "fooBarBest"]]
+
+    result = split_by_common_prefixes(kws)
+
+    assert result == expected_groups
+
+
+def test_prefix_splitting_no_prefix():
+    kws = ["1FooBar", "2FooBar", "3FooBar"]
+    expected_groups = [
+        [
+            "1FooBar",
+        ],
+        [
+            "2FooBar",
+        ],
+        [
+            "3FooBar",
+        ],
+    ]
+
+    result = split_by_common_prefixes(kws)
+
+    assert result == expected_groups
+
+
+def test_prefix_splitting_multiple_groups():
+    kws = ["1FooBar", "FooBar", "3FooBar", "FooBarBaz"]
+    expected_groups = [
+        [
+            "1FooBar",
+        ],
+        [
+            "FooBar",
+            "FooBarBaz",
+        ],
+        [
+            "3FooBar",
+        ],
+    ]
+
+    result = split_by_common_prefixes(kws)
+
+    assert result == expected_groups
+
+
+def test_prefix_splitting_threshold():
+    kws = ["Foo1", "Foo2", "Foo3"]
+    expected_groups_threshold_4 = [
+        ["Foo1"],
+        ["Foo2"],
+        ["Foo3"],
+    ]
+    result_threshold_4 = split_by_common_prefixes(kws, threshold=4)
+    assert result_threshold_4 == expected_groups_threshold_4
+
+    kws = ["Foo1", "Foo2", "Foo3"]
+    expected_groups_threshold_3 = [["Foo1", "Foo2", "Foo3"]]
+    result_threshold_3 = split_by_common_prefixes(kws, threshold=3)
+    assert result_threshold_3 == expected_groups_threshold_3
