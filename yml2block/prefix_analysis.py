@@ -25,7 +25,7 @@ def split_by_common_prefixes(keywords, threshold=3, verbose=False):
     However, to identify typos it would be helpful to bind to the longest
     prefix instead.
     """
-    identified_groups = []
+    identified_groups = {}
     if verbose:
         print(f"Checking with threshold {threshold}")
 
@@ -59,11 +59,16 @@ def split_by_common_prefixes(keywords, threshold=3, verbose=False):
                 # The detected common prefix is a superset of the expected prefix.
                 # TODO: Here we can filter the current group back down to bind
                 # to the longest keyword.
+                
+                current_prefix = common_prefix
                 current_group.append(kw)
+                current_group = [k for k in current_group if k.startswith(current_prefix)]
 
         # Remove all keywords sharing a prefix with the selected reference keyword from the keywords list.
         keywords = [kw for kw in keywords if kw not in current_group]
-        identified_groups.append(current_group)
+        if current_prefix is None:
+            current_prefix = kw
+        identified_groups[selected_keyword] = current_group
 
     if verbose:
         print("")
