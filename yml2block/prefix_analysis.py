@@ -57,18 +57,19 @@ def split_by_common_prefixes(keywords, threshold=3, verbose=False):
                 current_prefix
             ):
                 # The detected common prefix is a superset of the expected prefix.
-                # TODO: Here we can filter the current group back down to bind
-                # to the longest keyword.
-                
+
                 current_prefix = common_prefix
                 current_group.append(kw)
-                current_group = [k for k in current_group if k.startswith(current_prefix)]
+                current_group = [
+                    k for k in current_group if k.startswith(current_prefix)
+                ]
 
+        print()
         # Remove all keywords sharing a prefix with the selected reference keyword from the keywords list.
         keywords = [kw for kw in keywords if kw not in current_group]
         if current_prefix is None:
-            current_prefix = kw
-        identified_groups[selected_keyword] = current_group
+            current_prefix = selected_keyword
+        identified_groups[current_prefix] = current_group
 
     if verbose:
         print("")

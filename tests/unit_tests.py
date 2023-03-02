@@ -120,9 +120,9 @@ def test_input_guessing_invalid_extension():
 
 
 def test_prefix_splitting_one_group():
-    kws = ["fooBarBaz", "fooBarTest", "fooBarBest"]
+    kws = ["fooBarBaz", "fooBarTest", "fooBar"]
     expected_groups = {
-        "fooBar": ["fooBarBaz", "fooBarTest", "fooBarBest"],
+        "fooBar": ["fooBarBaz", "fooBarTest", "fooBar"],
     }
 
     result = split_by_common_prefixes(kws, verbose=True)
@@ -171,18 +171,19 @@ def test_prefix_splitting_multiple_groups():
 
 def test_prefix_splitting_threshold():
     kws = ["Foo1", "Foo2", "Foo3"]
-    expected_groups_threshold_4 = [
-        ["Foo1"],
-        ["Foo2"],
-        ["Foo3"],
-    ]
+    expected_groups_threshold_4 = {
+        "Foo1": ["Foo1"],
+        "Foo2": ["Foo2"],
+        "Foo3": ["Foo3"],
+    }
     result_threshold_4 = split_by_common_prefixes(kws, threshold=4)
     assert result_threshold_4 == expected_groups_threshold_4
 
     kws = ["Foo1", "Foo2", "Foo3"]
-    expected_groups_threshold_3 = [["Foo1", "Foo2", "Foo3"]]
+    expected_groups_threshold_3 = {"Foo": ["Foo1", "Foo2", "Foo3"]}
     result_threshold_3 = split_by_common_prefixes(kws, threshold=3)
     assert result_threshold_3 == expected_groups_threshold_3
+
 
 def test_prefix_splitting_longest_binding():
     kws = [
@@ -192,7 +193,7 @@ def test_prefix_splitting_longest_binding():
         "FoobarAlt2",
         "FoobarOpt1",
         "FoobarOpt2",
-        "FoobarOtp3", # This typo is intentional
+        "FoobarOtp3",  # This typo is intentional
         "1Foobar",
     ]
     expected_groups = {
@@ -209,9 +210,8 @@ def test_prefix_splitting_longest_binding():
             "FoobarOpt2",
         ],
         # This typo is intentional
-        "FoobarOtp3": [
-            "FoobarOtp3"
-        ],
+        "FoobarOtp3": ["FoobarOtp3"],
+        "1Foobar": ["1Foobar"],
     }
 
     result = split_by_common_prefixes(kws)
