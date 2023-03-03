@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "yml2block"
-version = "0.2.0"
+version = "0.3.0"
 description = "Converts yaml files describing dataverse metadata blocks into tsv files understood by dataverse."
 license = "MIT"
 authors = [
@@ -32,6 +32,7 @@ python = "^3.10"
 # Package names with '.' need quotes to make poetry happy
 "ruamel.yaml" = "^0.17.21"  # Earlier versions might work, but are untested.
 click = "^8.1"  # Earlier versions might work, but are untested.
+jellyfish = "^0.9"
 
 # Optional dependencies
 pytest = { version = "^7.2", optional = true }   # Earlier versions might work, but are untested.

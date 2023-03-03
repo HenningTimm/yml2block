@@ -253,3 +253,20 @@ def no_substructures_present(list_item, tsv_keyword):
                 )
             )
     return violations
+
+
+def possible_typo_in_entry(keyword_items):
+    """Screen keywords for similarities that could be explained by types."""
+    violations = []
+
+    for (prefix_1, entries_1), (prefix_2, entries_2) in estimiate_typos(keyword_items):
+        violations.append(
+            LintViolation(
+                "WARNING",
+                "possible_typo_in_entry",
+                f"The two prefixes {prefix_1}: {entries_1} "
+                f"and {prefix_2}: {entries_2} are very similar. "
+                "Are you sure this is not due to a typo?",
+            )
+        )
+    return violations

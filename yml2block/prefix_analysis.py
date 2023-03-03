@@ -1,6 +1,7 @@
 """This module contains facilities to screen prefixes of metadata fields to detect typos.
 """
 import os
+from jellyfish import damerau_levenshtein_distance as dl_dist
 
 
 def split_by_common_prefixes(keywords, threshold=3, verbose=False):
@@ -82,3 +83,19 @@ def split_by_common_prefixes(keywords, threshold=3, verbose=False):
         print("")
 
     return identified_groups
+
+
+def estimate_typos(keyword_prefixes, dl_distance_threshold=1):
+    typo_candidates = []
+    for prefix_1, prefix_2 in itertools.combinations(keywords.keys(), 2):
+        if dl_dist(prefix_1, prefix_2) == dl_distance_threshold:
+            print(
+                f"The two prefixes {prefix_1} and {prefix_2} are similar enough to merge"
+            )
+            typo_candidates.append(
+                (
+                    (prefix_1, keyword_prefixes[prefix_1]),
+                    (prefix_2, keyword_prefixes[prefix_2]),
+                )
+            )
+    return typo_candidates
