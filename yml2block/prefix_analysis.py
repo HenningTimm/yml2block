@@ -7,6 +7,17 @@ replaced, missing, or transposed letters, we use the Damerau Levenshtein distanc
 to compute distances between texts.
 The current heuristics are not able to guess all typos and can generate false positives.
 Thus, all lints based on this module should only produce warnings instead of errors.
+
+To estimate if an attribute contains an error, we group attributes by their shared prefixes,
+which are a common way to group attributes as part of dataverse metadata schema files.
+Based on this grouping by characteristic prefixes, we compare these prefixes.
+The grouping is performed by the function split_bycommon_prefix and greedily groups
+by the longest possible prefix. The exact rules are explained in the docstring of
+that function.
+
+Heuristics used to guess typos are applied in the function estimate typos.
+Currently only a simple heuristic based on singletons is available, but additional
+ones are planned for the future.
 """
 import os
 from jellyfish import damerau_levenshtein_distance as dl_dist
@@ -127,37 +138,11 @@ def _singleton_heuristic(keyword_prefixes, dl_distance_threshold):
 
 
 def estimate_typos(keyword_prefixes, dl_distance_threshold=1):
+    """Run all typo estimation functions."""
     typo_candidates = []
     typo_candidates.extend(
         _singleton_heuristic(keyword_prefixes, dl_distance_threshold)
     )
-    # for prefix_1, prefix_2 in itertools.combinations(keywords.keys(), 2):
-    #     if dl_dist(prefix_1, prefix_2) == dl_distance_threshold:
-    #         print(
-    #             f"The two prefixes {prefix_1} and {prefix_2} are similar enough to merge"
-    #         )
-    #         typo_candidates.append(
-    #             (
-    #                 (prefix_1, keyword_prefixes[prefix_1]),
-    #                 (prefix_2, keyword_prefixes[prefix_2]),
-    #             )
-    #         )
 
-    # # Assemble a list of all prefixes with exactly one entry
-    # # These are likely candidates for typos.
-    # singleton_prefixes = [pref for pref, entr in keywords.items() if len(items)==1]
-    # for singleton_prefix in singleton_prefixes:
-    #     for prefix, entries in keywords.items():
-    #         if prefix == singleton_prefix:
-    #             # Skip the singleton itself
-    #             continue
-    #         for entry in entries:
-    #             # NOTE: We cannot safely assume that the singleton is longer
-    #             # For many reasonable applications it is, but there are
-    #             # examples where we cannot. e.g. "Foobar1", "Foobar2", "Test"
-    #             # Where Test is the singleton as well as the shortest entry
-    #             assert len(entry) >= len(singleton_prefix)
-    #             truncated_singleton_prefix = singleton_prefix[:len(entry)]
-    #             if dl_dist(truncated_singleton_prefix, entry) == dl_distance_threshold
-
+    # TODO: Compute differences between larger groups as well.
     return typo_candidates
