@@ -85,17 +85,71 @@ def split_by_common_prefixes(keywords, threshold=3, verbose=False):
     return identified_groups
 
 
+def _singleton_heuristic(keyword_prefixes, dl_distance_threshold):
+    typo_candidates = []
+    singletons = [
+        pref for pref, entries in keyword_prefixes.items() if len(entries) == 1
+    ]
+    for singleton_prefix in singletons:
+        print(f"Singleton Prefix {singleton_prefix}")
+        for prefix, entries in keyword_prefixes.items():
+            print(f"  checking for {prefix}", end="")
+            if prefix == singleton_prefix:
+                # Skip the prefix itself
+                print(" skipped (identity)")
+                continue
+            elif len(singleton_prefix) < len(prefix):
+                # Skip prefixes that are longer than the selected singleton
+                # since these cannot be mistyped versions of the same prefix
+                print(" skipped for length")
+                continue
+            else:
+                truncated_singleton_prefix = singleton_prefix[: len(prefix)]
+                print(f" truncated to {truncated_singleton_prefix}", end="")
+                computed_distance = dl_dist(truncated_singleton_prefix, prefix)
+                print(f" with dl_dist == {computed_distance}")
+                if computed_distance <= dl_distance_threshold:
+                    typo_candidates.append(
+                        (
+                            {singleton_prefix: keyword_prefixes[singleton_prefix]},
+                            {prefix: keyword_prefixes[prefix]},
+                        ),
+                    )
+    return typo_candidates
+
+
 def estimate_typos(keyword_prefixes, dl_distance_threshold=1):
     typo_candidates = []
-    for prefix_1, prefix_2 in itertools.combinations(keywords.keys(), 2):
-        if dl_dist(prefix_1, prefix_2) == dl_distance_threshold:
-            print(
-                f"The two prefixes {prefix_1} and {prefix_2} are similar enough to merge"
-            )
-            typo_candidates.append(
-                (
-                    (prefix_1, keyword_prefixes[prefix_1]),
-                    (prefix_2, keyword_prefixes[prefix_2]),
-                )
-            )
+    typo_candidates.extend(
+        _singleton_heuristic(keyword_prefixes, dl_distance_threshold)
+    )
+    # for prefix_1, prefix_2 in itertools.combinations(keywords.keys(), 2):
+    #     if dl_dist(prefix_1, prefix_2) == dl_distance_threshold:
+    #         print(
+    #             f"The two prefixes {prefix_1} and {prefix_2} are similar enough to merge"
+    #         )
+    #         typo_candidates.append(
+    #             (
+    #                 (prefix_1, keyword_prefixes[prefix_1]),
+    #                 (prefix_2, keyword_prefixes[prefix_2]),
+    #             )
+    #         )
+
+    # # Assemble a list of all prefixes with exactly one entry
+    # # These are likely candidates for typos.
+    # singleton_prefixes = [pref for pref, entr in keywords.items() if len(items)==1]
+    # for singleton_prefix in singleton_prefixes:
+    #     for prefix, entries in keywords.items():
+    #         if prefix == singleton_prefix:
+    #             # Skip the singleton itself
+    #             continue
+    #         for entry in entries:
+    #             # NOTE: We cannot safely assume that the singleton is longer
+    #             # For many reasonable applications it is, but there are
+    #             # examples where we cannot. e.g. "Foobar1", "Foobar2", "Test"
+    #             # Where Test is the singleton as well as the shortest entry
+    #             assert len(entry) >= len(singleton_prefix)
+    #             truncated_singleton_prefix = singleton_prefix[:len(entry)]
+    #             if dl_dist(truncated_singleton_prefix, entry) == dl_distance_threshold
+
     return typo_candidates

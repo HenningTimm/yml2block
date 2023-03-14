@@ -1,5 +1,5 @@
 from yml2block.__main__ import guess_input_type
-from yml2block.prefix_analysis import split_by_common_prefixes
+from yml2block.prefix_analysis import split_by_common_prefixes, estimate_typos
 
 
 def test_input_guessing_valid_tsv():
@@ -216,3 +216,32 @@ def test_prefix_splitting_longest_binding():
 
     result = split_by_common_prefixes(kws)
     assert expected_groups == result
+
+
+def test_typo_prefix_heuristic():
+    kw_prefixes = {
+        "FoobarAttr": ["FoobarAttr1", "FoobarAttrZwo", "FoobarAttrDrei"],
+        "FoobraAttrNrVier": ["FoobraAttrNrVier"],
+        "Bar": "Bar",
+    }
+    expected_typo_candidates = [
+        (
+            {"FoobraAttrNrVier": ["FoobraAttrNrVier"]},
+            {"FoobarAttr": ["FoobarAttr1", "FoobarAttrZwo", "FoobarAttrDrei"]},
+        )
+    ]
+    typo_candidates = estimate_typos(kw_prefixes, dl_distance_threshold=1)
+    assert typo_candidates == expected_typo_candidates
+
+
+def test_full_typo_estimation():
+    kw_prefixes = {
+        "FoobarAttr": ["FoobarAttr1", "FoobarAttrZwo"],
+        "FoobraAttr": ["FoobraAttrDrei", "FoobraAttrNrVier"],
+        "FoobarAttrB": ["FoobarAttrBar", "FoobarAttrBoo"],
+        "Bar": ["Bar"],
+        "Foobar": ["Foobar"],
+        "F0obarAttr": ["F0obarAttrEight", "F0obarAttrNine"],
+    }
+
+    raise NotImplemented
