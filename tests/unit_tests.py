@@ -218,7 +218,21 @@ def test_prefix_splitting_longest_binding():
     assert expected_groups == result
 
 
-def test_typo_prefix_heuristic():
+def test_typo_detection_no_typo():
+    """Are prefix sets without probable typos handled correctly?"""
+    kw_prefixes = {
+        "FoobarAttr": ["FoobarAttr1", "FoobarAttrZwo", "FoobarAttrDrei"],
+        "BarfooAttr": ["BarfooAttr1", "BarfooAttr2"],
+        "Bar": "Bar",
+    }
+    expected_typo_candidates = []
+
+    typo_candidates = estimate_typos(kw_prefixes, dl_distance_threshold=1)
+    assert typo_candidates == expected_typo_candidates
+
+
+def test_typo_singleton_heuristic():
+    """Are typos covered by the singleton heuristic detected correctly?"""
     kw_prefixes = {
         "FoobarAttr": ["FoobarAttr1", "FoobarAttrZwo", "FoobarAttrDrei"],
         "FoobraAttrNrVier": ["FoobraAttrNrVier"],
@@ -233,6 +247,28 @@ def test_typo_prefix_heuristic():
     typo_candidates = estimate_typos(kw_prefixes, dl_distance_threshold=1)
     assert typo_candidates == expected_typo_candidates
 
+
+def test_typo_different_distances():
+    """Are typos covered by the singleton heuristic detected correctly?"""
+    kw_prefixes = {
+        "FoobarAttr": ["FoobarAttr1", "FoobarAttrZwo", "FoobarAttrDrei"],
+        # This prefix has a DL-distance of 2 (1 replacement X->o and one transposition ra->ar)
+        # It should not be detected with threshold 1, but with threshold 2.
+        "FXobraAttrNrVier": ["FXobraAttrNrVier"], 
+        "Bar": "Bar",
+    }
+    expected_typo_candidates_distance_1 = []
+    typo_candidates_distance_1 = estimate_typos(kw_prefixes, dl_distance_threshold=1)
+    assert typo_candidates_distance_1 == expected_typo_candidates_distance_1
+
+    expected_typo_candidates_distance_2 = [
+        (
+            {"FXobraAttrNrVier": ["FXobraAttrNrVier"]},
+            {"FoobarAttr": ["FoobarAttr1", "FoobarAttrZwo", "FoobarAttrDrei"]},
+        )
+    ]
+    typo_candidates_distance_2 = estimate_typos(kw_prefixes, dl_distance_threshold=2)
+    assert typo_candidates_distance_2 == expected_typo_candidates_distance_2
 
 def test_full_typo_estimation():
     kw_prefixes = {
