@@ -1,4 +1,12 @@
 """This module contains facilities to screen prefixes of metadata fields to detect typos.
+
+This module tries to guess, if minor typos are present in the attribute names.
+We consider two attributes to be a likely to contain a typo, if they can be transformed
+to be identical with few operations. Since we expect the most likely typos to be
+replaced, missing, or transposed letters, we use the Damerau Levenshtein distance
+to compute distances between texts.
+The current heuristics are not able to guess all typos and can generate false positives.
+Thus, all lints based on this module should only produce warnings instead of errors.
 """
 import os
 from jellyfish import damerau_levenshtein_distance as dl_dist
