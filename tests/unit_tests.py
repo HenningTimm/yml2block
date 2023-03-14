@@ -249,12 +249,12 @@ def test_typo_singleton_heuristic():
 
 
 def test_typo_different_distances():
-    """Are typos covered by the singleton heuristic detected correctly?"""
+    """Does typo estimation with different DL-distances work as expected??"""
     kw_prefixes = {
         "FoobarAttr": ["FoobarAttr1", "FoobarAttrZwo", "FoobarAttrDrei"],
         # This prefix has a DL-distance of 2 (1 replacement X->o and one transposition ra->ar)
         # It should not be detected with threshold 1, but with threshold 2.
-        "FXobraAttrNrVier": ["FXobraAttrNrVier"], 
+        "FXobraAttrNrVier": ["FXobraAttrNrVier"],
         "Bar": "Bar",
     }
     expected_typo_candidates_distance_1 = []
@@ -269,6 +269,7 @@ def test_typo_different_distances():
     ]
     typo_candidates_distance_2 = estimate_typos(kw_prefixes, dl_distance_threshold=2)
     assert typo_candidates_distance_2 == expected_typo_candidates_distance_2
+
 
 def test_full_typo_estimation():
     kw_prefixes = {
