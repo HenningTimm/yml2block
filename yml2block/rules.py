@@ -1,7 +1,7 @@
 """This file contains lints that can be selectively applied to yaml blocks.
 """
 from collections import Counter
-
+from yml2block import prefix_analysis
 
 # Note: The order of entries in this list defines the enforced order in the output file
 # Note: These are referred to as top-level keywords.
@@ -255,17 +255,28 @@ def no_substructures_present(list_item, tsv_keyword):
     return violations
 
 
-def possible_typo_in_entry(keyword_items):
+def possible_typo_in_entry(yaml_chunk, tsv_keyword):
     """Screen keywords for similarities that could be explained by types."""
     violations = []
 
-    for (prefix_1, entries_1), (prefix_2, entries_2) in estimiate_typos(keyword_items):
+    if tsv_keyword in ("metadataBlock", "datasetField"):
+        keyword_items = [e["name"] for e in yaml_chunk]
+    elif tsv_keyword == "controlledVocaubalry":
+        keyword_items = [e["DatasetField"] for e in yaml_chunk]
+    else:
+        # Invalid keywords are handled elsewhere
+        return []
+
+    print(f"FOO, {keyword_items}")
+    typo_candidates = prefix_analysis.estimate_typos(keyword_items)
+    print(typo_candidates)
+    for group_1, group_2 in typo_candidates:
         violations.append(
             LintViolation(
                 "WARNING",
                 "possible_typo_in_entry",
-                f"The two prefixes {prefix_1}: {entries_1} "
-                f"and {prefix_2}: {entries_2} are very similar. "
+                f"The two prefixes {group_1} "
+                f"and {group_2} are very similar. "
                 "Are you sure this is not due to a typo?",
             )
         )

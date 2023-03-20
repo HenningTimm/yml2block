@@ -60,7 +60,7 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
 
     longest_row = 0
 
-    for lint in (rules.unique_names,):
+    for lint in (rules.unique_names, rules.possible_typo_in_entry):
         violations.extend(lint(yaml_chunk, tsv_keyword))
 
     for item in yaml_chunk:

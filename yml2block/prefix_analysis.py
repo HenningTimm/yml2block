@@ -137,11 +137,16 @@ def _singleton_heuristic(keyword_prefixes, dl_distance_threshold):
     return typo_candidates
 
 
-def estimate_typos(keyword_prefixes, dl_distance_threshold=1):
+def estimate_typos(keyword_prefixes, dl_distance_threshold=1, verbose=True):
     """Run all typo estimation functions."""
+    if verbose:
+        print(f"Analysing keyword prefixes: {keyword_prefixes}")
     typo_candidates = []
+
+    split_keyword_prefixes = split_by_common_prefixes(keyword_prefixes, 3, verbose)
+
     typo_candidates.extend(
-        _singleton_heuristic(keyword_prefixes, dl_distance_threshold)
+        _singleton_heuristic(split_keyword_prefixes, dl_distance_threshold)
     )
 
     # TODO: Compute differences between larger groups as well.
