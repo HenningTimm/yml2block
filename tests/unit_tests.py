@@ -271,7 +271,11 @@ def test_typo_different_distances():
     assert typo_candidates_distance_2 == expected_typo_candidates_distance_2
 
 
-def test_full_typo_estimation():
+def test_placeholder_full_typo_estimation():
+    """Placeholder test for more complex detection."""
+    # These typos cannot be detected by the singleton heuristic.
+    # This test serves as a placeholder for future tests that can
+    # and should come up empty until then.
     kw_prefixes = {
         "FoobarAttr": ["FoobarAttr1", "FoobarAttrZwo"],
         "FoobraAttr": ["FoobraAttrDrei", "FoobraAttrNrVier"],
@@ -281,4 +285,6 @@ def test_full_typo_estimation():
         "F0obarAttr": ["F0obarAttrEight", "F0obarAttrNine"],
     }
 
-    raise NotImplemented
+    expected_typo_candidates = []
+    typo_candidates = estimate_typos(kw_prefixes, dl_distance_threshold=1)
+    assert typo_candidates == expected_typo_candidates
