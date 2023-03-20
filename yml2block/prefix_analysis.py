@@ -23,7 +23,7 @@ import os
 from jellyfish import damerau_levenshtein_distance as dl_dist
 
 
-def split_by_common_prefixes(keywords, threshold=3, verbose=False):
+def split_by_common_prefixes(keywords, min_prefix_length=3, verbose=False):
     """Split a list of keyword strings by their common prefixes.
 
     This has a worst case runtime of O(n^2) for the case where
@@ -52,7 +52,7 @@ def split_by_common_prefixes(keywords, threshold=3, verbose=False):
     """
     identified_groups = {}
     if verbose:
-        print(f"Checking with threshold {threshold}")
+        print(f"Checking with min_prefix_length {min_prefix_length}")
 
     while keywords:
         # Pick the first entry of keywords as the reference entry and remove it
@@ -72,7 +72,7 @@ def split_by_common_prefixes(keywords, threshold=3, verbose=False):
                     f"current prefix {current_prefix}, found common prefix {common_prefix}"
                 )
 
-            if current_prefix is None and len(common_prefix) >= threshold:
+            if current_prefix is None and len(common_prefix) >= min_prefix_length:
                 # The first shared prefix was detected.
                 current_prefix = common_prefix
                 current_group.append(kw)
@@ -137,13 +137,15 @@ def _singleton_heuristic(keyword_prefixes, dl_distance_threshold):
     return typo_candidates
 
 
-def estimate_typos(keyword_prefixes, dl_distance_threshold=1, verbose=True):
-    """Run all typo estimation functions."""
+def estimate_typos(keyword_prefixes, min_prefix_length=3, dl_distance_threshold=1, verbose=False):
+    """Run all typo estimation functions and return likely candidates for typos."""
     if verbose:
         print(f"Analysing keyword prefixes: {keyword_prefixes}")
-    typo_candidates = []
+        print(f"Searching for prefixes of length at least {min_prefix_length}")
+        print(f"And a Damerau Levenshtein distance of at most {dl_distance_threshold}")
 
-    split_keyword_prefixes = split_by_common_prefixes(keyword_prefixes, 3, verbose)
+    typo_candidates = []
+    split_keyword_prefixes = split_by_common_prefixes(keyword_prefixes, min_prefix_length, verbose)
 
     typo_candidates.extend(
         _singleton_heuristic(split_keyword_prefixes, dl_distance_threshold)

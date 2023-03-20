@@ -1,5 +1,5 @@
 from yml2block import rules
-
+from functools import partial
 
 def validate_yaml(data, verbose):
     """Check if the given yaml file is valid.
@@ -60,7 +60,10 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
 
     longest_row = 0
 
-    for lint in (rules.unique_names, rules.possible_typo_in_entry):
+    for lint in (
+            rules.unique_names,
+            partial(rules.possible_typo_in_entry, verbose=verbose)
+    ):
         violations.extend(lint(yaml_chunk, tsv_keyword))
 
     for item in yaml_chunk:

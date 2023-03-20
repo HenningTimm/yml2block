@@ -255,7 +255,7 @@ def no_substructures_present(list_item, tsv_keyword):
     return violations
 
 
-def possible_typo_in_entry(yaml_chunk, tsv_keyword):
+def possible_typo_in_entry(yaml_chunk, tsv_keyword, verbose):
     """Screen keywords for similarities that could be explained by types."""
     violations = []
 
@@ -268,7 +268,7 @@ def possible_typo_in_entry(yaml_chunk, tsv_keyword):
         return []
 
     print(f"FOO, {keyword_items}")
-    typo_candidates = prefix_analysis.estimate_typos(keyword_items)
+    typo_candidates = prefix_analysis.estimate_typos(keyword_items, verbose=verbose)
     print(typo_candidates)
     for group_1, group_2 in typo_candidates:
         violations.append(
