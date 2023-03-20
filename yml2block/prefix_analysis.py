@@ -137,7 +137,9 @@ def _singleton_heuristic(keyword_prefixes, dl_distance_threshold):
     return typo_candidates
 
 
-def estimate_typos(keyword_prefixes, min_prefix_length=3, dl_distance_threshold=1, verbose=False):
+def estimate_typos(
+    keyword_prefixes, min_prefix_length=3, dl_distance_threshold=1, verbose=False
+):
     """Run all typo estimation functions and return likely candidates for typos."""
     if verbose:
         print(f"Analysing keyword prefixes: {keyword_prefixes}")
@@ -145,7 +147,9 @@ def estimate_typos(keyword_prefixes, min_prefix_length=3, dl_distance_threshold=
         print(f"And a Damerau Levenshtein distance of at most {dl_distance_threshold}")
 
     typo_candidates = []
-    split_keyword_prefixes = split_by_common_prefixes(keyword_prefixes, min_prefix_length, verbose)
+    split_keyword_prefixes = split_by_common_prefixes(
+        keyword_prefixes, min_prefix_length, verbose
+    )
 
     typo_candidates.extend(
         _singleton_heuristic(split_keyword_prefixes, dl_distance_threshold)
