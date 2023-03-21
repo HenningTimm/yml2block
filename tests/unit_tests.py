@@ -179,7 +179,6 @@ def test_prefix_splitting_min_pref_len():
     result_min_pref_len_4 = split_by_common_prefixes(kws, min_prefix_length=4)
     assert result_min_pref_len_4 == expected_groups_min_pref_len_4
 
-    kws = ["Foo1", "Foo2", "Foo3"]
     expected_groups_min_pref_len_3 = {"Foo": ["Foo1", "Foo2", "Foo3"]}
     result_min_pref_len_3 = split_by_common_prefixes(kws, min_prefix_length=3)
     assert result_min_pref_len_3 == expected_groups_min_pref_len_3
@@ -220,14 +219,21 @@ def test_prefix_splitting_longest_binding():
 
 def test_typo_detection_no_typo():
     """Are prefix sets without probable typos handled correctly?"""
-    keywords = ["FoobarAttr1", "FoobarAttrZwo", "FoobarAttrDrei", "BarfooAttr1", "BarfooAttr2", "Bar",]
-    
+    keywords = [
+        "FoobarAttr1",
+        "FoobarAttrZwo",
+        "FoobarAttrDrei",
+        "BarfooAttr1",
+        "BarfooAttr2",
+        "Bar",
+    ]
     # NOTE: The keywords above should split into the groups shown below
     # keywords = {
     #     "FoobarAttr": ["FoobarAttr1", "FoobarAttrZwo", "FoobarAttrDrei"],
     #     "BarfooAttr": ["BarfooAttr1", "BarfooAttr2"],
     #     "Bar": "Bar",
     # }
+
     expected_typo_candidates = []
 
     typo_candidates = estimate_typos(keywords, dl_distance_threshold=1)
@@ -236,8 +242,13 @@ def test_typo_detection_no_typo():
 
 def test_typo_singleton_heuristic():
     """Are typos covered by the singleton heuristic detected correctly?"""
-    keywords = ["FoobarAttr1", "FoobarAttrZwo", "FoobarAttrDrei", "FoobraAttrNrVier", "Bar"]
-
+    keywords = [
+        "FoobarAttr1",
+        "FoobarAttrZwo",
+        "FoobarAttrDrei",
+        "FoobraAttrNrVier",
+        "Bar",
+    ]
     # NOTE: The keywords above should split into the groups shown below
     # keywords = {
     #     "FoobarAttr": ["FoobarAttr1", "FoobarAttrZwo", "FoobarAttrDrei"],
@@ -264,7 +275,6 @@ def test_typo_different_distances():
         "FXobraAttrNrVier",
         "Bar",
     ]
-
     # NOTE: The keywords above should split into the groups shown below
     # keywords = {
     #     "FoobarAttr": ["FoobarAttr1", "FoobarAttrZwo", "FoobarAttrDrei"],
@@ -274,8 +284,11 @@ def test_typo_different_distances():
     #     "FXobraAttrNrVier": ["FXobraAttrNrVier"],
     #     "Bar": "Bar",
     # }
+
     expected_typo_candidates_distance_1 = []
-    typo_candidates_distance_1 = estimate_typos(keywords, dl_distance_threshold=1)
+    typo_candidates_distance_1 = estimate_typos(
+        keywords, dl_distance_threshold=1, verbose=True
+    )
     assert typo_candidates_distance_1 == expected_typo_candidates_distance_1
 
     expected_typo_candidates_distance_2 = [
@@ -284,7 +297,9 @@ def test_typo_different_distances():
             {"FoobarAttr": ["FoobarAttr1", "FoobarAttrZwo", "FoobarAttrDrei"]},
         )
     ]
-    typo_candidates_distance_2 = estimate_typos(keywords, dl_distance_threshold=2)
+    typo_candidates_distance_2 = estimate_typos(
+        keywords, dl_distance_threshold=2, verbose=True
+    )
     assert typo_candidates_distance_2 == expected_typo_candidates_distance_2
 
 
@@ -293,8 +308,18 @@ def test_placeholder_full_typo_estimation():
     # These typos cannot be detected by the singleton heuristic.
     # This test serves as a placeholder for future tests that can
     # and should come up empty until then.
-    keywords = ["FoobarAttr1", "FoobarAttrZwo", "FoobraAttrDrei", "FoobraAttrNrVier", "FoobarAttrBar", "FoobarAttrBoo", "Bar", "Foobar", "F0obarAttrEight", "F0obarAttrNine"]
-
+    keywords = [
+        "FoobarAttr1",
+        "FoobarAttrZwo",
+        "FoobraAttrDrei",
+        "FoobraAttrNrVier",
+        "FoobarAttrBar",
+        "FoobarAttrBoo",
+        "Bar",
+        "Foobar",
+        "F0obarAttrEight",
+        "F0obarAttrNine",
+    ]
     # NOTE: The keywords defined above should split into the groups showm below
     # split_kws = {
     #     "FoobarAttr": ["FoobarAttr1", "FoobarAttrZwo"],

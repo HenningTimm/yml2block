@@ -20,6 +20,7 @@ Currently only a simple heuristic based on singletons is available, but addition
 ones are planned for the future.
 """
 import os
+import copy
 from jellyfish import damerau_levenshtein_distance as dl_dist
 
 
@@ -54,6 +55,9 @@ def split_by_common_prefixes(keywords, min_prefix_length=3, verbose=False):
     if verbose:
         print(f"Checking {keywords} with min_prefix_length {min_prefix_length}")
 
+    # Create a copy of the input list so that we can modify it without creating unexpected
+    # states in the reference-passed keyword list further down the line.
+    keywords = copy.deepcopy(keywords)
     while keywords:
         # Pick the first entry of keywords as the reference entry and remove it
         # from the list. This ensures, that this loop terminates after at most n
@@ -150,6 +154,9 @@ def estimate_typos(
     split_keyword_prefixes = split_by_common_prefixes(
         keyword_prefixes, min_prefix_length, verbose
     )
+
+    if verbose:
+        print(f"Split into the following groups: {split_keyword_prefixes}")
 
     typo_candidates.extend(
         _singleton_heuristic(split_keyword_prefixes, dl_distance_threshold)
