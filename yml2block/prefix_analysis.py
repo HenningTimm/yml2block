@@ -52,7 +52,7 @@ def split_by_common_prefixes(keywords, min_prefix_length=3, verbose=False):
     """
     identified_groups = {}
     if verbose:
-        print(f"Checking with min_prefix_length {min_prefix_length}")
+        print(f"Checking {keywords} with min_prefix_length {min_prefix_length}")
 
     while keywords:
         # Pick the first entry of keywords as the reference entry and remove it
