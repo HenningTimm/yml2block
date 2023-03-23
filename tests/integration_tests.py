@@ -53,3 +53,11 @@ def test_wrong_extensions_fail():
         yml2block.__main__.main, ["tests/invalid/minimal_example.xlsx", "--check"]
     )
     assert result.exit_code == 1, result.output
+
+def test_typo_estimation():
+    """Ensure that files that contain likely mistyped entries are detected."""
+    runner = CliRunner()
+    result = runner.invoke(
+        yml2block.__main__.main, ["tests/invalid/typo_in_attribute.yml", "--check"]
+    )
+    assert result.exit_code == 1, result.output
