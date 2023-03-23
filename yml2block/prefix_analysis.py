@@ -109,28 +109,29 @@ def split_by_common_prefixes(keywords, min_prefix_length=3, verbose=False):
 
 
 def _singleton_heuristic(keyword_prefixes, dl_distance_threshold):
+    """Estimate if single, long groups are mistyped versions of larger shorter groups."""
     typo_candidates = []
     singletons = [
         pref for pref, entries in keyword_prefixes.items() if len(entries) == 1
     ]
     for singleton_prefix in singletons:
-        print(f"Singleton Prefix {singleton_prefix}")
         for prefix, entries in keyword_prefixes.items():
-            print(f"  checking for {prefix}", end="")
             if prefix == singleton_prefix:
                 # Skip the prefix itself
-                print(" skipped (identity)")
                 continue
             elif len(singleton_prefix) < len(prefix):
                 # Skip prefixes that are longer than the selected singleton
                 # since these cannot be mistyped versions of the same prefix
-                print(" skipped for length")
                 continue
             else:
+                # Singletons are not trimmed to a groups consensus and are
+                # consequently longer than the prefix of a group they could be
+                # assigned to. Note that adding a new entry to the group can never
+                # elongate the characteristic prefix.
+                # To allow for comparison, singleton prefixes are truncated to
+                # the length of the groups prefix.
                 truncated_singleton_prefix = singleton_prefix[: len(prefix)]
-                print(f" truncated to {truncated_singleton_prefix}", end="")
                 computed_distance = dl_dist(truncated_singleton_prefix, prefix)
-                print(f" with dl_dist == {computed_distance}")
                 if computed_distance <= dl_distance_threshold:
                     typo_candidates.append(
                         (
