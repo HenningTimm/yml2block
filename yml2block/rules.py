@@ -255,7 +255,7 @@ def no_substructures_present(list_item, tsv_keyword):
     return violations
 
 
-def possible_typo_in_entry(yaml_chunk, tsv_keyword, verbose):
+def possible_typo_in_entry(yaml_chunk, tsv_keyword, verbose, kwargs):
     """Screen keywords for similarities that could be explained by typos."""
     violations = []
 
@@ -267,9 +267,7 @@ def possible_typo_in_entry(yaml_chunk, tsv_keyword, verbose):
         # Invalid keywords are handled elsewhere
         return []
 
-    print(f"FOO, {keyword_items}")
-    typo_candidates = prefix_analysis.estimate_typos(keyword_items, verbose=verbose)
-    print(typo_candidates)
+    typo_candidates = prefix_analysis.estimate_typos(keyword_items, min_prefix_length=3, dl_distance_threshold=kwargs["typo_distance"], verbose=verbose)
     for group_1, group_2 in typo_candidates:
         violations.append(
             LintViolation(

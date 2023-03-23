@@ -50,7 +50,6 @@ def guess_input_type(input_path):
 
 @click.command()
 @click.argument("file_path")
-@click.option("--verbose", "-v", count=True, help="Print performed checks to stdout.")
 @click.option(
     "--outfile", "-o", nargs=1, help="Path to where the output file will be written."
 )
@@ -59,12 +58,18 @@ def guess_input_type(input_path):
     is_flag=True,
     help="Only check the yaml file and do not write any output.",
 )
-def main(file_path, verbose, outfile, check):
+@click.option("--verbose", "-v", count=True, help="Print performed checks to stdout.")
+@click.option("--typo-distance", nargs=1, help="Damerau Levenshtein distance between shared prefixes that are considered a typo.", default=1)
+def main(file_path, outfile, check, **kwargs):
+    if kwargs["verbose"] >= 3:
+        print(kwargs)
+
     if outfile is None:
         path, _ext = os.path.splitext(file_path)
         outfile = f"{path}.tsv"
 
-    if verbose:
+
+    if kwargs["verbose"]:
         print(f"Checking input file: {file_path}\n\n")
 
     lint_violations = []
@@ -74,12 +79,12 @@ def main(file_path, verbose, outfile, check):
 
     if input_type == "yaml":
         data, longest_row, file_lint_violations = yaml_input.read_yaml(
-            file_path, verbose
+            file_path, kwargs["verbose"], kwargs
         )
     elif input_type in ("tsv", "csv"):
         data, tsv_parsing_violations = tsv_input.read_tsv(file_path)
         lint_violations.extend(tsv_parsing_violations)
-        longest_row, file_lint_violations = validation.validate_yaml(data, verbose)
+        longest_row, file_lint_violations = validation.validate_yaml(data, kwargs["verbose"], kwargs)
     else:
         file_lint_violations = []
         longest_row = 0
@@ -87,10 +92,10 @@ def main(file_path, verbose, outfile, check):
     lint_violations.extend(file_lint_violations)
 
     if len(lint_violations) == 0:
-        if verbose:
+        if kwargs["verbose"]:
             print("\nAll Checks passed!\n\n")
         if (not check) and (input_type == "yaml"):
-            output.write_metadata_block(data, outfile, longest_row, verbose)
+            output.write_metadata_block(data, outfile, longest_row, kwargs["verbose"])
     else:
         print(f"A total of {len(lint_violations)} lint(s) failed.")
         for violation in lint_violations:

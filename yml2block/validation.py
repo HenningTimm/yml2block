@@ -2,14 +2,14 @@ from yml2block import rules
 from functools import partial
 
 
-def validate_yaml(data, verbose):
+def validate_yaml(data, verbose, kwargs):
     """Check if the given yaml file is valid.
     Underlying checks will return lists of LintViolations if they don't.
     """
     violations = validate_keywords(data.keys(), verbose)
     longest_row = 0
     for kw, content in data.items():
-        block_row_max, entry_violations = validate_entry(data[kw], kw, verbose)
+        block_row_max, entry_violations = validate_entry(data[kw], kw, verbose, kwargs)
         violations.extend(entry_violations)
         longest_row = max(longest_row, block_row_max)
 
@@ -44,7 +44,7 @@ def validate_keywords(keywords, verbose):
         return []
 
 
-def validate_entry(yaml_chunk, tsv_keyword, verbose):
+def validate_entry(yaml_chunk, tsv_keyword, verbose, kwargs):
     """Validate a record, based on its type.
 
     Perform second level list item lints.
@@ -63,7 +63,7 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
 
     for lint in (
         rules.unique_names,
-        partial(rules.possible_typo_in_entry, verbose=verbose),
+        partial(rules.possible_typo_in_entry, verbose=verbose, kwargs=kwargs),
     ):
         violations.extend(lint(yaml_chunk, tsv_keyword))
 
