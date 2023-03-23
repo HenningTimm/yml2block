@@ -256,7 +256,7 @@ def no_substructures_present(list_item, tsv_keyword):
 
 
 def possible_typo_in_entry(yaml_chunk, tsv_keyword, verbose):
-    """Screen keywords for similarities that could be explained by types."""
+    """Screen keywords for similarities that could be explained by typos."""
     violations = []
 
     if tsv_keyword in ("metadataBlock", "datasetField"):
