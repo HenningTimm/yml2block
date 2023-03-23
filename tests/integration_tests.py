@@ -54,6 +54,7 @@ def test_wrong_extensions_fail():
     )
     assert result.exit_code == 1, result.output
 
+
 def test_typo_estimation():
     """Ensure that files that contain likely mistyped entries are detected."""
     runner = CliRunner()
