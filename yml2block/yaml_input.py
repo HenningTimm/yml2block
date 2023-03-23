@@ -13,7 +13,9 @@ def read_yaml(file_path, verbose, kwargs):
         yaml = YAML(typ="safe")
         try:
             data = yaml.load(yml_file)
-            longest_row, file_lint_violations = validation.validate_yaml(data, verbose, kwargs)
+            longest_row, file_lint_violations = validation.validate_yaml(
+                data, verbose, kwargs
+            )
         except DuplicateKeyError as dke:
             longest_row = 0
             # Raise error for duplicate keys

@@ -59,7 +59,12 @@ def guess_input_type(input_path):
     help="Only check the yaml file and do not write any output.",
 )
 @click.option("--verbose", "-v", count=True, help="Print performed checks to stdout.")
-@click.option("--typo-distance", nargs=1, help="Damerau Levenshtein distance between shared prefixes that are considered a typo.", default=1)
+@click.option(
+    "--typo-distance",
+    nargs=1,
+    help="Damerau Levenshtein distance between shared prefixes that are considered a typo.",
+    default=1,
+)
 def main(file_path, outfile, check, **kwargs):
     if kwargs["verbose"] >= 3:
         print(kwargs)
@@ -67,7 +72,6 @@ def main(file_path, outfile, check, **kwargs):
     if outfile is None:
         path, _ext = os.path.splitext(file_path)
         outfile = f"{path}.tsv"
-
 
     if kwargs["verbose"]:
         print(f"Checking input file: {file_path}\n\n")
@@ -84,7 +88,9 @@ def main(file_path, outfile, check, **kwargs):
     elif input_type in ("tsv", "csv"):
         data, tsv_parsing_violations = tsv_input.read_tsv(file_path)
         lint_violations.extend(tsv_parsing_violations)
-        longest_row, file_lint_violations = validation.validate_yaml(data, kwargs["verbose"], kwargs)
+        longest_row, file_lint_violations = validation.validate_yaml(
+            data, kwargs["verbose"], kwargs
+        )
     else:
         file_lint_violations = []
         longest_row = 0
