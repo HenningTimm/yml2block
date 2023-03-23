@@ -148,6 +148,7 @@ def estimate_typos(
     """Run all typo estimation functions and return likely candidates for typos."""
     if verbose:
         print(f"Analysing keyword prefixes: {keyword_prefixes}")
+    if verbose >= 2:
         print(f"Searching for prefixes of length at least {min_prefix_length}")
         print(f"And a Damerau Levenshtein distance of at most {dl_distance_threshold}")
 
@@ -157,7 +158,9 @@ def estimate_typos(
     )
 
     if verbose:
-        print(f"Split into the following groups: {split_keyword_prefixes}")
+        print(
+            f"Keywords were split into the following groups: {split_keyword_prefixes}"
+        )
 
     typo_candidates.extend(
         _singleton_heuristic(split_keyword_prefixes, dl_distance_threshold)
