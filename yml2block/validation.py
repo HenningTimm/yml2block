@@ -26,7 +26,6 @@ def validate_keywords(keywords, verbose):
     for lint in [
         rules.top_level_keywords_valid,
         rules.top_level_keywords_unique,
-        rules.top_level_keywords_complete,
     ]:
         if verbose >= 2:
             print(f"Running lint: {lint.__name__}")
