@@ -56,7 +56,7 @@ def guess_input_type(input_path):
 @click.option(
     "--check",
     is_flag=True,
-    help="Only check the yaml file and do not write any output.",
+    help="Only check the metadata block (yml or tsv) file and do not write any output.",
 )
 def main(file_path, verbose, outfile, check):
     if outfile is None:
