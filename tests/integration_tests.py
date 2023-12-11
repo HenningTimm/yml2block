@@ -37,11 +37,20 @@ def test_duplicate_top_level_key_detected():
     assert result.exit_code == 1, result.output
 
 
-def test_typo_in_key_key_detected():
+def test_typo_in_key_detected():
     """This test ensures that typos in keys are detected."""
     runner = CliRunner()
     result = runner.invoke(
         yml2block.__main__.main, ["tests/invalid/typo_in_key.yml", "--check"]
+    )
+    assert result.exit_code == 1, result.output
+
+
+def test_trailing_whitespace_detected():
+    """This test ensures that typos in keys are detected."""
+    runner = CliRunner()
+    result = runner.invoke(
+        yml2block.__main__.main, ["tests/invalid/whitespace_in_key.yml", "--check"]
     )
     assert result.exit_code == 1, result.output
 

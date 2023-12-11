@@ -251,7 +251,7 @@ def no_trailing_white_spaces(list_item, tsv_keyword):
     violations = []
     for entry in entries_to_check[tsv_keyword]:
         value = list_item[entry]
-        if re.search(" +$", value):
+        if value and re.search(" +$", value):
             # Regex matches one or more spaces at the end of strings
             violations.append(
                 LintViolation(
