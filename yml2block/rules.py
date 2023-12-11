@@ -1,7 +1,8 @@
 """This file contains lints that can be selectively applied to yaml blocks.
 """
-from collections import Counter
+import re
 
+from collections import Counter
 
 # Note: The order of entries in this list defines the enforced order in the output file
 # Note: These are referred to as top-level keywords.
@@ -125,9 +126,9 @@ def top_level_keywords_valid(keywords):
     top-level keyword level lint
     """
     unique_keys = set(keywords)
-    if unique_keys == set(permissible_keys):
+    if unique_keys == set(permissible_keywords):
         return []
-    elif unique_keys == set(required_top_level_keys):
+    elif unique_keys == set(required_top_level_keywords):
         return []
     else:
         return [
@@ -212,7 +213,7 @@ def no_invalid_keys_present(list_item, tsv_keyword):
                 LintViolation(
                     "ERROR",
                     "no_invalid_keys_present",
-                    f"Invalid key {key} present in block {tsv_keyword}.",
+                    f"Invalid key {key} present for {list_item} in block {tsv_keyword}.",
                 )
             )
     return violations
@@ -231,6 +232,32 @@ def no_substructures_present(list_item, tsv_keyword):
                     "ERROR",
                     "no_substructures_present",
                     f"Key {key} in block {tsv_keyword} has a subtructure of type {type(value)}. Only strings, booleans, an numericals are allowed here.",
+                )
+            )
+    return violations
+
+
+def no_trailing_white_spaces(list_item, tsv_keyword):
+    """Make sure the entries do not contain trailing white spaces.
+
+    second-level list entry lint
+    """
+    entries_to_check = {
+        "metadataBlock": ("name", "dataverseAlias"),
+        "datasetField": ("name", "title", "description", "watermark", "fieldType", "parent", "metadatablock_id"),
+        "controlledVocabulary": ("Value", "identifier"),
+    }
+
+    violations = []
+    for entry in entries_to_check[tsv_keyword]:
+        value = list_item[entry]
+        if re.search(" +$", value):
+            # Regex matches one or more spaces at the end of strings
+            violations.append(
+                LintViolation(
+                    "ERROR",
+                    "no_trailing_white_spaces",
+                    f"The entry '{value}' has one or more trailing spaces.",
                 )
             )
     return violations

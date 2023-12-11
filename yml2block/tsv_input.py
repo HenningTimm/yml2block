@@ -77,13 +77,17 @@ def read_tsv(tsv_path):
         # For consistency with the yaml format
         toplevel_key = toplevel_key_with_prefix.lstrip("#")
         row_as_dict = dict()
-
+        
         for key, value in row.items():
             if key is None:
                 # These entries cannot be associated with a column header
                 violations.append(
                     LintViolation("ERROR", "read_tsv", "Entry in headerless column")
                 )
+            elif not key and not value:
+                # Skip empty entries ('': '') that result from the empty columns in
+                # the TSV file used to pad all lines to the same length.
+                continue
             elif key is toplevel_key_with_prefix:
                 # Skip toplevel header identifiers. These columns are empty in
                 # Dataverse TSV files

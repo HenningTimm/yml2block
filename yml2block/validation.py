@@ -67,6 +67,7 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
             rules.required_keys_present,
             rules.no_invalid_keys_present,
             rules.no_substructures_present,
+            rules.no_trailing_white_spaces,
         ):
             if verbose >= 2:
                 print(f"Running lint: {lint.__name__}")
