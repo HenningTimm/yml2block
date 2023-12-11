@@ -6,6 +6,7 @@ from collections import Counter
 # Note: The order of entries in this list defines the enforced order in the output file
 # Note: These are referred to as top-level keywords.
 permissible_keywords = ["metadataBlock", "datasetField", "controlledVocabulary"]
+required_top_level_keywords = ["metadataBlock", "datasetField"]
 
 required_keys = {
     "metadataBlock": ["name", "displayName"],
@@ -123,14 +124,17 @@ def top_level_keywords_valid(keywords):
 
     top-level keyword level lint
     """
-    if all(kw in permissible_keywords for kw in keywords):
+    unique_keys = set(keywords)
+    if unique_keys == set(permissible_keys):
+        return []
+    elif unique_keys == set(required_top_level_keys):
         return []
     else:
         return [
             LintViolation(
                 "ERROR",
                 "top_level_keywords_valid",
-                f"Keyword list '{keywords}' differs from '{permissible_keywords}'",
+                f"Keyword list '{keywords}' differs from '{permissible_keywords}' or '{required_top_level_keyword}'",
             )
         ]
 
@@ -152,29 +156,6 @@ def top_level_keywords_unique(keywords):
                 "ERROR",
                 "top_level_keywords_unique",
                 f"Keyword list '{keywords}' contains duplicate keys.",
-            )
-        ]
-
-
-def top_level_keywords_complete(keywords):
-    """Make sure all required top-level keywords are present.
-
-    top-level keyword level lint
-    """
-    unique_keys = set(keywords)
-    # NOTE: This can be relaxed later to >0 and <=3 or to a membership test
-    # if we are willing to skip over empty entries.
-    # It can probably be merged with top_level_keywords_valid since only two
-    # combinations ("metadataBlock"+"datasetField"+"controlledVocabulary" and
-    # "metadataBlock"+"datasetField") are valid. But we need to verify this first.
-    if len(unique_keys) == 3:
-        return []
-    else:
-        return [
-            LintViolation(
-                "ERROR",
-                "top_level_keywords_complete",
-                f"Keyword list {keywords} does not contain enough entries.",
             )
         ]
 
