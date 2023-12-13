@@ -77,7 +77,7 @@ def read_tsv(tsv_path):
         # For consistency with the yaml format
         toplevel_key = toplevel_key_with_prefix.lstrip("#")
         row_as_dict = dict()
-        
+
         for key, value in row.items():
             if key is None:
                 # These entries cannot be associated with a column header

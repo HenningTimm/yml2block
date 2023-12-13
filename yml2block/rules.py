@@ -244,7 +244,15 @@ def no_trailing_white_spaces(list_item, tsv_keyword):
     """
     entries_to_check = {
         "metadataBlock": ("name", "dataverseAlias"),
-        "datasetField": ("name", "title", "description", "watermark", "fieldType", "parent", "metadatablock_id"),
+        "datasetField": (
+            "name",
+            "title",
+            "description",
+            "watermark",
+            "fieldType",
+            "parent",
+            "metadatablock_id",
+        ),
         "controlledVocabulary": ("Value", "identifier"),
     }
 
