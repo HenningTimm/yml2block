@@ -4,7 +4,7 @@ metadataBlock:
     dataverseAlias:
     displayName: Invalid
 datasetField:
-  - name: Description 
+  - name: "Description "
     title: Description
     description: This field describes.
     watermark:
