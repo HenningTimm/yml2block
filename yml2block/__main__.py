@@ -8,11 +8,35 @@ import os
 import sys
 import click
 
+from collections import defaultdict
+
 from yml2block import validation
 from yml2block import output
 from yml2block import rules
 from yml2block import tsv_input
 from yml2block import yaml_input
+
+
+class ViolationsByFile:
+    def __init__(self):
+        self.violations = defaultdict(list)
+
+    def add(self, file_path, violation):
+        self.violations[file_path].append(violation)
+
+    def extend(self, violation_list):
+        for file_path, violation in violation_list:
+            self.add(file_path, violation)
+
+    def extend_for(self, file_path, violation_list):
+        for violation in violation_list:
+            self.add(file_path, violation)
+
+    def items(self):
+        yield from self.violations.items()
+
+    def __len__(self):
+        return len(self.violations)
 
 
 def guess_input_type(input_path):
@@ -66,10 +90,10 @@ def main(file_path, verbose, outfile, check):
     if verbose:
         print(f"Checking input file: {file_path}\n\n")
 
-    lint_violations = []
+    lint_violations = ViolationsByFile()
 
     input_type, file_ext_violations = guess_input_type(file_path)
-    lint_violations.extend(file_ext_violations)
+    lint_violations.extend_for(file_path, file_ext_violations)
 
     if input_type == "yaml":
         data, longest_row, file_lint_violations = yaml_input.read_yaml(
@@ -77,13 +101,13 @@ def main(file_path, verbose, outfile, check):
         )
     elif input_type in ("tsv", "csv"):
         data, tsv_parsing_violations = tsv_input.read_tsv(file_path)
-        lint_violations.extend(tsv_parsing_violations)
+        lint_violations.extend_for(file_path, tsv_parsing_violations)
         longest_row, file_lint_violations = validation.validate_yaml(data, verbose)
     else:
         file_lint_violations = []
         longest_row = 0
 
-    lint_violations.extend(file_lint_violations)
+    lint_violations.extend_for(file_path, file_lint_violations)
 
     if len(lint_violations) == 0:
         if verbose:
@@ -92,8 +116,8 @@ def main(file_path, verbose, outfile, check):
             output.write_metadata_block(data, outfile, longest_row, verbose)
     else:
         print(f"A total of {len(lint_violations)} lint(s) failed.")
-        for violation in lint_violations:
-            print(violation)
+        for file_path, violation in lint_violations.items():
+            print(file_path, violation)
         print("Errors detected. Could not convert to TSV.")
         sys.exit(1)
 
