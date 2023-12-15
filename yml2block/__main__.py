@@ -91,10 +91,10 @@ def check(file_path, verbose):
     During conversion using the yml2block convert subcommand the same checks
     are also performed.
     """
+    lint_violations = ViolationsByFile()
+
     if verbose:
         print(f"Checking input file: {file_path}\n\n")
-
-    lint_violations = ViolationsByFile()
 
     input_type, file_ext_violations = guess_input_type(file_path)
     lint_violations.extend_for(file_path, file_ext_violations)
@@ -118,8 +118,10 @@ def check(file_path, verbose):
             print("\nAll Checks passed!\n\n")
     else:
         print(f"A total of {len(lint_violations)} lint(s) failed.")
-        for file_path, violation in lint_violations.items():
-            print(file_path, violation)
+        for file_path, violations in lint_violations.items():
+            print(file_path)
+            for violation in violations:
+                print(violation)
         print("Errors detected. Conversion to TSV would not be possible.")
         sys.exit(1)
 
@@ -156,6 +158,7 @@ def convert(file_path, verbose, outfile):
     lint_violations.extend_for(file_path, file_ext_violations)
 
     if input_type == "yaml":
+        # This call invokes YAML validation internally
         data, longest_row, file_lint_violations = yaml_input.read_yaml(
             file_path, verbose
         )
@@ -176,8 +179,10 @@ def convert(file_path, verbose, outfile):
             output.write_metadata_block(data, outfile, longest_row, verbose)
     else:
         print(f"A total of {len(lint_violations)} lint(s) failed.")
-        for file_path, violation in lint_violations.items():
-            print(file_path, violation)
+        for file_path, violations in lint_violations.items():
+            print(file_path)
+            for violation in violations:
+                print(violation)
         print("Errors detected. Could not convert to TSV.")
         sys.exit(1)
 
