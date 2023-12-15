@@ -71,7 +71,12 @@ def guess_input_type(input_path):
         )
 
 
-@click.command()
+@click.group()
+def main():
+    ...
+
+
+@main.command()
 @click.argument("file_path")
 @click.option("--verbose", "-v", count=True, help="Print performed checks to stdout.")
 @click.option(
@@ -82,7 +87,58 @@ def guess_input_type(input_path):
     is_flag=True,
     help="Only check the metadata block (yml or tsv) file and do not write any output.",
 )
-def main(file_path, verbose, outfile, check):
+def check(file_path, verbose, outfile, check):
+    if outfile is None:
+        path, _ext = os.path.splitext(file_path)
+        outfile = f"{path}.tsv"
+
+    if verbose:
+        print(f"Checking input file: {file_path}\n\n")
+
+    lint_violations = ViolationsByFile()
+
+    input_type, file_ext_violations = guess_input_type(file_path)
+    lint_violations.extend_for(file_path, file_ext_violations)
+
+    if input_type == "yaml":
+        data, longest_row, file_lint_violations = yaml_input.read_yaml(
+            file_path, verbose
+        )
+    elif input_type in ("tsv", "csv"):
+        data, tsv_parsing_violations = tsv_input.read_tsv(file_path)
+        lint_violations.extend_for(file_path, tsv_parsing_violations)
+        longest_row, file_lint_violations = validation.validate_yaml(data, verbose)
+    else:
+        file_lint_violations = []
+        longest_row = 0
+
+    lint_violations.extend_for(file_path, file_lint_violations)
+
+    if len(lint_violations) == 0:
+        if verbose:
+            print("\nAll Checks passed!\n\n")
+        if (not check) and (input_type == "yaml"):
+            output.write_metadata_block(data, outfile, longest_row, verbose)
+    else:
+        print(f"A total of {len(lint_violations)} lint(s) failed.")
+        for file_path, violation in lint_violations.items():
+            print(file_path, violation)
+        print("Errors detected. Could not convert to TSV.")
+        sys.exit(1)
+
+
+@main.command()
+@click.argument("file_path")
+@click.option("--verbose", "-v", count=True, help="Print performed checks to stdout.")
+@click.option(
+    "--outfile", "-o", nargs=1, help="Path to where the output file will be written."
+)
+@click.option(
+    "--check",
+    is_flag=True,
+    help="Only check the metadata block (yml or tsv) file and do not write any output.",
+)
+def convert(file_path, verbose, outfile, check):
     if outfile is None:
         path, _ext = os.path.splitext(file_path)
         outfile = f"{path}.tsv"
