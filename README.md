@@ -35,18 +35,18 @@ If you followed the installation instructions using poetry shown above,
 you can also call `yml2block` directly:
 
 ```bash
-~ $ yml2block path/to/inout_metadata_schema.yml -o path/to/dataverse_metadata_block.tsv
+~ $ yml2block convert path/to/inout_metadata_schema.yml -o path/to/dataverse_metadata_block.tsv
 ```
 
-## Parameters
+## Parameters and Subcommands
 
 ### Input
 The path to the input file containing the metadata schema in YAML format
 is given as the positional parameter.
 
-If a path to a tsv file is given as the positional parameter, this file
-will only be linted as if the `--check` parameter was passed.
-No output is written in this case.
+For linting using the `yml2block check` subcommand, both YAML and TSV files
+can be provided. For actually converting files using `yml2block convert`,
+only YAML files may be passed.
 
 ### Output
 By default, the output will be written to the same path as the input file,

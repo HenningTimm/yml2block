@@ -79,19 +79,18 @@ def main():
 @main.command()
 @click.argument("file_path")
 @click.option("--verbose", "-v", count=True, help="Print performed checks to stdout.")
-@click.option(
-    "--outfile", "-o", nargs=1, help="Path to where the output file will be written."
-)
-@click.option(
-    "--check",
-    is_flag=True,
-    help="Only check the metadata block (yml or tsv) file and do not write any output.",
-)
-def check(file_path, verbose, outfile, check):
-    if outfile is None:
-        path, _ext = os.path.splitext(file_path)
-        outfile = f"{path}.tsv"
+def check(file_path, verbose):
+    """Lint and validate a (yml or tsv) metadata block file.
 
+    Loads the input file and performs a series of checks defined in the rules.py module.
+    This call does not generate any output files.
+    If error/ lint violations are detected, a non-zero return code is returned.
+    If all lints pass, the return code is zero.
+
+    Nore that this command can be used to provide a stand-alone linter.
+    During conversion using the yml2block convert subcommand the same checks
+    are also performed.
+    """
     if verbose:
         print(f"Checking input file: {file_path}\n\n")
 
@@ -101,29 +100,27 @@ def check(file_path, verbose, outfile, check):
     lint_violations.extend_for(file_path, file_ext_violations)
 
     if input_type == "yaml":
-        data, longest_row, file_lint_violations = yaml_input.read_yaml(
+        # This call invokes yaml validation internally
+        _data, _longest_row, file_lint_violations = yaml_input.read_yaml(
             file_path, verbose
         )
     elif input_type in ("tsv", "csv"):
         data, tsv_parsing_violations = tsv_input.read_tsv(file_path)
         lint_violations.extend_for(file_path, tsv_parsing_violations)
-        longest_row, file_lint_violations = validation.validate_yaml(data, verbose)
+        _longest_row, file_lint_violations = validation.validate_yaml(data, verbose)
     else:
         file_lint_violations = []
-        longest_row = 0
 
     lint_violations.extend_for(file_path, file_lint_violations)
 
     if len(lint_violations) == 0:
         if verbose:
             print("\nAll Checks passed!\n\n")
-        if (not check) and (input_type == "yaml"):
-            output.write_metadata_block(data, outfile, longest_row, verbose)
     else:
         print(f"A total of {len(lint_violations)} lint(s) failed.")
         for file_path, violation in lint_violations.items():
             print(file_path, violation)
-        print("Errors detected. Could not convert to TSV.")
+        print("Errors detected. Conversion to TSV would not be possible.")
         sys.exit(1)
 
 
@@ -133,12 +130,19 @@ def check(file_path, verbose, outfile, check):
 @click.option(
     "--outfile", "-o", nargs=1, help="Path to where the output file will be written."
 )
-@click.option(
-    "--check",
-    is_flag=True,
-    help="Only check the metadata block (yml or tsv) file and do not write any output.",
-)
-def convert(file_path, verbose, outfile, check):
+def convert(file_path, verbose, outfile):
+    """Convert a YML metadata block into a TSV metadata block.
+
+    Reads in the provided Dataverse Metadata Block in YML format and converts it into
+    a Dataverse-compliant TSV metadata block.
+    For this, the input file is read and several QA checks and lints as defined in the
+    roles.py module are applied. If all lints pass, the output file is written
+    to the location specified via the out_path parameter. Per default, the .tsv file
+    is placed next to the .yml input file.
+
+    To only run the checks as a standalone linter, please use the yml2block check
+    subcommand instead.
+    """
     if outfile is None:
         path, _ext = os.path.splitext(file_path)
         outfile = f"{path}.tsv"
@@ -168,7 +172,7 @@ def convert(file_path, verbose, outfile, check):
     if len(lint_violations) == 0:
         if verbose:
             print("\nAll Checks passed!\n\n")
-        if (not check) and (input_type == "yaml"):
+        if input_type == "yaml":
             output.write_metadata_block(data, outfile, longest_row, verbose)
     else:
         print(f"A total of {len(lint_violations)} lint(s) failed.")
