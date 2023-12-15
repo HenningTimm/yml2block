@@ -117,9 +117,9 @@ def check(file_path, verbose):
         if verbose:
             print("\nAll Checks passed!\n\n")
     else:
-        print(f"A total of {len(lint_violations)} lint(s) failed.")
         for file_path, violations in lint_violations.items():
             print(file_path)
+            print(f"A total of {len(violations)} lint(s) failed.")
             for violation in violations:
                 print(violation)
         print("Errors detected. Conversion to TSV would not be possible.")
@@ -178,9 +178,9 @@ def convert(file_path, verbose, outfile):
         if input_type == "yaml":
             output.write_metadata_block(data, outfile, longest_row, verbose)
     else:
-        print(f"A total of {len(lint_violations)} lint(s) failed.")
         for file_path, violations in lint_violations.items():
             print(file_path)
+            print(f"A total of {len(violations)} lint(s) failed.")
             for violation in violations:
                 print(violation)
         print("Errors detected. Could not convert to TSV.")

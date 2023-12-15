@@ -258,7 +258,17 @@ def no_trailing_white_spaces(list_item, tsv_keyword):
 
     violations = []
     for entry in entries_to_check[tsv_keyword]:
-        value = list_item[entry]
+        try:
+            value = list_item[entry]
+        except KeyError:
+            # This case occurs, when a typo in one of the required
+            # keywords is present. They can safely be skipped here,
+            # since this error would also be detected in the rule
+            # required_keys_present
+            #
+            # Verbosity option:
+            # print(f"Could not check {entry} for {list_item}")
+            continue
         if value and re.search(" +$", value):
             # Regex matches one or more spaces at the end of strings
             violations.append(
