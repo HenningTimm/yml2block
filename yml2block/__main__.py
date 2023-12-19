@@ -18,24 +18,32 @@ from yml2block import yaml_input
 
 
 class ViolationsByFile:
+    """Collect lint violations grouped by files."""
+
     def __init__(self):
+        """Initialize empty violation collection."""
         self.violations = defaultdict(list)
 
     def add(self, file_path, violation):
+        """Add a single violation for the given file path."""
         self.violations[file_path].append(violation)
 
     def extend(self, violation_list):
+        """Extend the violation collection by an iterable of filename, violation tuples."""
         for file_path, violation in violation_list:
             self.add(file_path, violation)
 
     def extend_for(self, file_path, violation_list):
+        """Extend violation list for a given file."""
         for violation in violation_list:
             self.add(file_path, violation)
 
     def items(self):
+        """Get mapping of file names to violation lists."""
         yield from self.violations.items()
 
     def __len__(self):
+        """Return number of files with errors."""
         return len(self.violations)
 
 
@@ -73,6 +81,7 @@ def guess_input_type(input_path):
 
 @click.group()
 def main():
+    """Provide a central entry point for click group."""
     ...
 
 

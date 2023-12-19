@@ -1,4 +1,8 @@
 """This file contains lints that can be selectively applied to yaml blocks.
+
+This module contains rules that define a certain lint and return a
+LintViolation object containing error severity, rule name, and
+an error message.
 """
 import re
 
@@ -67,15 +71,25 @@ def kw_order(kw):
 
 
 class LintViolation:
+    """Class to model lint violations of different severity levels."""
+
     def __init__(self, level, rule, message):
+        """Create a new lint violation.
+
+        Level defines the severity severity level of the error,
+        e.g. WARNING or ERROR. Rule contains the rule name and
+        an message contains a concise, human-readable error message.
+        """
         self.level = level
         self.rule = rule
         self.message = message
 
     def __repr__(self):
+        """Print as a log-style record."""
         return f"{self.level} ({self.rule}): {self.message}"
 
     def __str__(self):
+        """Pass on string representation."""
         return self.__repr__()
 
 
@@ -120,8 +134,7 @@ def block_content_is_list(yaml_chunk):
 
 
 def top_level_keywords_valid(keywords):
-    """Make sure that the top-level keywords are spelled correctly and no additonal
-    ones are present.
+    """Ensure top-level keywords are spelled correctly and no additonal ones are present.
 
     top-level keyword level lint
     """
