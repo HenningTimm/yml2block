@@ -80,6 +80,18 @@ class LintConfig:
         """Create an empty config."""
         self.overrides = dict()
 
+    @classmethod
+    def from_cli_args(cls, warn, skip):
+        """Create config ussing warning and skip lists from CLI."""
+        conf = cls()
+        for warn_lint in warn:
+            lint = LINT_NAMES[warn_lint]
+            conf.warning(lint)
+        for skip_lint in skip:
+            lint = LINT_NAMES[skip_lint]
+            conf.skip(lint)
+        return conf
+
     def get(self, lint):
         """Return an overridden lint, if present. Otherwise keep original lint."""
         try:
@@ -343,3 +355,8 @@ def no_trailing_white_spaces(list_item, tsv_keyword, level=Level.ERROR):
                 )
             )
     return violations
+
+
+LINT_NAMES = {
+    "ws": no_trailing_white_spaces,
+}

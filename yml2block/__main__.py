@@ -92,8 +92,10 @@ def main():
 
 @main.command()
 @click.argument("file_path")
+@click.option("--warn", "-w", multiple=True)
+@click.option("--skip", "-s", multiple=True)
 @click.option("--verbose", "-v", count=True, help="Print performed checks to stdout.")
-def check(file_path, verbose):
+def check(file_path, warn, skip, verbose):
     """Lint and validate a (yml or tsv) metadata block file.
 
     Loads the input file and performs a series of checks defined in the rules.py module.
@@ -106,7 +108,7 @@ def check(file_path, verbose):
     are also performed.
     """
     lint_violations = ViolationsByFile()
-    lint_conf = LintConfig()
+    lint_conf = LintConfig.from_cli_args(warn, skip)
 
     if verbose:
         print(f"Checking input file: {file_path}\n\n")
@@ -146,6 +148,8 @@ def check(file_path, verbose):
 @main.command()
 @click.argument("file_path")
 @click.option("--verbose", "-v", count=True, help="Print performed checks to stdout.")
+@click.option("--warn", "-w", multiple=True)
+@click.option("--skip", "-s", multiple=True)
 @click.option(
     "--outfile", "-o", nargs=1, help="Path to where the output file will be written."
 )
@@ -170,7 +174,7 @@ def convert(file_path, verbose, outfile):
         print(f"Checking input file: {file_path}\n\n")
 
     lint_violations = ViolationsByFile()
-    lint_conf = LintConfig()
+    lint_conf = LintConfig.from_cli_args(warn, skip)
 
     input_type, file_ext_violations = guess_input_type(file_path)
     lint_violations.extend_for(file_path, file_ext_violations)
