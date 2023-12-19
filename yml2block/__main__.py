@@ -48,6 +48,10 @@ class ViolationsByFile:
         """Return number of files with errors."""
         return len(self.violations)
 
+    def total_violations(self):
+        """Return total number of violated lints."""
+        return sum([len(vl) for vl in self.violations.entries()])
+
 
 def guess_input_type(input_path):
     """Guess the input type from the file name."""
