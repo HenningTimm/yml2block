@@ -6,14 +6,15 @@ an error message.
 """
 import re
 
+from enum import Enum
 from collections import Counter
 
 # Note: The order of entries in this list defines the enforced order in the output file
 # Note: These are referred to as top-level keywords.
-permissible_keywords = ["metadataBlock", "datasetField", "controlledVocabulary"]
-required_top_level_keywords = ["metadataBlock", "datasetField"]
+PERMISSIBLE_KEYWORDS = ["metadataBlock", "datasetField", "controlledVocabulary"]
+REQUIRED_TOP_LEVEL_KEYWORDS = ["metadataBlock", "datasetField"]
 
-required_keys = {
+REQUIRED_KEYS = {
     "metadataBlock": ["name", "displayName"],
     "datasetField": [
         "name",
@@ -32,7 +33,7 @@ required_keys = {
     "controlledVocabulary": ["DatasetField", "Value"],
 }
 
-permissible_keys = {
+PERMISSIBLE_KEYS = {
     "metadataBlock": ["name", "dataverseAlias", "displayName", "blockURI"],
     "datasetField": [
         "name",
@@ -73,7 +74,7 @@ def kw_order(kw):
 
     Usage: `sorted(entries, key=kw_order)`
     """
-    mdb_order = {key: i for i, key in enumerate(permissible_keywords)}
+    mdb_order = {key: i for i, key in enumerate(PERMISSIBLE_KEYWORDS)}
     return mdb_order[kw]
 
 
@@ -146,16 +147,16 @@ def top_level_keywords_valid(keywords):
     top-level keyword level lint
     """
     unique_keys = set(keywords)
-    if unique_keys == set(permissible_keywords):
+    if unique_keys == set(PERMISSIBLE_KEYWORDS):
         return []
-    elif unique_keys == set(required_top_level_keywords):
+    elif unique_keys == set(REQUIRED_TOP_LEVEL_KEYWORDS):
         return []
     else:
         return [
             LintViolation(
                 Level.ERROR,
                 "top_level_keywords_valid",
-                f"Keyword list '{keywords}' differs from '{permissible_keywords}' or '{required_top_level_keyword}'",
+                f"Keyword list '{keywords}' differs from '{PERMISSIBLE_KEYWORDS}' or '{REQUIRED_TOP_LEVEL_KEYWORDS}'",
             )
         ]
 
@@ -188,7 +189,7 @@ def required_keys_present(list_item, tsv_keyword):
     """
     found_keys = list_item.keys()
     try:
-        required = required_keys[tsv_keyword]
+        required = REQUIRED_KEYS[tsv_keyword]
     except KeyError:
         return [
             LintViolation(
@@ -216,7 +217,7 @@ def no_invalid_keys_present(list_item, tsv_keyword):
     second-level list entry lint
     """
     try:
-        permissible = permissible_keys[tsv_keyword]
+        permissible = PERMISSIBLE_KEYS[tsv_keyword]
     except KeyError:
         return [
             LintViolation(
