@@ -16,6 +16,8 @@ from yml2block import rules
 from yml2block import tsv_input
 from yml2block import yaml_input
 
+from yml2block.rules import Level
+
 
 class ViolationsByFile:
     """Collect lint violations grouped by files."""
@@ -58,7 +60,7 @@ def guess_input_type(input_path):
             "csv",
             [
                 rules.LintViolation(
-                    "WARNING",
+                    Level.WARNING,
                     "guess_input_type",
                     f"Invalid file extension '{ext}'. Will be treated as tsv. Currently non-tab separators are not supported.",
                 )
@@ -71,7 +73,7 @@ def guess_input_type(input_path):
             False,
             [
                 rules.LintViolation(
-                    "ERROR",
+                    Level.ERROR,
                     "guess_input_type",
                     f"Invalid file extension '{ext}'. Only .tsv and .yaml/.yml files are supported.",
                 )

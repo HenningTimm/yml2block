@@ -61,6 +61,13 @@ permissible_keys = {
 }
 
 
+class Level(Enum):
+    """Provide numeric error levels."""
+
+    WARNING = 2
+    ERROR = 1
+
+
 def kw_order(kw):
     """Provide the canonical sort order expected by dataverse.
 
@@ -108,7 +115,7 @@ def unique_names(yaml_chunk, tsv_keyword):
         if count > 1:
             errors.append(
                 LintViolation(
-                    "ERROR",
+                    Level.ERROR,
                     "unique_names",
                     f"Name '{name}' occurs {count} times. Names have to be unique.",
                 )
@@ -126,7 +133,7 @@ def block_content_is_list(yaml_chunk):
     else:
         return [
             LintViolation(
-                "ERROR",
+                Level.ERROR,
                 "block_content_is_list",
                 "Entry is not a list",
             )
@@ -146,7 +153,7 @@ def top_level_keywords_valid(keywords):
     else:
         return [
             LintViolation(
-                "ERROR",
+                Level.ERROR,
                 "top_level_keywords_valid",
                 f"Keyword list '{keywords}' differs from '{permissible_keywords}' or '{required_top_level_keyword}'",
             )
@@ -167,7 +174,7 @@ def top_level_keywords_unique(keywords):
     else:
         return [
             LintViolation(
-                "ERROR",
+                Level.ERROR,
                 "top_level_keywords_unique",
                 f"Keyword list '{keywords}' contains duplicate keys.",
             )
@@ -185,7 +192,7 @@ def required_keys_present(list_item, tsv_keyword):
     except KeyError:
         return [
             LintViolation(
-                "ERROR",
+                Level.ERROR,
                 "required_keys_present",
                 f"Cannot check entry for invalid keyword '{tsv_keyword}'. Skipping entry.",
             )
@@ -196,7 +203,7 @@ def required_keys_present(list_item, tsv_keyword):
     else:
         return [
             LintViolation(
-                "ERROR",
+                Level.ERROR,
                 "required_keys_present",
                 f"List of required keys '{required}' and found keys '{found_keys}' differ.",
             )
@@ -213,7 +220,7 @@ def no_invalid_keys_present(list_item, tsv_keyword):
     except KeyError:
         return [
             LintViolation(
-                "ERROR",
+                Level.ERROR,
                 "no_invalid_keys_present",
                 f"Cannot check entry for invalid keyword '{tsv_keyword}'. Skipping entry.",
             )
@@ -224,7 +231,7 @@ def no_invalid_keys_present(list_item, tsv_keyword):
         if key not in permissible:
             violations.append(
                 LintViolation(
-                    "ERROR",
+                    Level.ERROR,
                     "no_invalid_keys_present",
                     f"Invalid key {key} present for {list_item} in block {tsv_keyword}.",
                 )
@@ -242,7 +249,7 @@ def no_substructures_present(list_item, tsv_keyword):
         if type(value) in (dict, tuple, list):
             violations.append(
                 LintViolation(
-                    "ERROR",
+                    Level.ERROR,
                     "no_substructures_present",
                     f"Key {key} in block {tsv_keyword} has a subtructure of type {type(value)}. Only strings, booleans, an numericals are allowed here.",
                 )
@@ -286,7 +293,7 @@ def no_trailing_white_spaces(list_item, tsv_keyword):
             # Regex matches one or more spaces at the end of strings
             violations.append(
                 LintViolation(
-                    "ERROR",
+                    Level.ERROR,
                     "no_trailing_white_spaces",
                     f"The entry '{value}' has one or more trailing spaces.",
                 )
