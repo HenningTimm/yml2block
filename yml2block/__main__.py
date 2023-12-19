@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""This script converts a yaml definition of a dataverse metadata schema into
-a metadata block understood by dataverse.
+"""Convert a yaml definition of a dataverse metadata schema into a metadata block understood by dataverse.
 
 https://guides.dataverse.org/en/latest/admin/metadatacustomization.html
 """
