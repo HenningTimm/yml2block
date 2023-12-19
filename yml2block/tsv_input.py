@@ -5,7 +5,7 @@ import csv
 import io
 import itertools
 
-from yml2block.rules import LintViolation
+from yml2block.rules import LintViolation, Level
 
 
 def _identify_break_points(full_file):
@@ -30,7 +30,7 @@ def _identify_break_points(full_file):
         split_block = full_file
         violations.append(
             LintViolation(
-                "WARNING",
+                Level.WARNING,
                 "identify_break_points",
                 "Unable to split TSV file into blocks. Check tsv file formatting.",
             )
@@ -82,7 +82,7 @@ def read_tsv(tsv_path):
             if key is None:
                 # These entries cannot be associated with a column header
                 violations.append(
-                    LintViolation("ERROR", "read_tsv", "Entry in headerless column")
+                    LintViolation(Level.ERROR, "read_tsv", "Entry in headerless column")
                 )
             elif not key and not value:
                 # Skip empty entries ('': '') that result from the empty columns in

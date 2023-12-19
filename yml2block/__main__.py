@@ -15,7 +15,7 @@ from yml2block import rules
 from yml2block import tsv_input
 from yml2block import yaml_input
 
-from yml2block.rules import Level
+from yml2block.rules import Level, LintConfig
 
 
 class ViolationsByFile:
@@ -106,6 +106,7 @@ def check(file_path, verbose):
     are also performed.
     """
     lint_violations = ViolationsByFile()
+    lint_conf = LintConfig()
 
     if verbose:
         print(f"Checking input file: {file_path}\n\n")
@@ -116,12 +117,14 @@ def check(file_path, verbose):
     if input_type == "yaml":
         # This call invokes yaml validation internally
         _data, _longest_row, file_lint_violations = yaml_input.read_yaml(
-            file_path, verbose
+            file_path, lint_conf, verbose
         )
     elif input_type in ("tsv", "csv"):
         data, tsv_parsing_violations = tsv_input.read_tsv(file_path)
         lint_violations.extend_for(file_path, tsv_parsing_violations)
-        _longest_row, file_lint_violations = validation.validate_yaml(data, verbose)
+        _longest_row, file_lint_violations = validation.validate_yaml(
+            data, lint_conf, verbose
+        )
     else:
         file_lint_violations = []
 
@@ -167,6 +170,7 @@ def convert(file_path, verbose, outfile):
         print(f"Checking input file: {file_path}\n\n")
 
     lint_violations = ViolationsByFile()
+    lint_conf = LintConfig()
 
     input_type, file_ext_violations = guess_input_type(file_path)
     lint_violations.extend_for(file_path, file_ext_violations)
@@ -174,12 +178,14 @@ def convert(file_path, verbose, outfile):
     if input_type == "yaml":
         # This call invokes YAML validation internally
         data, longest_row, file_lint_violations = yaml_input.read_yaml(
-            file_path, verbose
+            file_path, lint_conf, verbose
         )
     elif input_type in ("tsv", "csv"):
         data, tsv_parsing_violations = tsv_input.read_tsv(file_path)
         lint_violations.extend_for(file_path, tsv_parsing_violations)
-        longest_row, file_lint_violations = validation.validate_yaml(data, verbose)
+        longest_row, file_lint_violations = validation.validate_yaml(
+            data, lint_conf, verbose
+        )
     else:
         file_lint_violations = []
         longest_row = 0

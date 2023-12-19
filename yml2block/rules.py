@@ -8,6 +8,7 @@ import re
 
 from enum import Enum
 from collections import Counter
+from functools import partial
 
 # Note: The order of entries in this list defines the enforced order in the output file
 # Note: These are referred to as top-level keywords.
@@ -60,6 +61,48 @@ PERMISSIBLE_KEYS = {
         "displayOrder",
     ],
 }
+
+
+class LintConfig:
+    """Override lint functions with mofified versions.
+
+    This is used to modify the error level of lints, e.g.
+    making a certain lint a warning instead of an error.
+    This is also used to sip lints.
+
+    Internally, this config maps lint function objects to
+    other lint function objects, which are modified,
+    e.g. by usinf functools.partials or by applying a
+    completely different function.
+    """
+
+    def __init__(self):
+        """Create an empty config."""
+        self.overrides = dict()
+
+    def get(self, lint):
+        """Return an overridden lint, if present. Otherwise keep original lint."""
+        try:
+            return self.overrides[lint]
+        except KeyError:
+            return lint
+
+    def add_override(self, lint, override):
+        """Insert an override into the config."""
+        self.overrides[lint] = override
+
+    def warning(self, lint):
+        """Fix lint severity at WARNING."""
+        self.add_override(lint, partial(lint, level=Level.WARNING))
+
+    def skip(self, lint):
+        """Skip lint by overriding it with an identity function."""
+        self.add_override(
+            lint,
+            # This function takes an arbitrary number of input values
+            # and can thus be used as an identity function for any lint.
+            lambda *x: [],
+        )
 
 
 class Level(Enum):

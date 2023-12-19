@@ -1,21 +1,25 @@
+"""Dispatch entry to specialized lint rules."""
 from yml2block import rules
 
 
-def validate_yaml(data, verbose):
+def validate_yaml(data, lint_conf, verbose):
     """Check if the given yaml file is valid.
+
     Underlying checks will return lists of LintViolations if they don't.
     """
-    violations = validate_keywords(data.keys(), verbose)
+    violations = validate_keywords(data.keys(), lint_conf, verbose)
     longest_row = 0
     for kw, content in data.items():
-        block_row_max, entry_violations = validate_entry(data[kw], kw, verbose)
+        block_row_max, entry_violations = validate_entry(
+            data[kw], kw, lint_conf, verbose
+        )
         violations.extend(entry_violations)
         longest_row = max(longest_row, block_row_max)
 
     return longest_row, violations
 
 
-def validate_keywords(keywords, verbose):
+def validate_keywords(keywords, lint_conf, verbose):
     """Assure that the top-level keywords of the YAML file are well-behaved."""
     if verbose == 1:
         print("Validating top-level keywords:", end=" ")
@@ -30,6 +34,7 @@ def validate_keywords(keywords, verbose):
         if verbose >= 2:
             print(f"Running lint: {lint.__name__}")
 
+        lint = lint_conf.get(lint)
         violations.extend(lint(keywords))
 
     if verbose and len(violations) == 0:
@@ -42,7 +47,7 @@ def validate_keywords(keywords, verbose):
         return []
 
 
-def validate_entry(yaml_chunk, tsv_keyword, verbose):
+def validate_entry(yaml_chunk, tsv_keyword, lint_conf, verbose):
     """Validate a record, based on its type.
 
     Perform second level list item lints.
@@ -55,11 +60,13 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
 
     violations = []
     for lint in (rules.block_content_is_list,):
+        lint = lint_conf.get(lint)
         violations.extend(lint(yaml_chunk))
 
     longest_row = 0
 
     for lint in (rules.unique_names,):
+        lint = lint_conf.get(lint)
         violations.extend(lint(yaml_chunk, tsv_keyword))
 
     for item in yaml_chunk:
@@ -71,6 +78,8 @@ def validate_entry(yaml_chunk, tsv_keyword, verbose):
         ):
             if verbose >= 2:
                 print(f"Running lint: {lint.__name__}")
+
+            lint = lint_conf.get(lint)
             violations.extend(lint(item, tsv_keyword))
 
         # Compute the highest number of columns in the block
