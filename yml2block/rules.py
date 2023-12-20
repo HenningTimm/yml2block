@@ -333,6 +333,13 @@ def no_trailing_white_spaces(list_item, tsv_keyword, level=Level.ERROR):
     }
 
     violations = []
+
+    # This case occurs, when an invalid top level keyword is present
+    # this is flagged by a specialized test above and does not need
+    # to be handled here.
+    if tsv_keyword not in entries_to_check:
+        return []
+
     for entry in entries_to_check[tsv_keyword]:
         try:
             value = list_item[entry]
