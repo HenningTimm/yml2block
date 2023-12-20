@@ -147,13 +147,13 @@ def check(file_path, warn, skip, verbose):
 
 @main.command()
 @click.argument("file_path")
-@click.option("--verbose", "-v", count=True, help="Print performed checks to stdout.")
 @click.option("--warn", "-w", multiple=True)
 @click.option("--skip", "-s", multiple=True)
+@click.option("--verbose", "-v", count=True, help="Print performed checks to stdout.")
 @click.option(
     "--outfile", "-o", nargs=1, help="Path to where the output file will be written."
 )
-def convert(file_path, verbose, outfile):
+def convert(file_path, warn, skip, verbose, outfile):
     """Convert a YML metadata block into a TSV metadata block.
 
     Reads in the provided Dataverse Metadata Block in YML format and converts it into
