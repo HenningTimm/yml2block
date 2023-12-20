@@ -10,6 +10,8 @@ from enum import Enum
 from collections import Counter
 from functools import partial
 
+from yml2block import suggestions
+
 # Note: The order of entries in this list defines the enforced order in the output file
 # Note: These are referred to as top-level keywords.
 PERMISSIBLE_KEYWORDS = ["metadataBlock", "datasetField", "controlledVocabulary"]
@@ -211,7 +213,10 @@ def top_level_keywords_valid(keywords, level=Level.ERROR):
             LintViolation(
                 level,
                 "top_level_keywords_valid",
-                f"Keyword list '{keywords}' differs from '{PERMISSIBLE_KEYWORDS}' or '{REQUIRED_TOP_LEVEL_KEYWORDS}'",
+                # f"Keyword list '{keywords}' differs from '{PERMISSIBLE_KEYWORDS}' or '{REQUIRED_TOP_LEVEL_KEYWORDS}'",
+                suggestions.fix_keywords_valid(
+                    keywords, PERMISSIBLE_KEYWORDS, REQUIRED_TOP_LEVEL_KEYWORDS
+                ),
             )
         ]
 
