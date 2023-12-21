@@ -181,7 +181,7 @@ def unique_names(yaml_chunk, tsv_keyword, level=Level.ERROR):
     return errors
 
 
-def block_content_is_list(yaml_chunk, level=Level.ERROR):
+def block_is_list(yaml_chunk, level=Level.ERROR):
     """Make sure that the yaml chunk is a list.
 
     block content level lint
@@ -192,13 +192,13 @@ def block_content_is_list(yaml_chunk, level=Level.ERROR):
         return [
             LintViolation(
                 level,
-                "block_content_is_list",
+                "block_is_list",
                 "Entry is not a list",
             )
         ]
 
 
-def top_level_keywords_valid(keywords, level=Level.ERROR):
+def keywords_valid(keywords, level=Level.ERROR):
     """Ensure top-level keywords are spelled correctly and no additonal ones are present.
 
     top-level keyword level lint
@@ -213,7 +213,6 @@ def top_level_keywords_valid(keywords, level=Level.ERROR):
             LintViolation(
                 level,
                 "top_level_keywords_valid",
-                # f"Keyword list '{keywords}' differs from '{PERMISSIBLE_KEYWORDS}' or '{REQUIRED_TOP_LEVEL_KEYWORDS}'",
                 suggestions.fix_keywords_valid(
                     keywords, PERMISSIBLE_KEYWORDS, REQUIRED_TOP_LEVEL_KEYWORDS
                 ),
@@ -221,7 +220,7 @@ def top_level_keywords_valid(keywords, level=Level.ERROR):
         ]
 
 
-def top_level_keywords_unique(keywords, level=Level.ERROR):
+def keywords_unique(keywords, level=Level.ERROR):
     """Make sure no keyword is specified twice.
 
     NOTE: This is most likely also enforced by the YAML parser,
@@ -242,10 +241,39 @@ def top_level_keywords_unique(keywords, level=Level.ERROR):
         ]
 
 
+def keys_valid(list_item, tsv_keyword, level=Level.ERROR):
+    """Make sure no invalid keys are present.
+
+    block entry lint
+    """
+    try:
+        permissible = PERMISSIBLE_KEYS[tsv_keyword]
+    except KeyError:
+        return [
+            LintViolation(
+                level,
+                "keys_valid",
+                f"Cannot check entry for invalid keyword '{tsv_keyword}'. Skipping entry.",
+            )
+        ]
+
+    violations = []
+    for key, value in list_item.items():
+        if key not in permissible:
+            violations.append(
+                LintViolation(
+                    level,
+                    "keys_valid",
+                    f"Invalid key {key} present for {list_item} in block {tsv_keyword}.",
+                )
+            )
+    return violations
+
+
 def required_keys_present(list_item, tsv_keyword, level=Level.ERROR):
     """Make sure the keywords required for the current top-level item are present.
 
-    second-level list entry lint
+    block entry lint
     """
     found_keys = list_item.keys()
     try:
@@ -271,39 +299,10 @@ def required_keys_present(list_item, tsv_keyword, level=Level.ERROR):
         ]
 
 
-def no_invalid_keys_present(list_item, tsv_keyword, level=Level.ERROR):
-    """Make sure no invalid keys are present.
-
-    second-level list entry lint
-    """
-    try:
-        permissible = PERMISSIBLE_KEYS[tsv_keyword]
-    except KeyError:
-        return [
-            LintViolation(
-                level,
-                "no_invalid_keys_present",
-                f"Cannot check entry for invalid keyword '{tsv_keyword}'. Skipping entry.",
-            )
-        ]
-
-    violations = []
-    for key, value in list_item.items():
-        if key not in permissible:
-            violations.append(
-                LintViolation(
-                    level,
-                    "no_invalid_keys_present",
-                    f"Invalid key {key} present for {list_item} in block {tsv_keyword}.",
-                )
-            )
-    return violations
-
-
-def no_substructures_present(list_item, tsv_keyword, level=Level.ERROR):
+def no_substructures(list_item, tsv_keyword, level=Level.ERROR):
     """Make sure list items do not contain dicts, tuples lists etc.
 
-    second-level list entry lint
+    block entry lint
     """
     violations = []
     for key, value in list_item.items():
@@ -311,17 +310,17 @@ def no_substructures_present(list_item, tsv_keyword, level=Level.ERROR):
             violations.append(
                 LintViolation(
                     level,
-                    "no_substructures_present",
+                    "no_substructures",
                     f"Key {key} in block {tsv_keyword} has a subtructure of type {type(value)}. Only strings, booleans, an numericals are allowed here.",
                 )
             )
     return violations
 
 
-def no_trailing_white_spaces(list_item, tsv_keyword, level=Level.ERROR):
+def no_trailing_spaces(list_item, tsv_keyword, level=Level.ERROR):
     """Make sure the entries do not contain trailing white spaces.
 
-    second-level list entry lint
+    block entry lint
     """
     entries_to_check = {
         "metadataBlock": ("name", "dataverseAlias"),
@@ -362,7 +361,7 @@ def no_trailing_white_spaces(list_item, tsv_keyword, level=Level.ERROR):
             violations.append(
                 LintViolation(
                     level,
-                    "no_trailing_white_spaces",
+                    "no_trailing_spaces",
                     f"The entry '{value}' has one or more trailing spaces.",
                 )
             )
@@ -370,5 +369,20 @@ def no_trailing_white_spaces(list_item, tsv_keyword, level=Level.ERROR):
 
 
 LINT_NAMES = {
-    "ws": no_trailing_white_spaces,
+    "unique_names": unique_names,
+    "b001": unique_names,
+    "block_is_list": block_is_list,
+    "b002": block_is_list,
+    "keywords_valid": keywords_valid,
+    "k001": keywords_valid,
+    "keywords_unique": keywords_unique,
+    "k002": keywords_unique,
+    "keys_valid": keys_valid,
+    "e001": keys_valid,
+    "required_keys_present": required_keys_present,
+    "e002": required_keys_present,
+    "no_substructures": no_substructures,
+    "e003": no_substructures,
+    "no_trailing_spaces": no_trailing_spaces,
+    "e004": no_trailing_spaces,
 }

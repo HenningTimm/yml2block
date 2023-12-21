@@ -28,8 +28,8 @@ def validate_keywords(keywords, lint_conf, verbose):
 
     violations = []
     for lint in [
-        rules.top_level_keywords_valid,
-        rules.top_level_keywords_unique,
+        rules.keywords_valid,
+        rules.keywords_unique,
     ]:
         if verbose >= 2:
             print(f"Running lint: {lint.__name__}")
@@ -59,7 +59,7 @@ def validate_entry(yaml_chunk, tsv_keyword, lint_conf, verbose):
         print(f"Validating entries for {tsv_keyword}:\n{yaml_chunk}")
 
     violations = []
-    for lint in (rules.block_content_is_list,):
+    for lint in (rules.block_is_list,):
         lint = lint_conf.get(lint)
         violations.extend(lint(yaml_chunk))
 
@@ -71,10 +71,10 @@ def validate_entry(yaml_chunk, tsv_keyword, lint_conf, verbose):
 
     for item in yaml_chunk:
         for lint in (
+            rules.keys_valid,
             rules.required_keys_present,
-            rules.no_invalid_keys_present,
-            rules.no_substructures_present,
-            rules.no_trailing_white_spaces,
+            rules.no_substructures,
+            rules.no_trailing_spaces,
         ):
             if verbose >= 2:
                 print(f"Running lint: {lint.__name__}")
