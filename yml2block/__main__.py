@@ -51,6 +51,11 @@ class ViolationsByFile:
         """Return total number of violated lints."""
         return sum([len(vl) for vl in self.violations.entries()])
 
+    def __iter__(self):
+        """Iterate over violations and max severity level per file."""
+        for filename, violations in self.violations.items():
+            yield (filename, violations, min(violations, key=lambda x: x.level).level)
+
 
 def guess_input_type(input_path):
     """Guess the input type from the file name."""
@@ -84,6 +89,33 @@ def guess_input_type(input_path):
         )
 
 
+def return_violations(lint_violations, warn_ec, verbose):
+    """Print lint violations and exit with the resulting error code."""
+    if len(lint_violations) == 0:
+        if verbose:
+            print("\nAll Checks passed!\n\n")
+        sys.exit(0)
+    else:
+        max_severity = None
+        for file_path, violations, file_max_severity in lint_violations:
+            if (max_severity is None) or (file_max_severity < max_severity):
+                max_severity = file_max_severity
+            print()
+            print(file_path)
+            print(f"A total of {len(violations)} lint(s) failed.")
+            print(f"Errors were '{max_severity}'")
+            for violation in violations:
+                print(violation)
+        print("Errors detected. File(s) cannot safely be converted to TSV.")
+        print(max_severity)
+        if max_severity == Level.ERROR:
+            sys.exit(1)
+        elif max_severity == Level.WARNING:
+            sys.exit(warn_ec)
+        else:
+            sys.exit(1)
+
+
 @click.group()
 def main():
     """Provide a central entry point for click group."""
@@ -92,10 +124,11 @@ def main():
 
 @main.command()
 @click.argument("file_path")
-@click.option("--warn", "-w", multiple=True)
-@click.option("--skip", "-s", multiple=True)
+@click.option("--warn", "-w", multiple=True, help="Lints to treat as warnings.")
+@click.option("--skip", "-s", multiple=True, help="Lints to skip entirely.")
+@click.option("--warn-ec", default=0, help="Error code used for lint warnings. Default: 0")
 @click.option("--verbose", "-v", count=True, help="Print performed checks to stdout.")
-def check(file_path, warn, skip, verbose):
+def check(file_path, warn, skip, warn_ec, verbose):
     """Lint and validate a (yml or tsv) metadata block file.
 
     Loads the input file and performs a series of checks defined in the rules.py module.
@@ -132,23 +165,13 @@ def check(file_path, warn, skip, verbose):
 
     lint_violations.extend_for(file_path, file_lint_violations)
 
-    if len(lint_violations) == 0:
-        if verbose:
-            print("\nAll Checks passed!\n\n")
-    else:
-        for file_path, violations in lint_violations.items():
-            print(file_path)
-            print(f"A total of {len(violations)} lint(s) failed.")
-            for violation in violations:
-                print(violation)
-        print("Errors detected. Conversion to TSV would not be possible.")
-        sys.exit(1)
+    return_violations(lint_violations, warn_ec, verbose)
 
 
 @main.command()
 @click.argument("file_path")
-@click.option("--warn", "-w", multiple=True)
-@click.option("--skip", "-s", multiple=True)
+@click.option("--warn", "-w", multiple=True, help="Lints to treat as warnings.")
+@click.option("--skip", "-s", multiple=True, help="Lints to skip entirely.")
 @click.option("--verbose", "-v", count=True, help="Print performed checks to stdout.")
 @click.option(
     "--outfile", "-o", nargs=1, help="Path to where the output file will be written."

@@ -6,7 +6,7 @@ an error message.
 """
 import re
 
-from enum import Enum
+from enum import IntEnum
 from collections import Counter
 from functools import partial
 
@@ -119,7 +119,7 @@ class LintConfig:
         )
 
 
-class Level(Enum):
+class Level(IntEnum):
     """Provide numeric error levels."""
 
     WARNING = 2
