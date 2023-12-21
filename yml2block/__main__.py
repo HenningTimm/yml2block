@@ -126,7 +126,9 @@ def main():
 @click.argument("file_path")
 @click.option("--warn", "-w", multiple=True, help="Lints to treat as warnings.")
 @click.option("--skip", "-s", multiple=True, help="Lints to skip entirely.")
-@click.option("--warn-ec", default=0, help="Error code used for lint warnings. Default: 0")
+@click.option(
+    "--warn-ec", default=0, help="Error code used for lint warnings. Default: 0"
+)
 @click.option("--verbose", "-v", count=True, help="Print performed checks to stdout.")
 def check(file_path, warn, skip, warn_ec, verbose):
     """Lint and validate a (yml or tsv) metadata block file.
@@ -172,7 +174,9 @@ def check(file_path, warn, skip, warn_ec, verbose):
 @click.argument("file_path")
 @click.option("--warn", "-w", multiple=True, help="Lints to treat as warnings.")
 @click.option("--skip", "-s", multiple=True, help="Lints to skip entirely.")
-@click.option("--warn-ec", default=0, help="Error code used for lint warnings. Default: 0")
+@click.option(
+    "--warn-ec", default=0, help="Error code used for lint warnings. Default: 0"
+)
 @click.option("--verbose", "-v", count=True, help="Print performed checks to stdout.")
 @click.option(
     "--outfile", "-o", nargs=1, help="Path to where the output file will be written."
