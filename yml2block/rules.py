@@ -151,7 +151,7 @@ class LintViolation:
 
     def __repr__(self):
         """Print as a log-style record."""
-        return f"{self.level} ({self.rule}): {self.message}"
+        return f"[{self.level.name}] {self.rule}: {self.message}"
 
     def __str__(self):
         """Pass on string representation."""
