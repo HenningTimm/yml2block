@@ -264,7 +264,7 @@ def keys_valid(list_item, tsv_keyword, level=Level.ERROR):
                 LintViolation(
                     level,
                     "keys_valid",
-                    f"Invalid key {key} present for {list_item} in block {tsv_keyword}.",
+                    suggestions.fix_keys_valid(key, list_item, tsv_keyword, permissible),
                 )
             )
     return violations
@@ -287,14 +287,15 @@ def required_keys_present(list_item, tsv_keyword, level=Level.ERROR):
             )
         ]
     # Assure all required keys are there
-    if len(set(required) - set(found_keys)) == 0:
+    missing_keys = set(required) - set(found_keys)
+    if len(missing_keys) == 0:
         return []
     else:
         return [
             LintViolation(
                 level,
                 "required_keys_present",
-                f"List of required keys '{required}' and found keys '{found_keys}' differ.",
+                suggestions.fix_required_keys_present(missing_keys, list_item, tsv_keyword),
             )
         ]
 
