@@ -172,11 +172,12 @@ def check(file_path, warn, skip, warn_ec, verbose):
 @click.argument("file_path")
 @click.option("--warn", "-w", multiple=True, help="Lints to treat as warnings.")
 @click.option("--skip", "-s", multiple=True, help="Lints to skip entirely.")
+@click.option("--warn-ec", default=0, help="Error code used for lint warnings. Default: 0")
 @click.option("--verbose", "-v", count=True, help="Print performed checks to stdout.")
 @click.option(
     "--outfile", "-o", nargs=1, help="Path to where the output file will be written."
 )
-def convert(file_path, warn, skip, verbose, outfile):
+def convert(file_path, warn, skip, warn_ec, verbose, outfile):
     """Convert a YML metadata block into a TSV metadata block.
 
     Reads in the provided Dataverse Metadata Block in YML format and converts it into
@@ -218,20 +219,7 @@ def convert(file_path, warn, skip, verbose, outfile):
         longest_row = 0
 
     lint_violations.extend_for(file_path, file_lint_violations)
-
-    if len(lint_violations) == 0:
-        if verbose:
-            print("\nAll Checks passed!\n\n")
-        if input_type == "yaml":
-            output.write_metadata_block(data, outfile, longest_row, verbose)
-    else:
-        for file_path, violations in lint_violations.items():
-            print(file_path)
-            print(f"A total of {len(violations)} lint(s) failed.")
-            for violation in violations:
-                print(violation)
-        print("Errors detected. Could not convert to TSV.")
-        sys.exit(1)
+    return_violations(lint_violations, warn_ec, verbose)
 
 
 if __name__ == "__main__":
