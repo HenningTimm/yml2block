@@ -104,7 +104,7 @@ def return_violations(lint_violations, warn_ec, verbose):
                 max_severity = file_max_severity
             print()
             print(file_path)
-            print(100*"-")
+            print(100 * "-")
             print(f"A total of {len(violations)} lint(s) failed.")
             print(f"Highest error level was '{max_severity.name}'")
             for violation in violations:
