@@ -17,12 +17,13 @@ def read_yaml(file_path, lint_conf, verbose):
             )
         except DuplicateKeyError as dke:
             longest_row = 0
+            data = None
             # Raise error for duplicate keys
             file_lint_violations = [
                 LintViolation(
                     Level.ERROR,
                     "top_level_keywords_valid",
-                    dke.problem,
+                    f"ruamel.yaml says '{dke.problem}'",
                 )
             ]
     return data, longest_row, file_lint_violations

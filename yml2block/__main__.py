@@ -6,6 +6,7 @@ https://guides.dataverse.org/en/latest/admin/metadatacustomization.html
 import os
 import sys
 import click
+import glob
 
 from collections import defaultdict
 
@@ -91,6 +92,7 @@ def guess_input_type(input_path):
 
 def return_violations(lint_violations, warn_ec, verbose):
     """Print lint violations and exit with the resulting error code."""
+
     if len(lint_violations) == 0:
         if verbose:
             print("\nAll Checks passed!\n\n")
@@ -102,12 +104,12 @@ def return_violations(lint_violations, warn_ec, verbose):
                 max_severity = file_max_severity
             print()
             print(file_path)
+            print(100*"-")
             print(f"A total of {len(violations)} lint(s) failed.")
-            print(f"Errors were '{max_severity}'")
+            print(f"Highest error level was '{max_severity.name}'")
             for violation in violations:
                 print(violation)
         print("Errors detected. File(s) cannot safely be converted to TSV.")
-        print(max_severity)
         if max_severity == Level.ERROR:
             sys.exit(1)
         elif max_severity == Level.WARNING:
@@ -123,16 +125,17 @@ def main():
 
 
 @main.command()
-@click.argument("file_path")
+@click.argument("file_paths", nargs=-1, type=click.Path())
 @click.option("--warn", "-w", multiple=True, help="Lints to treat as warnings.")
 @click.option("--skip", "-s", multiple=True, help="Lints to skip entirely.")
 @click.option(
     "--warn-ec", default=0, help="Error code used for lint warnings. Default: 0"
 )
 @click.option("--verbose", "-v", count=True, help="Print performed checks to stdout.")
-def check(file_path, warn, skip, warn_ec, verbose):
-    """Lint and validate a (yml or tsv) metadata block file.
+def check(file_paths, warn, skip, warn_ec, verbose):
+    """Lint and validate one or multiple (yml or tsv) metadata block file(s).
 
+    Input paths can be one or multiple file names or glob patterns.
     Loads the input file and performs a series of checks defined in the rules.py module.
     This call does not generate any output files.
     If error/ lint violations are detected, a non-zero return code is returned.
@@ -145,27 +148,33 @@ def check(file_path, warn, skip, warn_ec, verbose):
     lint_violations = ViolationsByFile()
     lint_conf = LintConfig.from_cli_args(warn, skip)
 
+    # Unpack all file paths as glob patterns
+    file_paths = [path for fp in file_paths for path in glob.glob(fp)]
     if verbose:
-        print(f"Checking input file: {file_path}\n\n")
+        print(f"Checking the following files: {file_paths}\n")
 
-    input_type, file_ext_violations = guess_input_type(file_path)
-    lint_violations.extend_for(file_path, file_ext_violations)
+    for file_path in file_paths:
+        if verbose:
+            print(f"\n{80*'-'}\nChecking input file: {file_path}\n{80*'-'}")
 
-    if input_type == "yaml":
-        # This call invokes yaml validation internally
-        _data, _longest_row, file_lint_violations = yaml_input.read_yaml(
-            file_path, lint_conf, verbose
-        )
-    elif input_type in ("tsv", "csv"):
-        data, tsv_parsing_violations = tsv_input.read_tsv(file_path)
-        lint_violations.extend_for(file_path, tsv_parsing_violations)
-        _longest_row, file_lint_violations = validation.validate_yaml(
-            data, lint_conf, verbose
-        )
-    else:
-        file_lint_violations = []
+        input_type, file_ext_violations = guess_input_type(file_path)
+        lint_violations.extend_for(file_path, file_ext_violations)
 
-    lint_violations.extend_for(file_path, file_lint_violations)
+        if input_type == "yaml":
+            # This call invokes yaml validation internally
+            _data, _longest_row, file_lint_violations = yaml_input.read_yaml(
+                file_path, lint_conf, verbose
+            )
+        elif input_type in ("tsv", "csv"):
+            data, tsv_parsing_violations = tsv_input.read_tsv(file_path)
+            lint_violations.extend_for(file_path, tsv_parsing_violations)
+            _longest_row, file_lint_violations = validation.validate_yaml(
+                data, lint_conf, verbose
+            )
+        else:
+            file_lint_violations = []
+
+        lint_violations.extend_for(file_path, file_lint_violations)
 
     return_violations(lint_violations, warn_ec, verbose)
 
