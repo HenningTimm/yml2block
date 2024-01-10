@@ -223,6 +223,10 @@ def convert(file_path, warn, skip, warn_ec, verbose, outfile):
         longest_row = 0
 
     lint_violations.extend_for(file_path, file_lint_violations)
+
+    if input_type == "yaml" and file_path not in lint_violations:
+        output.write_metadata_block(data, outfile, longest_row, verbose)
+
     return_violations(lint_violations, warn_ec, verbose)
 
 
