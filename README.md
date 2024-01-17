@@ -15,8 +15,11 @@ To use `yml2block` you will need the following Python packages
 
 and use Python 3.10 or newer.
 
-Currently, the only way to install is from this GitHub repo.
-After cloning, you can install `yml2block` and its requirements using `poetry`:
+You can install this repository via `pip`:
+```bash
+pip install git+https://github.com/HenningTimm/yml2block.git
+```
+For manual installation after cloning, you can install `yml2block` and its requirements using `poetry`:
 
 ```bash
 ~ $ git clone https://github.com/HenningTimm/yml2block.git
