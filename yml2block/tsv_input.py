@@ -13,7 +13,7 @@ def _identify_break_points(full_file):
     violations = []
 
     # Split slong lines starting with '#'
-    break_points = [i for i, l in enumerate(full_file) if l.startswith("#")]
+    break_points = [i for i, line in enumerate(full_file) if line.startswith("#")]
     if len(break_points) == 3:
         split_blocks = (
             full_file[break_points[0] : break_points[1]],
@@ -39,7 +39,7 @@ def _identify_break_points(full_file):
 
 
 def read_tsv(tsv_path):
-    """Read in a Dataverse TSV metadata block file and convert it into a python diytionary structure."""
+    """Read in a Dataverse TSV metadata block file and convert it into a python dictionary structure."""
     violations = []
     data = dict()
 
@@ -97,7 +97,7 @@ def read_tsv(tsv_path):
                 row_as_dict[key] = value
 
         # Initialize the entry for this toplevel keyword with an empty list
-        if not (toplevel_key in data.keys()):
+        if toplevel_key not in data.keys():
             data[toplevel_key] = []
 
         data[toplevel_key].append(row_as_dict)
