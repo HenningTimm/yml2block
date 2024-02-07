@@ -1,9 +1,17 @@
 """Import module for YAML files."""
 from ruamel.yaml import YAML
 from ruamel.yaml.constructor import DuplicateKeyError
+# from ruamel.yaml.scalarstring import LiteralScalarString, FoldedScalarString, DoubleQuotedScalarString, SingleQuotedScalarString, PlainScalarString
+# from ruamel.yaml.scalarint import ScalarInt
+# from ruamel.yaml.scalarbool import ScalarBoolean
 
 from yml2block.rules import LintViolation, Level
 from yml2block import validation
+
+
+# TODO: Implement custom constructor for ruamel yaml
+# to get line and colum numbers for leafs in the yaml file
+# https://stackoverflow.com/a/45717104
 
 
 def read_yaml(file_path, lint_conf, verbose):
