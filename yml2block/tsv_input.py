@@ -63,7 +63,7 @@ def read_tsv(tsv_path):
     # of dictionaries.
     parsed_blocks = [_parse(block) for block in split_blocks]
 
-    for row in itertools.chain(*parsed_blocks):
+    for line_no, row in enumerate(itertools.chain(*parsed_blocks)):
         # Each row corresponds to a line in the TSV file
         # unpacked into a dictionary with keys depending
         # on the part of the block identified by the top level keyword
