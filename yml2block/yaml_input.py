@@ -9,9 +9,11 @@ from yml2block import validation
 def read_yaml(file_path, lint_conf, verbose):
     """Read in a yaml file and convert it into a python dictionary structure."""
     with open(file_path, "r") as yml_file:
-        yaml = YAML(typ="safe")
+        # Use the ruamel.yaml round trip parser to get line and column info.
+        # This is still considered safe: https://stackoverflow.com/a/71299116
+        yaml_parser = YAML(typ="rt")
         try:
-            data = yaml.load(yml_file)
+            data = yaml_parser.load(yml_file)
             longest_row, file_lint_violations = validation.validate_yaml(
                 data, lint_conf, verbose
             )
