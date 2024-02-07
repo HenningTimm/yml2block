@@ -27,7 +27,7 @@ def _identify_break_points(full_file):
             None,
         )
     else:
-        split_block = full_file
+        split_blocks = full_file
         violations.append(
             LintViolation(
                 Level.WARNING,
