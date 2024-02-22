@@ -1,4 +1,5 @@
 """Dispatch entry to specialized lint rules."""
+
 from yml2block import rules
 
 

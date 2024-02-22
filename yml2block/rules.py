@@ -4,6 +4,7 @@ This module contains rules that define a certain lint and return a
 LintViolation object containing error severity, rule name, and
 an error message.
 """
+
 import re
 
 from enum import IntEnum

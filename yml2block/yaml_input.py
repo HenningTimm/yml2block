@@ -1,6 +1,8 @@
 """Import module for YAML files."""
+
 from ruamel.yaml import YAML
 from ruamel.yaml.constructor import DuplicateKeyError
+
 # from ruamel.yaml.scalarstring import LiteralScalarString, FoldedScalarString, DoubleQuotedScalarString, SingleQuotedScalarString, PlainScalarString
 # from ruamel.yaml.scalarint import ScalarInt
 # from ruamel.yaml.scalarbool import ScalarBoolean

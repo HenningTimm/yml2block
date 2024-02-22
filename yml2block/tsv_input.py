@@ -1,6 +1,7 @@
 """This module provides a parser to convert a Dataverse TSV file into the same
 dictionary-based representation used for YAML input.
 """
+
 import csv
 import io
 import itertools
@@ -8,12 +9,13 @@ import itertools
 from yml2block.rules import LintViolation, Level
 
 
-
 class MDBlockList(list):
     __slots__ = ("line", "column")
 
+
 class MDBlockDict(dict):
     __slots__ = ("line", "column")
+
 
 class MDBlockNode:
     __slots__ = ("line", "column", "value")
@@ -25,8 +27,7 @@ class MDBlockNode:
 
     def __repr__(self):
         return f"({self.line}, {self.column}) {self.value}"
-    
-    
+
 
 def _identify_break_points(full_file):
     """Identify where to split the metadata block into its three subsections"""
@@ -82,13 +83,16 @@ def read_tsv(tsv_path):
 
     # Unpack each tsv-chunk of the metadata block into a list
     # of dictionaries.
-    parsed_blocks = [zip(_parse(block), itertools.repeat(offset)) for offset, block in enumerate(split_blocks, 1)]
+    parsed_blocks = [
+        zip(_parse(block), itertools.repeat(offset))
+        for offset, block in enumerate(split_blocks, 1)
+    ]
 
     for line_no, (row, offset) in enumerate(itertools.chain(*parsed_blocks), 1):
         # Each row corresponds to a content line in the TSV file
         # unpacked into a dictionary with keys depending
         # on the part of the block identified by the top level keyword
-        
+
         # Get the toplevel keyword from the first column of the TSV file
         # e.g. #metadataBlock, #datasetField, #controlledVocabulary
         toplevel_key_with_prefix = [
@@ -103,8 +107,7 @@ def read_tsv(tsv_path):
         offset_line_no = line_no + offset
         row_as_dict.line = offset_line_no
         row_as_dict.column = None
-        
-        
+
         for key, value in row.items():
             if key is None:
                 # These entries cannot be associated with a column header
@@ -125,7 +128,7 @@ def read_tsv(tsv_path):
 
         # Initialize the entry for this toplevel keyword with an empty list
         if toplevel_key not in data.keys():
-            block_list =  MDBlockList()
+            block_list = MDBlockList()
             block_list.line = line_no
             block_list.column = None
             data[toplevel_key] = block_list
