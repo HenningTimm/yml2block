@@ -8,11 +8,31 @@ import itertools
 from yml2block.rules import LintViolation, Level
 
 
+
+class MDBlockList(list):
+    __slots__ = ("line", "column")
+
+class MDBlockDict(dict):
+    __slots__ = ("line", "column")
+
+class MDBlockNode:
+    __slots__ = ("line", "column", "value")
+
+    def __init__(self, value, line=None, column=None):
+        self.line = line
+        self.column = column
+        self.value = value
+
+    def __repr__(self):
+        return f"({self.line}, {self.column}) {self.value}"
+    
+    
+
 def _identify_break_points(full_file):
     """Identify where to split the metadata block into its three subsections"""
     violations = []
 
-    # Split slong lines starting with '#'
+    # Split along lines starting with '#'
     break_points = [i for i, line in enumerate(full_file) if line.startswith("#")]
     if len(break_points) == 3:
         split_blocks = (
@@ -27,6 +47,7 @@ def _identify_break_points(full_file):
             None,
         )
     else:
+        # TODO: suggest better fix for this
         split_blocks = full_file
         violations.append(
             LintViolation(
@@ -41,7 +62,7 @@ def _identify_break_points(full_file):
 def read_tsv(tsv_path):
     """Read in a Dataverse TSV metadata block file and convert it into a python dictionary structure."""
     violations = []
-    data = dict()
+    data = MDBlockDict()
 
     with open(tsv_path, "r") as raw_file:
         full_file = raw_file.readlines()
@@ -61,13 +82,13 @@ def read_tsv(tsv_path):
 
     # Unpack each tsv-chunk of the metadata block into a list
     # of dictionaries.
-    parsed_blocks = [_parse(block) for block in split_blocks]
+    parsed_blocks = [zip(_parse(block), itertools.repeat(offset)) for offset, block in enumerate(split_blocks, 1)]
 
-    for line_no, row in enumerate(itertools.chain(*parsed_blocks)):
-        # Each row corresponds to a line in the TSV file
+    for line_no, (row, offset) in enumerate(itertools.chain(*parsed_blocks), 1):
+        # Each row corresponds to a content line in the TSV file
         # unpacked into a dictionary with keys depending
         # on the part of the block identified by the top level keyword
-
+        
         # Get the toplevel keyword from the first column of the TSV file
         # e.g. #metadataBlock, #datasetField, #controlledVocabulary
         toplevel_key_with_prefix = [
@@ -76,8 +97,14 @@ def read_tsv(tsv_path):
 
         # For consistency with the yaml format
         toplevel_key = toplevel_key_with_prefix.lstrip("#")
-        row_as_dict = dict()
 
+        # print(f"{line_no} + {offset} = {line_no + offset}", row)
+        row_as_dict = MDBlockDict()
+        offset_line_no = line_no + offset
+        row_as_dict.line = offset_line_no
+        row_as_dict.column = None
+        
+        
         for key, value in row.items():
             if key is None:
                 # These entries cannot be associated with a column header
@@ -94,12 +121,16 @@ def read_tsv(tsv_path):
                 continue
             else:
                 # Copy all other entries into a new data structure for this row
-                row_as_dict[key] = value
+                row_as_dict[key] = MDBlockNode(value, line=offset_line_no)
 
         # Initialize the entry for this toplevel keyword with an empty list
         if toplevel_key not in data.keys():
-            data[toplevel_key] = []
+            block_list =  MDBlockList()
+            block_list.line = line_no
+            block_list.column = None
+            data[toplevel_key] = block_list
 
         data[toplevel_key].append(row_as_dict)
 
+    print(data)
     return data, violations

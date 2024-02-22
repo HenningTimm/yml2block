@@ -351,7 +351,7 @@ def no_trailing_spaces(list_item, tsv_keyword, level=Level.ERROR):
 
     for entry in entries_to_check[tsv_keyword]:
         try:
-            value = list_item[entry]
+            value = list_item[entry].value
         except KeyError:
             # This case occurs, when a typo in one of the required
             # keywords is present. They can safely be skipped here,
