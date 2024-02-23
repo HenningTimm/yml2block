@@ -8,12 +8,27 @@ from ruamel.yaml.constructor import DuplicateKeyError
 # from ruamel.yaml.scalarbool import ScalarBoolean
 
 from yml2block.rules import LintViolation, Level
+from yml2block.tsv_input import MDBlockList, MDBlockDict, MDBlockNode
 from yml2block import validation
 
 
 # TODO: Implement custom constructor for ruamel yaml
 # to get line and colum numbers for leafs in the yaml file
 # https://stackoverflow.com/a/45717104
+
+
+def to_md_block_types(data):
+    """This function takes a ruamel YAML struture and wraps its
+    content into cutsom types that support annotation with line and column
+    numbers to be compatible with the tsv input.
+    """
+    match data:
+        case dict():
+            return MDBlockDict({key: to_md_block_types(val) for key, val in data.items()})
+        case list():
+            return MDBlockList([to_md_block_types(d) for d in data])
+        case _:
+            return MDBlockNode(data)
 
 
 def read_yaml(file_path, lint_conf, verbose):
@@ -24,6 +39,7 @@ def read_yaml(file_path, lint_conf, verbose):
         yaml_parser = YAML(typ="rt")
         try:
             data = yaml_parser.load(yml_file)
+            data = to_md_block_types(data)
             longest_row, file_lint_violations = validation.validate_yaml(
                 data, lint_conf, verbose
             )
@@ -38,4 +54,5 @@ def read_yaml(file_path, lint_conf, verbose):
                     f"ruamel.yaml says '{dke.problem}'",
                 )
             ]
+
     return data, longest_row, file_lint_violations
