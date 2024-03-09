@@ -24,9 +24,18 @@ def to_md_block_types(data):
     """
     match data:
         case dict():
-            return MDBlockDict({key: to_md_block_types(val) for key, val in data.items()})
+            print(data.lc.line)
+            return MDBlockDict(
+                {key: to_md_block_types(val) for key, val in data.items()},
+                line=data.lc.line,
+                column=data.lc.col,
+            )
         case list():
-            return MDBlockList([to_md_block_types(d) for d in data])
+            return MDBlockList(
+                [to_md_block_types(d) for d in data],
+                line=data.lc.line,
+                column=data.lc.col,
+            )
         case _:
             return MDBlockNode(data)
 
