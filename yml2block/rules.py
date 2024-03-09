@@ -167,8 +167,10 @@ def unique_names(yaml_chunk, tsv_keyword, level=Level.ERROR):
     if tsv_keyword not in ["metadataBlock", "datasetField"]:
         return []
     names = Counter()
+
     for item in yaml_chunk:
-        names.update([item["name"]])
+        names.update([item["name"].value])
+
     errors = []
     for name, count in names.items():
         if count > 1:
