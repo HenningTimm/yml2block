@@ -193,7 +193,7 @@ def unique_names(yaml_chunk, tsv_keyword, level=Level.ERROR):
                 LintViolation(
                     level,
                     "unique_names",
-                    f"Name '{name}' occurs {count} times {str(occ) if occ else ''}. Names have to be unique.",
+                    f"Name '{name}' occurs {count} times: {', '.join(occs) if occs else ''}. Names have to be unique.",
                 )
             )
     return errors
