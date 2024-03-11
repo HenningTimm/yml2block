@@ -12,6 +12,7 @@ from collections import Counter
 from functools import partial
 
 from yml2block import suggestions
+from yml2block.datatypes import MDBlockList, MDBlockDict, MDBlockNode
 
 # Note: The order of entries in this list defines the enforced order in the output file
 # Note: These are referred to as top-level keywords.
@@ -195,7 +196,7 @@ def block_is_list(yaml_chunk, level=Level.ERROR):
 
     block content level lint
     """
-    if isinstance(yaml_chunk, list):
+    if isinstance(yaml_chunk, list | MDBlockList):
         return []
     else:
         return [
