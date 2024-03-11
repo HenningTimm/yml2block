@@ -8,7 +8,7 @@ from ruamel.yaml.constructor import DuplicateKeyError
 # from ruamel.yaml.scalarbool import ScalarBoolean
 
 from yml2block.rules import LintViolation, Level
-from yml2block.tsv_input import MDBlockList, MDBlockDict, MDBlockNode
+from yml2block.datatypes import MDBlockList, MDBlockDict, MDBlockNode
 from yml2block import validation
 
 

@@ -5,3 +5,4 @@ from . import output
 from . import tsv_input
 from . import yaml_input
 from . import suggestions
+from . import datatypes
