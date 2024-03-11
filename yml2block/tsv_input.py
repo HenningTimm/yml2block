@@ -116,5 +116,4 @@ def read_tsv(tsv_path):
 
         data[toplevel_key].append(row_as_dict)
 
-    print(data)
     return data, violations

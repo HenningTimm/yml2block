@@ -15,7 +15,6 @@ def to_md_block_types(data):
     """
     match data:
         case dict():
-            print(data.lc.line)
             return MDBlockDict(
                 {key: to_md_block_types(val) for key, val in data.items()},
                 line=data.lc.line,
