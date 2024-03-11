@@ -2,6 +2,7 @@
 structure used for metadata block lints. MOst importantly these types allow to
 track line and column numbers for input data to enable more helpful user feedback.
 """
+
 # from ruamel.yaml.scalarstring import LiteralScalarString, FoldedScalarString, DoubleQuotedScalarString, SingleQuotedScalarString, PlainScalarString
 # from ruamel.yaml.scalarint import ScalarInt
 # from ruamel.yaml.scalarbool import ScalarBoolean

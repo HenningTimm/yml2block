@@ -9,6 +9,7 @@ import itertools
 from yml2block.rules import LintViolation, Level
 from yml2block.datatypes import MDBlockList, MDBlockDict, MDBlockNode
 
+
 def _identify_break_points(full_file):
     """Identify where to split the metadata block into its three subsections"""
     violations = []
