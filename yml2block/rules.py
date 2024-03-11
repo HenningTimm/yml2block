@@ -159,7 +159,11 @@ class LintViolation:
             line_info = f"line {str(self.line)} "
         else:
             line_info = ""
-        return f"[{self.level.name}] {line_info}{self.rule}: {self.message}"
+        if self.column:
+            col_info = f"column {str(self.column)} "
+        else:
+            col_info = ""
+        return f"[{self.level.name}] {line_info}{col_info}{self.rule}: {self.message}"
 
     def __str__(self):
         """Pass on string representation."""
