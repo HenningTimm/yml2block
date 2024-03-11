@@ -139,7 +139,7 @@ def kw_order(kw):
 class LintViolation:
     """Class to model lint violations of different severity levels."""
 
-    def __init__(self, level, rule, message):
+    def __init__(self, level, rule, message, line=None, column=None):
         """Create a new lint violation.
 
         Level defines the severity severity level of the error,
@@ -149,10 +149,16 @@ class LintViolation:
         self.level = level
         self.rule = rule
         self.message = message
+        self.line = line
+        self.column = column
 
     def __repr__(self):
         """Print as a log-style record."""
-        return f"[{self.level.name}] {self.rule}: {self.message}"
+        if self.line:
+            line_info = f"line {str(self.line)} "
+        else:
+            line_info = ""
+        return f"[{self.level.name}] {line_info}{self.rule}: {self.message}"
 
     def __str__(self):
         """Pass on string representation."""
@@ -197,6 +203,8 @@ def block_is_list(yaml_chunk, level=Level.ERROR):
                 level,
                 "block_is_list",
                 "Entry is not a list",
+                yaml_chunk.line,
+                yaml_chunk.column,
             )
         ]
 
@@ -257,6 +265,8 @@ def keys_valid(list_item, tsv_keyword, level=Level.ERROR):
                 level,
                 "keys_valid",
                 f"Cannot check entry for invalid keyword '{tsv_keyword}'. Skipping entry.",
+                list_item[entry].line,
+                list_item[entry].column,
             )
         ]
 
@@ -270,6 +280,8 @@ def keys_valid(list_item, tsv_keyword, level=Level.ERROR):
                     suggestions.fix_keys_valid(
                         key, list_item, tsv_keyword, permissible
                     ),
+                    list_item[entry].line,
+                    list_item[entry].column,
                 )
             )
     return violations
@@ -289,6 +301,8 @@ def required_keys_present(list_item, tsv_keyword, level=Level.ERROR):
                 level,
                 "required_keys_present",
                 f"Cannot check entry for invalid keyword '{tsv_keyword}'. Skipping entry.",
+                list_item[entry].line,
+                list_item[entry].column,
             )
         ]
     # Assure all required keys are there
@@ -303,6 +317,8 @@ def required_keys_present(list_item, tsv_keyword, level=Level.ERROR):
                 suggestions.fix_required_keys_present(
                     missing_keys, list_item, tsv_keyword
                 ),
+                list_item[entry].line,
+                list_item[entry].column,
             )
         ]
 
@@ -320,6 +336,8 @@ def no_substructures(list_item, tsv_keyword, level=Level.ERROR):
                     level,
                     "no_substructures",
                     f"Key {key} in block {tsv_keyword} has a subtructure of type {type(value)}. Only strings, booleans, an numericals are allowed here.",
+                    list_item[entry].line,
+                    list_item[entry].column,
                 )
             )
     return violations
@@ -371,6 +389,8 @@ def no_trailing_spaces(list_item, tsv_keyword, level=Level.ERROR):
                     level,
                     "no_trailing_spaces",
                     f"The entry '{value}' has one or more trailing spaces.",
+                    list_item[entry].line,
+                    list_item[entry].column,
                 )
             )
     return violations
