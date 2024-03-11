@@ -8,7 +8,7 @@ an error message.
 import re
 
 from enum import IntEnum
-from collections import Counter
+from collections import Counter, defaultdict
 from functools import partial
 
 from yml2block import suggestions
@@ -178,18 +178,22 @@ def unique_names(yaml_chunk, tsv_keyword, level=Level.ERROR):
     if tsv_keyword not in ["metadataBlock", "datasetField"]:
         return []
     names = Counter()
+    occurrences = defaultdict(list)
 
     for item in yaml_chunk:
-        names.update([item["name"].value])
+        item_name = item["name"].value
+        names.update([item_name])
+        occurrences[item_name].append(item)
 
     errors = []
     for name, count in names.items():
         if count > 1:
+            occs = [f"line {o.line}" for o in occurrences[name]]
             errors.append(
                 LintViolation(
                     level,
                     "unique_names",
-                    f"Name '{name}' occurs {count} times. Names have to be unique.",
+                    f"Name '{name}' occurs {count} times {str(occ) if occ else ""}. Names have to be unique.",
                 )
             )
     return errors
