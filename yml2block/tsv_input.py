@@ -105,7 +105,7 @@ def read_tsv(tsv_path):
                 continue
             else:
                 # Copy all other entries into a new data structure for this row
-                row_as_dict[key] = MDBlockNode(value, line=offset_line_no)
+                row_as_dict[key] = MDBlockNode(value, line=offset_line_no, column=key)
 
         # Initialize the entry for this toplevel keyword with an empty list
         if toplevel_key not in data.keys():
