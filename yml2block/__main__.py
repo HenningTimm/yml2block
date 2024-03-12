@@ -150,6 +150,12 @@ def check(file_paths, warn, skip, warn_ec, verbose):
 
     # Unpack all file paths as glob patterns
     file_paths = [path for fp in file_paths for path in glob.glob(fp)]
+
+    # Return early with an error, if no files are found
+    if not file_paths:
+        print("No files found at path. No check was performed.")
+        sys.exit(1)
+
     if verbose:
         print(f"Checking the following files: {file_paths}\n")
 
@@ -206,6 +212,11 @@ def convert(file_path, warn, skip, warn_ec, verbose, outfile):
     if outfile is None:
         path, _ext = os.path.splitext(file_path)
         outfile = f"{path}.tsv"
+
+    # Return early with an error, if no files are found
+    if not file_path:
+        print("No file found at path. Nothing to convert.")
+        sys.exit(1)
 
     if verbose:
         print(f"Checking input file: {file_path}\n\n")
