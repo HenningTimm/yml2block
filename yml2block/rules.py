@@ -274,8 +274,8 @@ def keys_valid(list_item, tsv_keyword, level=Level.ERROR):
                 level,
                 "keys_valid",
                 f"Cannot check entry for invalid keyword '{tsv_keyword}'. Skipping entry.",
-                list_item[entry].line,
-                list_item[entry].column,
+                list_item.line,
+                list_item.column,
             )
         ]
 
@@ -289,8 +289,8 @@ def keys_valid(list_item, tsv_keyword, level=Level.ERROR):
                     suggestions.fix_keys_valid(
                         key, list_item, tsv_keyword, permissible
                     ),
-                    list_item[entry].line,
-                    list_item[entry].column,
+                    value.line,
+                    value.column,
                 )
             )
     return violations
@@ -310,8 +310,8 @@ def required_keys_present(list_item, tsv_keyword, level=Level.ERROR):
                 level,
                 "required_keys_present",
                 f"Cannot check entry for invalid keyword '{tsv_keyword}'. Skipping entry.",
-                list_item[entry].line,
-                list_item[entry].column,
+                list_item.line,
+                list_item.column,
             )
         ]
     # Assure all required keys are there
@@ -326,8 +326,8 @@ def required_keys_present(list_item, tsv_keyword, level=Level.ERROR):
                 suggestions.fix_required_keys_present(
                     missing_keys, list_item, tsv_keyword
                 ),
-                list_item[entry].line,
-                list_item[entry].column,
+                list_item.line,
+                list_item.column,
             )
         ]
 
