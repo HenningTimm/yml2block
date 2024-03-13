@@ -51,6 +51,12 @@ def test_typo_in_key_detected():
     )
     assert result.exit_code == 1, result.output
 
+    runner = CliRunner()
+    result = runner.invoke(
+        yml2block.__main__.main, ["check", "tests/invalid/typo_in_key.tsv"]
+    )
+    assert result.exit_code == 1, result.output
+
 
 def test_trailing_whitespace_detected():
     """This test ensures that typos in keys are detected."""
