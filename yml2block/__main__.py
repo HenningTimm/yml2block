@@ -57,6 +57,24 @@ class ViolationsByFile:
         for filename, violations in self.violations.items():
             yield (filename, violations, min(violations, key=lambda x: x.level).level)
 
+    def safe_conversion_possible(self, file_path, strict=False):
+        """Check if the file can be safely converted to tsv.
+        """
+        try:
+            max_severity = min(self.violations[file_path], key=lambda x: x.level).level
+            if max_severity == Level.ERROR:
+                return False
+            elif max_severity == Level.WARNING:
+                if strict:
+                    return False
+                else:
+                    return True
+            else:
+                return True
+        except KeyError:
+            print(f"The file {file_path} is not present in this list of files.")
+            raise
+
 
 def guess_input_type(input_path):
     """Guess the input type from the file name."""
@@ -244,8 +262,10 @@ def convert(file_path, warn, skip, warn_ec, verbose, outfile):
 
     lint_violations.extend_for(file_path, file_lint_violations)
 
-    if input_type == "yaml" and file_path not in lint_violations:
+    if input_type == "yaml" and lint_violations.safe_conversion_possible(file_path):
         output.write_metadata_block(data, outfile, longest_row, verbose)
+    else:
+        print("Errors detected. No TSV file was written.")
 
     return_violations(lint_violations, warn_ec, verbose)
 
