@@ -58,8 +58,7 @@ class ViolationsByFile:
             yield (filename, violations, min(violations, key=lambda x: x.level).level)
 
     def safe_conversion_possible(self, file_path, strict=False):
-        """Check if the file can be safely converted to tsv.
-        """
+        """Check if the file can be safely converted to tsv."""
         try:
             max_severity = min(self.violations[file_path], key=lambda x: x.level).level
             if max_severity == Level.ERROR:
@@ -210,11 +209,16 @@ def check(file_paths, warn, skip, warn_ec, verbose):
 @click.option(
     "--warn-ec", default=0, help="Error code used for lint warnings. Default: 0"
 )
+@click.option(
+    "--strict",
+    is_flag=True,
+    help="Fail conversion, if warnings are present. Default: false",
+)
 @click.option("--verbose", "-v", count=True, help="Print performed checks to stdout.")
 @click.option(
     "--outfile", "-o", nargs=1, help="Path to where the output file will be written."
 )
-def convert(file_path, warn, skip, warn_ec, verbose, outfile):
+def convert(file_path, warn, skip, warn_ec, strict, verbose, outfile):
     """Convert a YML metadata block into a TSV metadata block.
 
     Reads in the provided Dataverse Metadata Block in YML format and converts it into
@@ -262,7 +266,9 @@ def convert(file_path, warn, skip, warn_ec, verbose, outfile):
 
     lint_violations.extend_for(file_path, file_lint_violations)
 
-    if input_type == "yaml" and lint_violations.safe_conversion_possible(file_path):
+    if input_type == "yaml" and lint_violations.safe_conversion_possible(
+        file_path, strict
+    ):
         output.write_metadata_block(data, outfile, longest_row, verbose)
     else:
         print("Errors detected. No TSV file was written.")
