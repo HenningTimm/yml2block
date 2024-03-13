@@ -232,7 +232,7 @@ def keywords_valid(keywords, level=Level.ERROR):
         return [
             LintViolation(
                 level,
-                "top_level_keywords_valid",
+                "keywords_valid",
                 suggestions.fix_keywords_valid(
                     keywords, PERMISSIBLE_KEYWORDS, REQUIRED_TOP_LEVEL_KEYWORDS
                 ),
@@ -255,7 +255,7 @@ def keywords_unique(keywords, level=Level.ERROR):
         return [
             LintViolation(
                 level,
-                "top_level_keywords_unique",
+                "keywords_unique",
                 f"Keyword list '{keywords}' contains duplicate keys.",
             )
         ]
