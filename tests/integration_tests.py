@@ -22,13 +22,15 @@ def test_duplicate_names_detected():
     """This test ensures that duplicate names are detected."""
     runner = CliRunner()
     result = runner.invoke(
-        yml2block.__main__.main, ["check", "tests/invalid/duplicate_datasetfield_name.yml"]
+        yml2block.__main__.main,
+        ["check", "tests/invalid/duplicate_datasetfield_name.yml"],
     )
     assert result.exit_code == 1, result.output
 
     runner = CliRunner()
     result = runner.invoke(
-        yml2block.__main__.main, ["check", "tests/invalid/duplicate_datasetfield_name.tsv"]
+        yml2block.__main__.main,
+        ["check", "tests/invalid/duplicate_datasetfield_name.tsv"],
     )
     assert result.exit_code == 1, result.output
 
@@ -63,6 +65,12 @@ def test_trailing_whitespace_detected():
     runner = CliRunner()
     result = runner.invoke(
         yml2block.__main__.main, ["check", "tests/invalid/whitespace_in_key.yml"]
+    )
+    assert result.exit_code == 1, result.output
+
+    runner = CliRunner()
+    result = runner.invoke(
+        yml2block.__main__.main, ["check", "tests/invalid/whitespace_in_key.tsv"]
     )
     assert result.exit_code == 1, result.output
 
