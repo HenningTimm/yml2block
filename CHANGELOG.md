@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 0.6.0 (2024-03-??)
+## Version 0.6.0 (2024-03-18)
 
 - Added a CHANGELOG file.
 - Switched yaml input to use the ruamel.yaml round trip parser.
@@ -11,6 +11,7 @@
 - Added `--strict` flag to the `convert` sub-command that prevents converting files that produced warnings.
 - The rules `keys_valid` and `keys_unique` now correctly report their name in output.
 - Added integration tests checking tsv files.
+- Improved user feedback for parameters dealing with rule names, e.g. `--skip`.
 
 
 ## Version 0.5.0 (2024-01-10)
