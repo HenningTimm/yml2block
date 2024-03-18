@@ -95,14 +95,16 @@ class LintConfig:
                 conf.warning(lint)
             except KeyError:
                 print(f"Could not find lint with name or id '{warn_lint}'")
-                print(f"Valid lint names are:\n{'\n'.join(LINT_NAMES.keys())}")
+                print("Valid lint names are:")
+                print(f"{'\n'.join(LINT_NAMES.keys())}")
                 sys.exit(1)
         for skip_lint in skip:
             try:
                 lint = LINT_NAMES[skip_lint]
             except KeyError:
-                print(f"Could not find lint with name or id '{warn_lint}'")
-                print(f"Valid lint names are:\n{'\n'.join(LINT_NAMES.keys())}")
+                print(f"Could not find lint with name or id '{skip_lint}'")
+                print("Valid lint names are:")
+                print(f"{'\n'.join(LINT_NAMES.keys())}")
                 sys.exit(1)
             conf.skip(lint)
         return conf
