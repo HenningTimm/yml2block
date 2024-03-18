@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "yml2block"
-version = "0.5.0"
+version = "0.6.0"
 description = "Converts yaml files describing dataverse metadata blocks into tsv files understood by dataverse."
 license = "MIT"
 authors = [
@@ -13,7 +13,7 @@ authors = [
 repository = "https://github.com/HenningTimm/yml2block"
 readme = "README.md"
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 4 - Beta",
     "Environment :: Console",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",

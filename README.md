@@ -1,9 +1,10 @@
 # yml2block
 
-The yml2block script converts a YAML description of a dataverse-compliant
+The yml2block script converts a YAML description of a Dataverse-compliant
 metadata schema into a Dataverse metadata block TSV file.
 Additionally, it can lint both YAML and TSV metadata block files for common errors.
 
+For a list of releases and a documentation of added features etc. please refer to the  [changelog](CHANGELOG.md).
 
 ## Requirements and Installation
 

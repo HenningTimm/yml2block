@@ -57,6 +57,23 @@ class ViolationsByFile:
         for filename, violations in self.violations.items():
             yield (filename, violations, min(violations, key=lambda x: x.level).level)
 
+    def safe_conversion_possible(self, file_path, strict=False):
+        """Check if the file can be safely converted to tsv."""
+        try:
+            max_severity = min(self.violations[file_path], key=lambda x: x.level).level
+            if max_severity == Level.ERROR:
+                return False
+            elif max_severity == Level.WARNING:
+                if strict:
+                    return False
+                else:
+                    return True
+            else:
+                return True
+        except KeyError:
+            print(f"The file {file_path} is not present in this list of files.")
+            raise
+
 
 def guess_input_type(input_path):
     """Guess the input type from the file name."""
@@ -150,6 +167,12 @@ def check(file_paths, warn, skip, warn_ec, verbose):
 
     # Unpack all file paths as glob patterns
     file_paths = [path for fp in file_paths for path in glob.glob(fp)]
+
+    # Return early with an error, if no files are found
+    if not file_paths:
+        print("No files found at path. No check was performed.")
+        sys.exit(1)
+
     if verbose:
         print(f"Checking the following files: {file_paths}\n")
 
@@ -186,11 +209,16 @@ def check(file_paths, warn, skip, warn_ec, verbose):
 @click.option(
     "--warn-ec", default=0, help="Error code used for lint warnings. Default: 0"
 )
+@click.option(
+    "--strict",
+    is_flag=True,
+    help="Fail conversion, if warnings are present. Default: false",
+)
 @click.option("--verbose", "-v", count=True, help="Print performed checks to stdout.")
 @click.option(
     "--outfile", "-o", nargs=1, help="Path to where the output file will be written."
 )
-def convert(file_path, warn, skip, warn_ec, verbose, outfile):
+def convert(file_path, warn, skip, warn_ec, strict, verbose, outfile):
     """Convert a YML metadata block into a TSV metadata block.
 
     Reads in the provided Dataverse Metadata Block in YML format and converts it into
@@ -206,6 +234,11 @@ def convert(file_path, warn, skip, warn_ec, verbose, outfile):
     if outfile is None:
         path, _ext = os.path.splitext(file_path)
         outfile = f"{path}.tsv"
+
+    # Return early with an error, if no files are found
+    if not file_path:
+        print("No file found at path. Nothing to convert.")
+        sys.exit(1)
 
     if verbose:
         print(f"Checking input file: {file_path}\n\n")
@@ -233,8 +266,12 @@ def convert(file_path, warn, skip, warn_ec, verbose, outfile):
 
     lint_violations.extend_for(file_path, file_lint_violations)
 
-    if input_type == "yaml" and file_path not in lint_violations:
+    if input_type == "yaml" and lint_violations.safe_conversion_possible(
+        file_path, strict
+    ):
         output.write_metadata_block(data, outfile, longest_row, verbose)
+    else:
+        print("Errors detected. No TSV file was written.")
 
     return_violations(lint_violations, warn_ec, verbose)
 

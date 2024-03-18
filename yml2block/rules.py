@@ -4,13 +4,16 @@ This module contains rules that define a certain lint and return a
 LintViolation object containing error severity, rule name, and
 an error message.
 """
+
 import re
+import sys
 
 from enum import IntEnum
-from collections import Counter
+from collections import Counter, defaultdict
 from functools import partial
 
 from yml2block import suggestions
+from yml2block.datatypes import MDBlockList, MDBlockDict, MDBlockNode
 
 # Note: The order of entries in this list defines the enforced order in the output file
 # Note: These are referred to as top-level keywords.
@@ -87,10 +90,22 @@ class LintConfig:
         """Create config ussing warning and skip lists from CLI."""
         conf = cls()
         for warn_lint in warn:
-            lint = LINT_NAMES[warn_lint]
-            conf.warning(lint)
+            try:
+                lint = LINT_NAMES[warn_lint]
+                conf.warning(lint)
+            except KeyError:
+                lint_names = "\n".join(LINT_NAMES.keys())
+                print(f"Could not find lint with name or id '{warn_lint}'")
+                print(f"Valid lint names are:\n{lint_names}")
+                sys.exit(1)
         for skip_lint in skip:
-            lint = LINT_NAMES[skip_lint]
+            try:
+                lint = LINT_NAMES[skip_lint]
+            except KeyError:
+                lint_names = "\n".join(LINT_NAMES.keys())
+                print(f"Could not find lint with name or id '{skip_lint}'")
+                print(f"Valid lint names are:\n{lint_names}")
+                sys.exit(1)
             conf.skip(lint)
         return conf
 
@@ -138,7 +153,7 @@ def kw_order(kw):
 class LintViolation:
     """Class to model lint violations of different severity levels."""
 
-    def __init__(self, level, rule, message):
+    def __init__(self, level, rule, message, line=None, column=None):
         """Create a new lint violation.
 
         Level defines the severity severity level of the error,
@@ -148,10 +163,24 @@ class LintViolation:
         self.level = level
         self.rule = rule
         self.message = message
+        self.line = line
+        self.column = column
 
     def __repr__(self):
         """Print as a log-style record."""
-        return f"[{self.level.name}] {self.rule}: {self.message}"
+        if self.line:
+            line_info = f"line {str(self.line)} "
+        else:
+            line_info = ""
+        if self.column:
+            # Put everything that is not an integer into single quotes
+            if isinstance(self.column, int):
+                col_info = f"column {self.column} "
+            else:
+                col_info = f"column '{str(self.column)}' "
+        else:
+            col_info = ""
+        return f"[{self.level.name}] {line_info}{col_info}{self.rule}: {self.message}"
 
     def __str__(self):
         """Pass on string representation."""
@@ -166,16 +195,22 @@ def unique_names(yaml_chunk, tsv_keyword, level=Level.ERROR):
     if tsv_keyword not in ["metadataBlock", "datasetField"]:
         return []
     names = Counter()
+    occurrences = defaultdict(list)
+
     for item in yaml_chunk:
-        names.update([item["name"]])
+        item_name = item["name"].value
+        names.update([item_name])
+        occurrences[item_name].append(item)
+
     errors = []
     for name, count in names.items():
         if count > 1:
+            occs = [f"line {o.line}" for o in occurrences[name]]
             errors.append(
                 LintViolation(
                     level,
                     "unique_names",
-                    f"Name '{name}' occurs {count} times. Names have to be unique.",
+                    f"Name '{name}' occurs {count} times: {', '.join(occs) if occs else ''}. Names have to be unique.",
                 )
             )
     return errors
@@ -186,7 +221,7 @@ def block_is_list(yaml_chunk, level=Level.ERROR):
 
     block content level lint
     """
-    if isinstance(yaml_chunk, list):
+    if isinstance(yaml_chunk, list | MDBlockList):
         return []
     else:
         return [
@@ -194,6 +229,8 @@ def block_is_list(yaml_chunk, level=Level.ERROR):
                 level,
                 "block_is_list",
                 "Entry is not a list",
+                yaml_chunk.line,
+                yaml_chunk.column,
             )
         ]
 
@@ -212,7 +249,7 @@ def keywords_valid(keywords, level=Level.ERROR):
         return [
             LintViolation(
                 level,
-                "top_level_keywords_valid",
+                "keywords_valid",
                 suggestions.fix_keywords_valid(
                     keywords, PERMISSIBLE_KEYWORDS, REQUIRED_TOP_LEVEL_KEYWORDS
                 ),
@@ -235,7 +272,7 @@ def keywords_unique(keywords, level=Level.ERROR):
         return [
             LintViolation(
                 level,
-                "top_level_keywords_unique",
+                "keywords_unique",
                 f"Keyword list '{keywords}' contains duplicate keys.",
             )
         ]
@@ -254,6 +291,8 @@ def keys_valid(list_item, tsv_keyword, level=Level.ERROR):
                 level,
                 "keys_valid",
                 f"Cannot check entry for invalid keyword '{tsv_keyword}'. Skipping entry.",
+                list_item.line,
+                list_item.column,
             )
         ]
 
@@ -267,6 +306,8 @@ def keys_valid(list_item, tsv_keyword, level=Level.ERROR):
                     suggestions.fix_keys_valid(
                         key, list_item, tsv_keyword, permissible
                     ),
+                    value.line,
+                    value.column,
                 )
             )
     return violations
@@ -286,6 +327,8 @@ def required_keys_present(list_item, tsv_keyword, level=Level.ERROR):
                 level,
                 "required_keys_present",
                 f"Cannot check entry for invalid keyword '{tsv_keyword}'. Skipping entry.",
+                list_item.line,
+                list_item.column,
             )
         ]
     # Assure all required keys are there
@@ -300,6 +343,8 @@ def required_keys_present(list_item, tsv_keyword, level=Level.ERROR):
                 suggestions.fix_required_keys_present(
                     missing_keys, list_item, tsv_keyword
                 ),
+                list_item.line,
+                list_item.column,
             )
         ]
 
@@ -317,6 +362,8 @@ def no_substructures(list_item, tsv_keyword, level=Level.ERROR):
                     level,
                     "no_substructures",
                     f"Key {key} in block {tsv_keyword} has a subtructure of type {type(value)}. Only strings, booleans, an numericals are allowed here.",
+                    list_item[entry].line,
+                    list_item[entry].column,
                 )
             )
     return violations
@@ -351,7 +398,7 @@ def no_trailing_spaces(list_item, tsv_keyword, level=Level.ERROR):
 
     for entry in entries_to_check[tsv_keyword]:
         try:
-            value = list_item[entry]
+            value = list_item[entry].value
         except KeyError:
             # This case occurs, when a typo in one of the required
             # keywords is present. They can safely be skipped here,
@@ -368,6 +415,8 @@ def no_trailing_spaces(list_item, tsv_keyword, level=Level.ERROR):
                     level,
                     "no_trailing_spaces",
                     f"The entry '{value}' has one or more trailing spaces.",
+                    list_item[entry].line,
+                    list_item[entry].column,
                 )
             )
     return violations
