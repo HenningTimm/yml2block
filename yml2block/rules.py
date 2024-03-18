@@ -6,6 +6,7 @@ an error message.
 """
 
 import re
+import sys
 
 from enum import IntEnum
 from collections import Counter, defaultdict
@@ -89,10 +90,20 @@ class LintConfig:
         """Create config ussing warning and skip lists from CLI."""
         conf = cls()
         for warn_lint in warn:
-            lint = LINT_NAMES[warn_lint]
-            conf.warning(lint)
+            try:
+                lint = LINT_NAMES[warn_lint]
+                conf.warning(lint)
+            except KeyError:
+                print(f"Could not find lint with name or id '{warn_lint}'")
+                print(f"Valid lint names are:\n{'\n'.join(LINT_NAMES.keys())}")
+                sys.exit(1)
         for skip_lint in skip:
-            lint = LINT_NAMES[skip_lint]
+            try:
+                lint = LINT_NAMES[skip_lint]
+            except KeyError:
+                print(f"Could not find lint with name or id '{warn_lint}'")
+                print(f"Valid lint names are:\n{'\n'.join(LINT_NAMES.keys())}")
+                sys.exit(1)
             conf.skip(lint)
         return conf
 
