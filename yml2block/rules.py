@@ -160,7 +160,11 @@ class LintViolation:
         else:
             line_info = ""
         if self.column:
-            col_info = f"column {str(self.column)} "
+            # Put everything that is not an integer into single quotes
+            if isinstance(self.column, int):
+                col_info = f"column {self.column} "
+            else:
+                col_info = f"column '{str(self.column)}' "
         else:
             col_info = ""
         return f"[{self.level.name}] {line_info}{col_info}{self.rule}: {self.message}"
