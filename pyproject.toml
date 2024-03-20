@@ -8,7 +8,7 @@ version = "0.6.0"
 description = "Converts yaml files describing dataverse metadata blocks into tsv files understood by dataverse."
 license = "MIT"
 authors = [
-    "Henning Timm <henning.timm@tu-dortmund.de>"
+    "Henning Timm <henning.timm@uni-due.de>"
 ]
 repository = "https://github.com/HenningTimm/yml2block"
 readme = "README.md"
