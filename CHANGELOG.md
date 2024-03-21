@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 0.6.1 (2024-03-??)
+
+- Fixed a bug where files without errors resulted in an error.
+- Added first conversion test (cf. #10)
+
+
 ## Version 0.6.0 (2024-03-18)
 
 - Added a CHANGELOG file.
