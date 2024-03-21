@@ -137,6 +137,7 @@ class LintConfig:
 class Level(IntEnum):
     """Provide numeric error levels."""
 
+    NONE = 3
     WARNING = 2
     ERROR = 1
 
