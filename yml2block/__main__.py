@@ -144,7 +144,9 @@ def return_violations(lint_violations, warn_ec, verbose):
             print("Errors detected. File(s) cannot safely be converted to TSV.")
             sys.exit(1)
         elif max_severity == Level.WARNING:
-            print("Warnings detected. File(s) can probably not be safely converted to TSV.")
+            print(
+                "Warnings detected. File(s) can probably not be safely converted to TSV."
+            )
             sys.exit(warn_ec)
         elif max_severity == Level.NONE:
             print("\nAll Checks passed! 🎉 Safe covnersion is possible.\n\n")
