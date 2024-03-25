@@ -2,3 +2,4 @@ build
 yml2block.egg-info
 poetry.lock
 yml2block/__pycache__/
+tests/__pychache__/
