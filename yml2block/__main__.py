@@ -122,7 +122,7 @@ def return_violations(lint_violations, warn_ec, verbose):
 
     if len(lint_violations) == 0:
         if verbose:
-            print("\nAll Checks passed!\n\n")
+            print("\nAll Checks passed! 🎉\n\n")
         sys.exit(0)
     else:
         max_severity = None
@@ -132,15 +132,23 @@ def return_violations(lint_violations, warn_ec, verbose):
             print()
             print(file_path)
             print(100 * "-")
-            print(f"A total of {len(violations)} lint(s) failed.")
-            print(f"Highest error level was '{max_severity.name}'")
-            for violation in violations:
-                print(violation)
-        print("Errors detected. File(s) cannot safely be converted to TSV.")
+            if violations:
+                print(f"A total of {len(violations)} lint(s) failed.")
+                print(f"Highest error level was '{max_severity.name}'")
+                for violation in violations:
+                    print(violation)
+            else:
+                print(f"All checks passed for {file_path}! 🎉")
+
         if max_severity == Level.ERROR:
+            print("Errors detected. File(s) cannot safely be converted to TSV.")
             sys.exit(1)
         elif max_severity == Level.WARNING:
+            print("Warnings detected. File(s) can probably not be safely converted to TSV.")
             sys.exit(warn_ec)
+        elif max_severity == Level.NONE:
+            print("\nAll Checks passed! 🎉 Safe covnersion is possible.\n\n")
+            sys.exit(0)
         else:
             sys.exit(1)
 
