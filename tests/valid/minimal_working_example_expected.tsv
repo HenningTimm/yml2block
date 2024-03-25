@@ -1,0 +1,9 @@
+#metadataBlock	name	dataverseAlias	displayName												
+	ValidExample		Valid												
+#datasetField	name	title	description	watermark	fieldType	displayOrder	displayFormat	advancedSearchField	allowControlledVocabulary	allowmultiples	facetable	displayoncreate	required	parent	metadatablock_id
+	Description	Description	This field describes.		textbox			TRUE	FALSE	FALSE	FALSE	TRUE	TRUE		ValidExample
+	Answer	Answer			text			TRUE	TRUE	TRUE	TRUE	TRUE	TRUE		ValidExample
+#controlledVocabulary	DatasetField	Value	identifier	displayOrder											
+	AnswerYes	Yes	answer_positive												
+	AnswerNo	No	answer_negative												
+	AnswerMaybeSo	Maybe	answer_unclear												
