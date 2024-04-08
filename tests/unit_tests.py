@@ -1,5 +1,6 @@
 from yml2block.__main__ import guess_input_type
 from yml2block.rules import Level
+from yml2block.tsv_input import _identify_break_points
 
 
 def test_input_guessing_valid_tsv():
@@ -117,3 +118,32 @@ def test_input_guessing_invalid_extension():
         assert len(violations) == 1
         assert violations[0].level == Level.ERROR
         assert guessed_type is False
+
+
+def test_breakpoint_identification():
+    """ """
+    test_cases = [
+        {
+            "file": "tests/valid/minimal_working_example_expected.tsv",
+            "expected_blocks": (
+                "#metadataBlock\tname\tdataverseAlias\tdisplayName\t\t\t\t\t\t\t\t\t\t\t\t\n\tValidExample\t\tValid\t\t\t\t\t\t\t\t\t\t\t\t\n",
+                "#datasetField\tname\ttitle\tdescription\twatermark\tfieldType\tdisplayOrder\tdisplayFormat\tadvancedSearchField\tallowControlledVocabulary\tallowmultiples\tfacetable\tdisplayoncreate\trequired\tparent\tmetadatablock_id\n\tDescription\tDescription\tThis field describes.\t\ttextbox\t\t\tTRUE\tFALSE\tFALSE\tFALSE\tTRUE\tTRUE\t\tValidExample\n\tAnswer\tAnswer\t\t\ttext\t\t\tTRUE\tTRUE\tTRUE\tTRUE\tTRUE\tTRUE\t\tValidExample\n",
+                "#controlledVocabulary\tDatasetField\tValue\tidentifier\tdisplayOrder\t\t\t\t\t\t\t\t\t\t\t\n\tAnswerYes\tYes\tanswer_positive\t\t\t\t\t\t\t\t\t\t\t\t\n\tAnswerNo\tNo\tanswer_negative\t\t\t\t\t\t\t\t\t\t\t\t\n\tAnswerMaybeSo\tMaybe\tanswer_unclear\t\t\t\t\t\t\t\t\t\t\t\t\n",
+            ),
+            "expected_violations": [],
+        },
+        # TODO more test cases
+    ]
+
+    for test_case in test_cases:
+        with open(test_case["file"], "r") as case_file:
+            split_blocks, violations = _identify_break_points(case_file.read())
+        assert split_blocks == test_case["expected_blocks"]
+        assert len(violations) == len(test_case["expected_violations"])
+        for vio, exp_vio in zip(violations, test_case["expected_violations"]):
+            assert vio == exp_vio
+
+
+def test_breakpoint_suggestions():
+    """ """
+    raise NotImplemented
