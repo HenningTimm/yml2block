@@ -116,4 +116,4 @@ def test_input_guessing_invalid_extension():
         guessed_type, violations = guess_input_type(path)
         assert len(violations) == 1
         assert violations[0].level == Level.ERROR
-        assert guessed_type == False
+        assert guessed_type is False
