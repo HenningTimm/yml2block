@@ -180,8 +180,3 @@ def test_breakpoint_identification():
         for vio, exp_vio in zip(violations, test_case["expected_violations"]):
             assert vio.level == exp_vio["level"]
             assert vio.rule == exp_vio["rule"]
-
-
-def test_breakpoint_suggestions():
-    """ """
-    raise NotImplemented
