@@ -132,7 +132,44 @@ def test_breakpoint_identification():
             ),
             "expected_violations": [],
         },
-        # TODO more test cases
+        {
+            "file": "tests/snippets/minimal_snippet.tsv",
+            "expected_blocks": (
+                "#metadataBlock\n",
+                "#datasetField\n",
+                None,
+            ),
+            "expected_violations": [],
+        },
+        {
+            "file": "tests/snippets/three_item_snippet.tsv",
+            "expected_blocks": (
+                "#metadataBlock\n",
+                "#datasetField\n",
+                "#controlledVocabulary\n",
+            ),
+            "expected_violations": [],
+        },
+        {
+            "file": "tests/snippets/one_item_snippet.tsv",
+            "expected_blocks": "#metadataBlock\n",
+            "expected_violations": [
+                {
+                    "level": Level.WARNING,
+                    "rule": "identify_break_points",
+                }
+            ],
+        },
+        {
+            "file": "tests/snippets/four_item_snippet.tsv",
+            "expected_blocks": "#metadataBlock\n#datasetField\n#controlledVocabulary\n#controlledVocabulary\n",
+            "expected_violations": [
+                {
+                    "level": Level.WARNING,
+                    "rule": "identify_break_points",
+                }
+            ],
+        },
     ]
 
     for test_case in test_cases:
@@ -141,7 +178,8 @@ def test_breakpoint_identification():
         assert split_blocks == test_case["expected_blocks"]
         assert len(violations) == len(test_case["expected_violations"])
         for vio, exp_vio in zip(violations, test_case["expected_violations"]):
-            assert vio == exp_vio
+            assert vio.level == exp_vio["level"]
+            assert vio.rule == exp_vio["rule"]
 
 
 def test_breakpoint_suggestions():
