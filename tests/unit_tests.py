@@ -175,8 +175,13 @@ def test_breakpoint_identification():
     for test_case in test_cases:
         with open(test_case["file"], "r") as case_file:
             split_blocks, violations = _identify_break_points(case_file.read())
+
+        # Ensure the expected blocks are returned
+        # and that the correct number is returned
         assert split_blocks == test_case["expected_blocks"]
         assert len(violations) == len(test_case["expected_violations"])
+
+        # Ensure the expected error are detected
         for vio, exp_vio in zip(violations, test_case["expected_violations"]):
             assert vio.level == exp_vio["level"]
             assert vio.rule == exp_vio["rule"]
