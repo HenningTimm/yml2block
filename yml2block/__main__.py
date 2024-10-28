@@ -3,19 +3,15 @@
 
 https://guides.dataverse.org/en/latest/admin/metadatacustomization.html
 """
+
+import glob
 import os
 import sys
-import click
-import glob
-
 from collections import defaultdict
 
-from yml2block import validation
-from yml2block import output
-from yml2block import rules
-from yml2block import tsv_input
-from yml2block import yaml_input
+import click
 
+from yml2block import output, rules, tsv_input, validation, yaml_input
 from yml2block.rules import Level, LintConfig
 
 
@@ -59,20 +55,23 @@ class ViolationsByFile:
 
     def safe_conversion_possible(self, file_path, strict=False):
         """Check if the file can be safely converted to tsv."""
-        try:
-            max_severity = min(self.violations[file_path], key=lambda x: x.level).level
-            if max_severity == Level.ERROR:
-                return False
-            elif max_severity == Level.WARNING:
-                if strict:
+        if self.violations:
+            try:
+                max_severity = min(self.violations[file_path], key=lambda x: x.level).level
+                if max_severity == Level.ERROR:
                     return False
+                elif max_severity == Level.WARNING:
+                    if strict:
+                        return False
+                    else:
+                        return True
                 else:
                     return True
-            else:
-                return True
-        except KeyError:
-            print(f"The file {file_path} is not present in this list of files.")
-            raise
+            except KeyError:
+                print(f"The file {file_path} is not present in this list of files.")
+                raise
+        else:
+            return True
 
 
 def guess_input_type(input_path):
