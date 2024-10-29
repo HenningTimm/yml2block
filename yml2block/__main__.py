@@ -61,7 +61,9 @@ class ViolationsByFile:
         """Check if the file can be safely converted to tsv."""
         if self.violations:
             try:
-                max_severity = min(self.violations[file_path], key=lambda x: x.level).level
+                max_severity = min(
+                    self.violations[file_path], key=lambda x: x.level
+                ).level
                 if max_severity == Level.ERROR:
                     return False
                 elif max_severity == Level.WARNING:
