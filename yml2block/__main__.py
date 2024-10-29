@@ -59,20 +59,23 @@ class ViolationsByFile:
 
     def safe_conversion_possible(self, file_path, strict=False):
         """Check if the file can be safely converted to tsv."""
-        try:
-            max_severity = min(self.violations[file_path], key=lambda x: x.level).level
-            if max_severity == Level.ERROR:
-                return False
-            elif max_severity == Level.WARNING:
-                if strict:
+        if self.violations:
+            try:
+                max_severity = min(self.violations[file_path], key=lambda x: x.level).level
+                if max_severity == Level.ERROR:
                     return False
+                elif max_severity == Level.WARNING:
+                    if strict:
+                        return False
+                    else:
+                        return True
                 else:
                     return True
-            else:
-                return True
-        except KeyError:
-            print(f"The file {file_path} is not present in this list of files.")
-            raise
+            except KeyError:
+                print(f"The file {file_path} is not present in this list of files.")
+                raise
+        else:
+            return True
 
 
 def guess_input_type(input_path):
