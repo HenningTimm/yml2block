@@ -1,13 +1,20 @@
 name: Lint and test
 
-on: [push]
+on:
+  - push
+  - pull_request
+
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-versions: ["3.10", "3.11", "3.12"]
+        python-versions:
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
 
     steps:
       - uses: actions/checkout@v3
