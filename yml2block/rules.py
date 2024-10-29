@@ -216,6 +216,35 @@ def unique_names(yaml_chunk, tsv_keyword, level=Level.ERROR):
     return errors
 
 
+def unique_titles(yaml_chunk, tsv_keyword, level=Level.ERROR):
+    """Make sure that each title in the block is only used once.
+
+    block content level lint
+    """
+    if tsv_keyword not in ["datasetField"]:
+        return []
+    titles = Counter()
+    occurrences = defaultdict(list)
+
+    for item in yaml_chunk:
+        item_title = item["title"].value
+        titles.update([item_title])
+        occurrences[item_title].append(item)
+
+    errors = []
+    for title, count in titles.items():
+        if count > 1:
+            occs = [f"line {o.line}" for o in occurrences[title]]
+            errors.append(
+                LintViolation(
+                    level,
+                    "unique_titles",
+                    f"Title '{title}' occurs {count} times: {', '.join(occs) if occs else ''}. Titles should be unique.",
+                )
+            )
+    return errors
+
+
 def block_is_list(yaml_chunk, level=Level.ERROR):
     """Make sure that the yaml chunk is a list.
 
@@ -427,6 +456,8 @@ LINT_NAMES = {
     "b001": unique_names,
     "block_is_list": block_is_list,
     "b002": block_is_list,
+    "unique_titles": unique_titles,
+    "b003": unique_titles,
     "keywords_valid": keywords_valid,
     "k001": keywords_valid,
     "keywords_unique": keywords_unique,

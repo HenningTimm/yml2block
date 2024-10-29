@@ -66,7 +66,7 @@ def validate_entry(yaml_chunk, tsv_keyword, lint_conf, verbose):
 
     longest_row = 0
 
-    for lint in (rules.unique_names,):
+    for lint in (rules.unique_names, rules.unique_titles):
         lint = lint_conf.get(lint)
         violations.extend(lint(yaml_chunk, tsv_keyword))
 

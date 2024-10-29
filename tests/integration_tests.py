@@ -35,6 +35,23 @@ def test_duplicate_names_detected():
     assert result.exit_code == 1, result.output
 
 
+def test_duplicate_titles_detected():
+    """This test ensures that duplicate titles are detected."""
+    runner = CliRunner()
+    result = runner.invoke(
+        yml2block.__main__.main,
+        ["check", "tests/invalid/duplicate_datasetfield_title.yml"],
+    )
+    assert result.exit_code == 1, result.output
+
+    runner = CliRunner()
+    result = runner.invoke(
+        yml2block.__main__.main,
+        ["check", "tests/invalid/duplicate_datasetfield_title.tsv"],
+    )
+    assert result.exit_code == 1, result.output
+
+
 def test_duplicate_top_level_key_detected():
     """This test ensures that duplicates in top-level keys are detected."""
     runner = CliRunner()

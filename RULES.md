@@ -6,6 +6,7 @@ This file contains a list of all lints checked by yml2block.
 |-------------------------|---------|------|
 | `unique_names`          | b001    | Ensure that within a block (e.g. DatasetField) all names are unique. |
 | `block_is_list`         | b002    | Ensure that each block content is a valid yaml list. |
+| `unique_titles`         | b003    | Ensure that within the DatasetField block all titles are unique. |
 | `keywords_valid`        | k001    | Ensure top level keywords (i.e. block names) are present and contain no typos. |
 | `keywords_unique`       | k002    | Ensure no top level keyword occurs multiple times. |
 | `keys_valid`            | e001    | Ensure that no invalid keys are present, e.g. through typos. |
