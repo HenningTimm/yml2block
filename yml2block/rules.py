@@ -362,8 +362,8 @@ def no_substructures(list_item, tsv_keyword, level=Level.ERROR):
                     level,
                     "no_substructures",
                     f"Key {key} in block {tsv_keyword} has a subtructure of type {type(value)}. Only strings, booleans, an numericals are allowed here.",
-                    list_item[entry].line,
-                    list_item[entry].column,
+                    list_item[key].line,
+                    list_item[key].column,
                 )
             )
     return violations
