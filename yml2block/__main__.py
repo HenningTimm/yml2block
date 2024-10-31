@@ -57,27 +57,33 @@ class ViolationsByFile:
         for filename, violations in self.violations.items():
             yield (filename, violations, min(violations, key=lambda x: x.level).level)
 
+
+    def max_severity(self, file_path):
+        try:
+            violation_list = self.violations[file_path]
+            if len(violation_list) == 0:
+                # Catch empty violation lists for well-behaved files
+                return Level.NONE
+            else:
+                return min(violation_list, key=lambda x: x.level).level
+        except KeyError:
+            print(f"The file {file_path} is not present in this list of files.")
+            raise
+
     def safe_conversion_possible(self, file_path, strict=False):
         """Check if the file can be safely converted to tsv."""
-        if self.violations:
-            try:
-                max_severity = min(
-                    self.violations[file_path], key=lambda x: x.level
-                ).level
-                if max_severity == Level.ERROR:
-                    return False
-                elif max_severity == Level.WARNING:
-                    if strict:
-                        return False
-                    else:
-                        return True
-                else:
-                    return True
-            except KeyError:
-                print(f"The file {file_path} is not present in this list of files.")
-                raise
-        else:
-            return True
+
+        max_severity = self.max_severity(file_path)
+
+        match max_severity:
+            case Level.NONE:
+                return True
+            case Level.WARNING:
+                return False if strict else True
+            case Level.ERROR:
+                return False
+            case _:
+                raise ValueError(f"Unexpected severity level {max_severity}.")
 
 
 def guess_input_type(input_path):
