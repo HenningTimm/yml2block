@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.7.0 (2024-11-??)
+
+- Fixed bug where converting files without lint violations would result in an error (#T16). Thanks @Athemis
+
+
 ## Version 0.6.0 (2024-03-18)
 
 - Added a CHANGELOG file.
