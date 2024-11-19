@@ -427,8 +427,8 @@ def no_trailing_spaces(list_item, tsv_keyword, level=Level.ERROR):
 
     for entry in entries_to_check[tsv_keyword]:
         try:
-            # Make sure that value is a string since re.search can
-            # only work with that, not e.g. int.
+            # Ensure 'value' is a string, as re.search requires
+            # string input, not a numerical type like int.
             value = str(list_item[entry].value)
         except KeyError:
             # This case occurs, when a typo in one of the required
