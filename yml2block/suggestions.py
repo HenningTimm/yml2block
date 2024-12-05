@@ -58,3 +58,24 @@ def fix_required_keys_present(missing_keys, list_item, tsv_keyword):
     """Return list of missing keys."""
     name = identify_entry(list_item, tsv_keyword)
     return f"Missing keys '{missing_keys}' for '{name}' in block '{tsv_keyword}'."
+
+
+def fix_identify_breaking_points(full_file, break_points):
+    """Suggest fixes for too little or too many detected blocks."""
+    match len(break_points):
+        case 0:
+            # No line starts with #
+            # are you passing the right file?
+            ...
+        case 1:
+            # Only one line starts with #
+            # At least two blocks are required for a reasonable metadata schema
+            ...
+        case 2 | 3:
+            # This case should never be reached, those files are fine
+            # Raise an exception if I get here in error handling
+            ...
+        case _:
+            # More than the required number of blocks is present.
+            # Identify what is going on.
+            ...
