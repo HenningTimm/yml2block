@@ -55,10 +55,12 @@ class ViolationsByFile:
     def __iter__(self):
         """Iterate over violations and max severity level per file."""
         for filename, violations in self.violations.items():
-            yield (filename, violations, min(violations, key=lambda x: x.level).level)
-
+            yield (filename, violations, self.max_severity(filename))
 
     def max_severity(self, file_path):
+        """Get the highest error severity level for the file and Level.NONE
+        if the file has no violations.
+        """
         try:
             violation_list = self.violations[file_path]
             if len(violation_list) == 0:

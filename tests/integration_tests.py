@@ -33,8 +33,6 @@ def test_minimal_valid_example_convert():
         yml2block.__main__.main,
         ["convert", "tests/valid/minimal_working_example.yml", "-o", path_output],
     )
-    print(result)
-    print(result.stdout)
     assert result.exit_code == 0, result.stdout
     with open(path_output, "r") as converted_file, open(
         path_expected, "r"
