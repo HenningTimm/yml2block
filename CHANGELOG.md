@@ -2,11 +2,11 @@
 
 ## Version 0.7.0 (2024-12-??)
 
-- Fixed bug where converting files without lint violations would result in an error (#T16). Thanks @Athemis
+- Fixed bug where converting files without lint violations would result in an error (#16). Thanks @Athemis
+- Fixed bug where non-string watermarks caused an error (#19). Thanks @Athemis
 - Added minimal test for conversion function.
 - Add tests to PRs.
 - Add lint `b003` that checks if all titles within the DatasetField block are unique.
-
 
 ## Version 0.6.0 (2024-03-18)
 
