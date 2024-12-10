@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 0.7.0 (2024-12-??)
+## Version 0.7.0 (2024-12-10)
 
 - Fixed bug where converting files without lint violations would result in an error (#16). Thanks @Athemis
 - Fixed bug where non-string watermarks caused an error (#19). Thanks @Athemis
