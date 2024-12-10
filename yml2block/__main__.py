@@ -152,7 +152,7 @@ def return_violations(lint_violations, warn_ec, verbose):
             )
             sys.exit(warn_ec)
         elif max_severity == Level.NONE:
-            print("\nAll Checks passed! 🎉 Safe covnersion is possible.\n\n")
+            print("\nAll Checks passed! 🎉 Safe conversion is possible.\n\n")
             sys.exit(0)
         else:
             sys.exit(1)
