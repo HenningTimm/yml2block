@@ -55,29 +55,37 @@ class ViolationsByFile:
     def __iter__(self):
         """Iterate over violations and max severity level per file."""
         for filename, violations in self.violations.items():
-            yield (filename, violations, min(violations, key=lambda x: x.level).level)
+            yield (filename, violations, self.max_severity(filename))
+
+    def max_severity(self, file_path):
+        """Get the highest error severity level for the file and Level.NONE
+        if the file has no violations.
+        """
+        try:
+            violation_list = self.violations[file_path]
+            if len(violation_list) == 0:
+                # Catch empty violation lists for well-behaved files
+                return Level.NONE
+            else:
+                return min(violation_list, key=lambda x: x.level).level
+        except KeyError:
+            print(f"The file {file_path} is not present in this list of files.")
+            raise
 
     def safe_conversion_possible(self, file_path, strict=False):
         """Check if the file can be safely converted to tsv."""
-        if self.violations:
-            try:
-                max_severity = min(
-                    self.violations[file_path], key=lambda x: x.level
-                ).level
-                if max_severity == Level.ERROR:
-                    return False
-                elif max_severity == Level.WARNING:
-                    if strict:
-                        return False
-                    else:
-                        return True
-                else:
-                    return True
-            except KeyError:
-                print(f"The file {file_path} is not present in this list of files.")
-                raise
-        else:
-            return True
+
+        max_severity = self.max_severity(file_path)
+
+        match max_severity:
+            case Level.NONE:
+                return True
+            case Level.WARNING:
+                return False if strict else True
+            case Level.ERROR:
+                return False
+            case _:
+                raise ValueError(f"Unexpected severity level {max_severity}.")
 
 
 def guess_input_type(input_path):
@@ -117,7 +125,7 @@ def return_violations(lint_violations, warn_ec, verbose):
 
     if len(lint_violations) == 0:
         if verbose:
-            print("\nAll Checks passed!\n\n")
+            print("\nAll Checks passed! 🎉\n\n")
         sys.exit(0)
     else:
         max_severity = None
@@ -127,15 +135,25 @@ def return_violations(lint_violations, warn_ec, verbose):
             print()
             print(file_path)
             print(100 * "-")
-            print(f"A total of {len(violations)} lint(s) failed.")
-            print(f"Highest error level was '{max_severity.name}'")
-            for violation in violations:
-                print(violation)
-        print("Errors detected. File(s) cannot safely be converted to TSV.")
+            if violations:
+                print(f"A total of {len(violations)} lint(s) failed.")
+                print(f"Highest error level was '{max_severity.name}'")
+                for violation in violations:
+                    print(violation)
+            else:
+                print(f"All checks passed for {file_path}! 🎉")
+
         if max_severity == Level.ERROR:
+            print("Errors detected. File(s) cannot safely be converted to TSV.")
             sys.exit(1)
         elif max_severity == Level.WARNING:
+            print(
+                "Warnings detected. File(s) can probably not be safely converted to TSV."
+            )
             sys.exit(warn_ec)
+        elif max_severity == Level.NONE:
+            print("\nAll Checks passed! 🎉 Safe conversion is possible.\n\n")
+            sys.exit(0)
         else:
             sys.exit(1)
 

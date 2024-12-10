@@ -8,14 +8,40 @@ def test_basic_execution_works():
     result = runner.invoke(yml2block.__main__.main, ["--help"])
     assert result.exit_code == 0, result
 
+    result = runner.invoke(yml2block.__main__.main, ["check", "--help"])
+    assert result.exit_code == 0, result
 
-def test_minimal_valid_example():
-    """This test ensures that a valid file is translated without throwing an error."""
+    result = runner.invoke(yml2block.__main__.main, ["convert", "--help"])
+    assert result.exit_code == 0, result
+
+
+def test_minimal_valid_example_check():
+    """This test ensures that a valid files do not throw errors during check."""
     runner = CliRunner()
     result = runner.invoke(
         yml2block.__main__.main, ["check", "tests/valid/minimal_working_example.yml"]
     )
     assert result.exit_code == 0, result
+
+
+def test_minimal_valid_example_convert():
+    """This test ensures that a valid file is translated without throwing an error."""
+    runner = CliRunner()
+    path_expected = "tests/valid/minimal_working_example_expected.tsv"
+    path_output = "/tmp/y2b_mwe.tsv"
+    result = runner.invoke(
+        yml2block.__main__.main,
+        ["convert", "tests/valid/minimal_working_example.yml", "-o", path_output],
+    )
+    assert result.exit_code == 0, result.stdout
+    with open(path_output, "r") as converted_file, open(
+        path_expected, "r"
+    ) as expected_file:
+        converted_tsv = converted_file.read()
+        expected_tsv = expected_file.read()
+        assert converted_tsv == expected_tsv
+        assert len(converted_tsv) > 0
+        assert len(expected_tsv) > 0
 
 
 def test_duplicate_names_detected():
