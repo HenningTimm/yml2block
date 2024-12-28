@@ -53,7 +53,6 @@ def test_duplicate_names_detected():
     )
     assert result.exit_code == 1, result.output
 
-    runner = CliRunner()
     result = runner.invoke(
         yml2block.__main__.main,
         ["check", "tests/invalid/duplicate_datasetfield_name.tsv"],
@@ -70,7 +69,6 @@ def test_duplicate_titles_detected():
     )
     assert result.exit_code == 1, result.output
 
-    runner = CliRunner()
     result = runner.invoke(
         yml2block.__main__.main,
         ["check", "tests/invalid/duplicate_datasetfield_title.tsv"],
@@ -78,7 +76,6 @@ def test_duplicate_titles_detected():
     assert result.exit_code == 1, result.output
 
     # Acceptable duplications are not reported as errors
-    runner = CliRunner()
     result = runner.invoke(
         yml2block.__main__.main,
         ["check", "tests/valid/duplicate_compound_titles.yml"],
@@ -104,7 +101,6 @@ def test_typo_in_keyword_detected():
     )
     assert result.exit_code == 1, result.output
 
-    runner = CliRunner()
     result = runner.invoke(
         yml2block.__main__.main, ["check", "tests/invalid/typo_in_keyword.tsv"]
     )
@@ -120,7 +116,6 @@ def test_trailing_whitespace_detected():
     )
     assert result.exit_code == 2, result.output
 
-    runner = CliRunner()
     result = runner.invoke(
         yml2block.__main__.main,
         ["check", "--warn-ec 2", "tests/invalid/whitespace_in_key.tsv"],
