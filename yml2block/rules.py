@@ -90,7 +90,11 @@ class LintConfig:
         """Create config using warning and skip lists from CLI."""
         conf = cls()
 
-        for lint, apply_level in [(e, conf.error) for e in error] + [(w, conf.warn) for w in warn] + [(s, conf.skip) for s in skip]:
+        for lint, apply_level in (
+            [(e, conf.error) for e in error]
+            + [(w, conf.warn) for w in warn]
+            + [(s, conf.skip) for s in skip]
+        ):
             try:
                 lint_func = LINT_NAMES[lint]
                 apply_level(lint_func)
