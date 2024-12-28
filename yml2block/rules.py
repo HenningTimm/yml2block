@@ -86,27 +86,19 @@ class LintConfig:
         self.overrides = dict()
 
     @classmethod
-    def from_cli_args(cls, warn, skip):
-        """Create config ussing warning and skip lists from CLI."""
+    def from_cli_args(cls, error, warn, skip):
+        """Create config using warning and skip lists from CLI."""
         conf = cls()
-        for warn_lint in warn:
+
+        for lint, apply_level in [(e, conf.error) for e in error] + [(w, conf.warn) for w in warn] + [(s, conf.skip) for s in skip]:
             try:
-                lint = LINT_NAMES[warn_lint]
-                conf.warning(lint)
+                lint_func = LINT_NAMES[lint]
+                apply_level(lint_func)
             except KeyError:
                 lint_names = "\n".join(LINT_NAMES.keys())
-                print(f"Could not find lint with name or id '{warn_lint}'")
+                print(f"Could not find lint with name or id '{lint}'")
                 print(f"Valid lint names are:\n{lint_names}")
                 sys.exit(1)
-        for skip_lint in skip:
-            try:
-                lint = LINT_NAMES[skip_lint]
-            except KeyError:
-                lint_names = "\n".join(LINT_NAMES.keys())
-                print(f"Could not find lint with name or id '{skip_lint}'")
-                print(f"Valid lint names are:\n{lint_names}")
-                sys.exit(1)
-            conf.skip(lint)
         return conf
 
     def get(self, lint):
@@ -119,6 +111,10 @@ class LintConfig:
     def add_override(self, lint, override):
         """Insert an override into the config."""
         self.overrides[lint] = override
+
+    def error(self, lint):
+        """Fix lint severity at ERROR."""
+        self.add_override(lint, partial(lint, level=Level.ERROR))
 
     def warning(self, lint):
         """Fix lint severity at WARNING."""

@@ -166,13 +166,14 @@ def main():
 
 @main.command()
 @click.argument("file_paths", nargs=-1, type=click.Path())
+@click.option("--error", "-e", multiple=True, help="Lints to treat as errors.")
 @click.option("--warn", "-w", multiple=True, help="Lints to treat as warnings.")
 @click.option("--skip", "-s", multiple=True, help="Lints to skip entirely.")
 @click.option(
     "--warn-ec", default=0, help="Error code used for lint warnings. Default: 0"
 )
 @click.option("--verbose", "-v", count=True, help="Print performed checks to stdout.")
-def check(file_paths, warn, skip, warn_ec, verbose):
+def check(file_paths, error, warn, skip, warn_ec, verbose):
     """Lint and validate one or multiple (yml or tsv) metadata block file(s).
 
     Input paths can be one or multiple file names or glob patterns.
@@ -186,7 +187,7 @@ def check(file_paths, warn, skip, warn_ec, verbose):
     are also performed.
     """
     lint_violations = ViolationsByFile()
-    lint_conf = LintConfig.from_cli_args(warn, skip)
+    lint_conf = LintConfig.from_cli_args(error, warn, skip)
 
     # Unpack all file paths as glob patterns
     file_paths = [path for fp in file_paths for path in glob.glob(fp)]
@@ -227,6 +228,7 @@ def check(file_paths, warn, skip, warn_ec, verbose):
 
 @main.command()
 @click.argument("file_path")
+@click.option("--error", "-e", multiple=True, help="Lints to treat as errors.")
 @click.option("--warn", "-w", multiple=True, help="Lints to treat as warnings.")
 @click.option("--skip", "-s", multiple=True, help="Lints to skip entirely.")
 @click.option(
@@ -241,7 +243,7 @@ def check(file_paths, warn, skip, warn_ec, verbose):
 @click.option(
     "--outfile", "-o", nargs=1, help="Path to where the output file will be written."
 )
-def convert(file_path, warn, skip, warn_ec, strict, verbose, outfile):
+def convert(file_path, error, warn, skip, warn_ec, strict, verbose, outfile):
     """Convert a YML metadata block into a TSV metadata block.
 
     Reads in the provided Dataverse Metadata Block in YML format and converts it into
@@ -267,7 +269,7 @@ def convert(file_path, warn, skip, warn_ec, strict, verbose, outfile):
         print(f"Checking input file: {file_path}\n\n")
 
     lint_violations = ViolationsByFile()
-    lint_conf = LintConfig.from_cli_args(warn, skip)
+    lint_conf = LintConfig.from_cli_args(error, warn, skip)
 
     input_type, file_ext_violations = guess_input_type(file_path)
     lint_violations.extend_for(file_path, file_ext_violations)
