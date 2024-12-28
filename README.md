@@ -102,7 +102,8 @@ You can explicitly specify an output file name using the `-o file/path.tsv` para
 
 All checks performed during the `check` and `convert` commands are described in the file `RULES.md`.
 Each rule can be toggled to be a warning instead of an error using the `--warn` parameter and
-skipped entirely by using the `--skip` parameter. Both need to be followed by a rule name
+skipped entirely by using the `--skip` parameter. In the same manner, warnings can be treated as
+errors with the `--error` flag. All three need to be followed by a rule name
 or rule id. Both can be found in the file `RULES.md`.
 
 ```bash
