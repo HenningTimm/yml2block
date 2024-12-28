@@ -77,6 +77,14 @@ def test_duplicate_titles_detected():
     )
     assert result.exit_code == 1, result.output
 
+    # Acceptable duplications are not reported as errors
+    runner = CliRunner()
+    result = runner.invoke(
+        yml2block.__main__.main,
+        ["check", "tests/valid/duplicate_compound_titles.yml"],
+    )
+    assert result.exit_code == 0, result.output
+
 
 def test_duplicate_top_level_key_detected():
     """This test ensures that duplicates in top-level keys are detected."""

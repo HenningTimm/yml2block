@@ -228,8 +228,11 @@ def unique_titles(yaml_chunk, tsv_keyword, level=Level.ERROR):
     occurrences = defaultdict(list)
 
     for item in yaml_chunk:
+        # Use title parent tuple to allow identical titles
+        # in different compound fields
         item_title = item["title"].value
-        titles.update([item_title])
+        item_parent = item["parent"].value
+        titles.update([(item_title, item_parent)])
         occurrences[item_title].append(item)
 
     errors = []
