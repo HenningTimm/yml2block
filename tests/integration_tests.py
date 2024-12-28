@@ -130,3 +130,29 @@ def test_wrong_extensions_fail():
         yml2block.__main__.main, ["check", "tests/invalid/minimal_example.xlsx"]
     )
     assert result.exit_code == 1, result.output
+
+
+def test_nested_compound_metadata():
+    """Ensure nested compound metadata are detected and classified correctly.
+    """
+
+    runner = CliRunner()
+    result = runner.invoke(
+        yml2block.__main__.main, ["check", "tests/invalid/nested_compound_metadata.yml"]
+    )
+    assert result.exit_code == 1, result.output
+
+    result = runner.invoke(
+        yml2block.__main__.main, ["check", "tests/invalid/nested_compound_metadata.tsv"]
+    )
+    assert result.exit_code == 1, result.output
+
+    result = runner.invoke(
+        yml2block.__main__.main, ["check", "--warn-ec 2", "tests/valid/nested_compound_metadata.yml"]
+    )
+    assert result.exit_code == 2, result.output
+
+    result = runner.invoke(
+        yml2block.__main__.main, ["check", "--warn-ec 2", "tests/valid/nested_compound_metadata.tsv"]
+    )
+    assert result.exit_code == 2, result.output
