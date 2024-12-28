@@ -107,15 +107,15 @@ def test_trailing_whitespace_detected():
     """This test ensures that typos in keys are detected."""
     runner = CliRunner()
     result = runner.invoke(
-        yml2block.__main__.main, ["check", "tests/invalid/whitespace_in_key.yml"]
+        yml2block.__main__.main, ["check", "--warn-ec 2", "tests/invalid/whitespace_in_key.yml"]
     )
-    assert result.exit_code == 1, result.output
+    assert result.exit_code == 2, result.output
 
     runner = CliRunner()
     result = runner.invoke(
-        yml2block.__main__.main, ["check", "tests/invalid/whitespace_in_key.tsv"]
+        yml2block.__main__.main, ["check", "--warn-ec 2", "tests/invalid/whitespace_in_key.tsv"]
     )
-    assert result.exit_code == 1, result.output
+    assert result.exit_code == 2, result.output
 
 
 def test_wrong_extensions_fail():

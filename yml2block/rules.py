@@ -399,7 +399,7 @@ def no_substructures(list_item, tsv_keyword, level=Level.ERROR):
     return violations
 
 
-def no_trailing_spaces(list_item, tsv_keyword, level=Level.ERROR):
+def no_trailing_spaces(list_item, tsv_keyword, level=Level.WARNING):
     """Make sure the entries do not contain trailing white spaces.
 
     block entry lint
