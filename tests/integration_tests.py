@@ -133,8 +133,7 @@ def test_wrong_extensions_fail():
 
 
 def test_nested_compound_metadata():
-    """Ensure nested compound metadata are detected and classified correctly.
-    """
+    """Ensure nested compound metadata are detected and classified correctly."""
 
     runner = CliRunner()
     result = runner.invoke(
@@ -148,11 +147,13 @@ def test_nested_compound_metadata():
     assert result.exit_code == 1, result.output
 
     result = runner.invoke(
-        yml2block.__main__.main, ["check", "--warn-ec 2", "tests/valid/nested_compound_metadata.yml"]
+        yml2block.__main__.main,
+        ["check", "--warn-ec 2", "tests/valid/nested_compound_metadata.yml"],
     )
     assert result.exit_code == 2, result.output
 
     result = runner.invoke(
-        yml2block.__main__.main, ["check", "--warn-ec 2", "tests/valid/nested_compound_metadata.tsv"]
+        yml2block.__main__.main,
+        ["check", "--warn-ec 2", "tests/valid/nested_compound_metadata.tsv"],
     )
     assert result.exit_code == 2, result.output

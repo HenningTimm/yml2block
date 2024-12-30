@@ -457,10 +457,6 @@ def no_trailing_spaces(list_item, tsv_keyword, level=Level.WARNING):
     return violations
 
 
-
-
-
-
 def nested_compound_metadata(list_item, tsv_keyword, level=Level.WARNING):
     """Screen for nested compound metadata (entries that are children, but allow multiple values).
 
@@ -474,10 +470,12 @@ def nested_compound_metadata(list_item, tsv_keyword, level=Level.WARNING):
 
     if tsv_keyword != "datasetField":
         return []
-    
-    if list_item["parent"].value is not None \
-       and list_item["allowmultiples"].value is True \
-       and list_item["allowControlledVocabulary"].value is False:
+
+    if (
+        list_item["parent"].value is not None
+        and list_item["allowmultiples"].value is True
+        and list_item["allowControlledVocabulary"].value is False
+    ):
         violations.append(
             LintViolation(
                 level,
@@ -491,7 +489,9 @@ def nested_compound_metadata(list_item, tsv_keyword, level=Level.WARNING):
     return violations
 
 
-def nested_compound_metadata_controlled_vocab(list_item, tsv_keyword, level=Level.ERROR):
+def nested_compound_metadata_controlled_vocab(
+    list_item, tsv_keyword, level=Level.ERROR
+):
     """Screen for nested compound metadata (entries that are children, but allow multiple values).
 
     This variant checks for compound metadata that do not use a controled vocabulary.
@@ -505,9 +505,11 @@ def nested_compound_metadata_controlled_vocab(list_item, tsv_keyword, level=Leve
     if tsv_keyword != "datasetField":
         return []
 
-    if list_item["parent"].value is not None \
-       and list_item["allowmultiples"].value is True \
-       and list_item["allowControlledVocabulary"].value is True:
+    if (
+        list_item["parent"].value is not None
+        and list_item["allowmultiples"].value is True
+        and list_item["allowControlledVocabulary"].value is True
+    ):
         violations.append(
             LintViolation(
                 level,
@@ -519,8 +521,6 @@ def nested_compound_metadata_controlled_vocab(list_item, tsv_keyword, level=Leve
         )
 
     return violations
-
-
 
 
 LINT_NAMES = {
