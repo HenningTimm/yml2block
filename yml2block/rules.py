@@ -457,6 +457,72 @@ def no_trailing_spaces(list_item, tsv_keyword, level=Level.WARNING):
     return violations
 
 
+
+
+
+
+def nested_compound_metadata(list_item, tsv_keyword, level=Level.WARNING):
+    """Screen for nested compound metadata (entries that are children, but allow multiple values).
+
+    This variant checks for compound metadata that do not use a controled vocabulary.
+    These are not offered via the dataverse UI and simpy do not work.
+
+    block entry lint
+    """
+
+    violations = []
+
+    if tsv_keyword != "datasetField":
+        return []
+    
+    if list_item["parent"].value is not None \
+       and list_item["allowmultiples"].value is True \
+       and list_item["allowControlledVocabulary"].value is False:
+        violations.append(
+            LintViolation(
+                level,
+                "nested_compound_metadata",
+                f"The entry '{list_item["name"]}' allows multiple entries in a nested field.",
+                list_item["allowmultiples"].line,
+                list_item["allowmultiples"].column,
+            )
+        )
+
+    return violations
+
+
+def nested_compound_metadata_controlled_vocab(list_item, tsv_keyword, level=Level.ERROR):
+    """Screen for nested compound metadata (entries that are children, but allow multiple values).
+
+    This variant checks for compound metadata that do not use a controled vocabulary.
+    These are not offered via the dataverse UI and simpy do not work.
+
+    block entry lint
+    """
+
+    violations = []
+
+    if tsv_keyword != "datasetField":
+        return []
+
+    if list_item["parent"].value is not None \
+       and list_item["allowmultiples"].value is True \
+       and list_item["allowControlledVocabulary"].value is True:
+        violations.append(
+            LintViolation(
+                level,
+                "nested_compound_metadata_controlled_vocab",
+                f"The entry '{list_item["name"]}' allows multiple entries in a nested field.",
+                list_item["allowmultiples"].line,
+                list_item["allowmultiples"].column,
+            )
+        )
+
+    return violations
+
+
+
+
 LINT_NAMES = {
     "unique_names": unique_names,
     "b001": unique_names,
@@ -476,4 +542,8 @@ LINT_NAMES = {
     "e003": no_substructures,
     "no_trailing_spaces": no_trailing_spaces,
     "e004": no_trailing_spaces,
+    "nested_compound_metadata": nested_compound_metadata,
+    "e005": nested_compound_metadata,
+    "nested_compound_metadata_controlled_vocab": nested_compound_metadata_controlled_vocab,
+    "e006": nested_compound_metadata_controlled_vocab,
 }
