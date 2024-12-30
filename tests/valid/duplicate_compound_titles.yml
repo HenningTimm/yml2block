@@ -28,7 +28,7 @@ datasetField:
     displayFormat:
     advancedSearchField: true
     allowControlledVocabulary: true
-    allowmultiples: true
+    allowmultiples: false
     facetable: true
     displayoncreate: true
     required: true
