@@ -42,21 +42,6 @@ datasetField:
     displayOrder: 2
     displayFormat:
     advancedSearchField: true
-    allowControlledVocabulary: true
-    allowmultiples: true
-    facetable: false
-    displayoncreate: true
-    required: false
-    parent: compoundParent
-    metadatablock_id: NestedCompoundMetadataError
-  - name: compoundChild3
-    title: Child 3
-    description: Nested compound Metadata field WITHOUT controlled vocab
-    watermark:
-    fieldType: text
-    displayOrder: 3
-    displayFormat:
-    advancedSearchField: true
     allowControlledVocabulary: false
     allowmultiples: true
     facetable: false
@@ -75,17 +60,5 @@ controlledVocabulary:
     displayOrder:
   - DatasetField: compoundChild1 
     Value: "C1 Value C"
-    identifier: 
-    displayOrder:
-  - DatasetField: compoundChild2 
-    Value: "C2 Value D"
-    identifier: 
-    displayOrder:
-  - DatasetField: compoundChild2 
-    Value: "C2 Value E"
-    identifier: 
-    displayOrder:
-  - DatasetField: compoundChild2 
-    Value: "C2 Value F"
     identifier: 
     displayOrder:
