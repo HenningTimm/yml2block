@@ -1,12 +1,37 @@
 # Changelog
 
+## Version 0.8.0 (2025-01-01)
+
+### Lint Changes
+
+- Added lints (e005 and e006) to detect [nested compound metadata](https://github.com/IQSS/dataverse/issues/9911).
+- Demote e004 to be a warning by default (Fixes https://github.com/HenningTimm/yml2block/issues/23).
+  Since Dataverse 6.5, trailing whitespaces [are trimmed](https://github.com/IQSS/dataverse/pull/10696).
+- Tweak `unique_title` (b003) lint to allow identical titles as long as
+  they are part of different compound field. (Fixed https://github.com/HenningTimm/yml2block/issues/22)
+
+### CLI Changes
+
+- Add `--error` flag that allows warnings to be treated as errors instead.
+
+### Test Changes
+
+- Fixed multi version tests not working properly
+
+### Other Changes
+
+- Dropped support for Python versions below 3.12 for better string formatting (cf. [PEP 701](https://peps.python.org/pep-0701/))
+
+
+
 ## Version 0.7.0 (2024-12-10)
 
-- Fixed bug where converting files without lint violations would result in an error (#16). Thanks @Athemis
-- Fixed bug where non-string watermarks caused an error (#19). Thanks @Athemis
+- Fixed bug where converting files without lint violations would result in an error (https://github.com/HenningTimm/yml2block/issues/16). Thanks @Athemis
+- Fixed bug where non-string watermarks caused an error (https://github.com/HenningTimm/yml2block/issues/19). Thanks @Athemis
 - Added minimal test for conversion function.
 - Add tests to PRs.
 - Add lint `b003` that checks if all titles within the DatasetField block are unique.
+
 
 ## Version 0.6.0 (2024-03-18)
 
