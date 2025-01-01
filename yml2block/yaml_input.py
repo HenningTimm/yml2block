@@ -9,8 +9,8 @@ from yml2block import validation
 
 
 def to_md_block_types(data):
-    """This function takes a ruamel YAML struture and wraps its
-    content into cutsom types that support annotation with line and column
+    """This function takes a ruamel YAML structure and wraps its
+    content into custom types that support annotation with line and column
     numbers to be compatible with the tsv input.
     """
     match data:
