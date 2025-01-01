@@ -1,0 +1,64 @@
+---
+metadataBlock:
+  - name: ValidExample
+    dataverseAlias:
+    displayName: Valid
+datasetField:
+  - name: Name 1
+    title: Parent Field
+    description: This is a parent field.
+    watermark:
+    fieldType: textbox
+    displayOrder:
+    displayFormat:
+    advancedSearchField: true
+    allowControlledVocabulary: false
+    allowmultiples: false
+    facetable: false
+    displayoncreate: true
+    required: true
+    parent:
+    metadatablock_id: ValidExample
+  - name: Child 1
+    title: Duplicate Title
+    description: This is a child field of Parent Field
+    watermark:
+    fieldType: text
+    displayOrder:
+    displayFormat:
+    advancedSearchField: true
+    allowControlledVocabulary: true
+    allowmultiples: false
+    facetable: true
+    displayoncreate: true
+    required: true
+    parent: Name 1
+    metadatablock_id: ValidExample
+  - name: Name 2
+    title: Duplicate Title
+    description: This is not a child field, so this duplicate title is acceptable.
+    watermark:
+    fieldType: text
+    displayOrder:
+    displayFormat:
+    advancedSearchField: true
+    allowControlledVocabulary: true
+    allowmultiples: true
+    facetable: true
+    displayoncreate: true
+    required: true
+    parent:
+    metadatablock_id: ValidExample
+controlledVocabulary:
+  - DatasetField: AnswerYes
+    Value: "Yes"
+    identifier: answer_positive
+    displayOrder:
+  - DatasetField: AnswerNo
+    Value: "No"
+    identifier: answer_negative
+    displayOrder:
+  - DatasetField: AnswerMaybeSo
+    Value: "Maybe"
+    identifier: answer_unclear
+    displayOrder:

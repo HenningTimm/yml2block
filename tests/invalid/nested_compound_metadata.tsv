@@ -1,0 +1,15 @@
+#metadataBlock	name	dataverseAlias	displayName												
+	compound_error		Nested Compound Metadata Error												
+#datasetField	name	title	description	watermark	 fieldType	displayOrder	displayFormat	advancedSearchField	allowControlledVocabulary	allowmultiples	facetable	displayoncreate	required	parent	metadatablock_id
+	compoundParent	Parent	Parent node of nested metadata		none	0		FALSE	FALSE	FALSE	FALSE	TRUE	FALSE		compound_error
+	compoundChild1	Child 1	compound metadata field		text	1		TRUE	TRUE	FALSE	FALSE	TRUE	FALSE	compoundParent	compound_error
+	compoundChild2	Child 2	compound metadata field		text	2		TRUE	TRUE	FALSE	FALSE	TRUE	FALSE	compoundParent	compound_error
+	compoundChild3	Child 3	compound metadata field		text	3		TRUE	FALSE	TRUE	FALSE	TRUE	FALSE	compoundParent	compound_error
+#controlledVocabulary	DatasetField	Value	identifier	displayOrder											
+	compoundChild1	C1 Value A		0											
+	compoundChild1	C1 Value B		1											
+	compoundChild1	C1 Value C		2											
+	compoundChild2	C2 Value D		3											
+	compoundChild2	C2 Value E		2											
+	compoundChild2	C2 Value F		1											
+	compoundChild2	C3 Value F		0											

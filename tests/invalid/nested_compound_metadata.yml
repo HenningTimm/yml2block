@@ -1,0 +1,64 @@
+---
+metadataBlock:
+  - name: NestedCompoundMetadataError
+    dataverseAlias:
+    displayName: Valid
+datasetField:
+  - name: compoundParent
+    title: Parent
+    description: Parent node of nested metadata
+    watermark:
+    fieldType: none
+    displayOrder: 0
+    displayFormat:
+    advancedSearchField: false
+    allowControlledVocabulary: false
+    allowmultiples: false
+    facetable: false
+    displayoncreate: true
+    required: false
+    parent:
+    metadatablock_id: NestedCompoundMetadataError
+  - name: compoundChild1
+    title: child 1
+    description: Nested compound Metadata field with controlled vocab
+    watermark:
+    fieldType: text
+    displayOrder: 1
+    displayFormat:
+    advancedSearchField: true
+    allowControlledVocabulary: true
+    allowmultiples: true
+    facetable: false
+    displayoncreate: true
+    required: false
+    parent: compoundParent
+    metadatablock_id: NestedCompoundMetadataError
+  - name: compoundChild2
+    title: Child 2
+    description: Nested compound Metadata field with controlled vocab
+    watermark:
+    fieldType: text
+    displayOrder: 2
+    displayFormat:
+    advancedSearchField: true
+    allowControlledVocabulary: false
+    allowmultiples: true
+    facetable: false
+    displayoncreate: true
+    required: false
+    parent: compoundParent
+    metadatablock_id: NestedCompoundMetadataError
+controlledVocabulary:
+  - DatasetField: compoundChild1 
+    Value: "C1 Value A"
+    identifier: 
+    displayOrder:
+  - DatasetField: compoundChild1 
+    Value: "C1 Value B"
+    identifier: 
+    displayOrder:
+  - DatasetField: compoundChild1 
+    Value: "C1 Value C"
+    identifier: 
+    displayOrder:

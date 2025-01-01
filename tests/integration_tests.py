@@ -53,7 +53,6 @@ def test_duplicate_names_detected():
     )
     assert result.exit_code == 1, result.output
 
-    runner = CliRunner()
     result = runner.invoke(
         yml2block.__main__.main,
         ["check", "tests/invalid/duplicate_datasetfield_name.tsv"],
@@ -70,12 +69,18 @@ def test_duplicate_titles_detected():
     )
     assert result.exit_code == 1, result.output
 
-    runner = CliRunner()
     result = runner.invoke(
         yml2block.__main__.main,
         ["check", "tests/invalid/duplicate_datasetfield_title.tsv"],
     )
     assert result.exit_code == 1, result.output
+
+    # Acceptable duplications are not reported as errors
+    result = runner.invoke(
+        yml2block.__main__.main,
+        ["check", "tests/valid/duplicate_compound_titles.yml"],
+    )
+    assert result.exit_code == 0, result.output
 
 
 def test_duplicate_top_level_key_detected():
@@ -96,7 +101,6 @@ def test_typo_in_keyword_detected():
     )
     assert result.exit_code == 1, result.output
 
-    runner = CliRunner()
     result = runner.invoke(
         yml2block.__main__.main, ["check", "tests/invalid/typo_in_keyword.tsv"]
     )
@@ -107,15 +111,16 @@ def test_trailing_whitespace_detected():
     """This test ensures that typos in keys are detected."""
     runner = CliRunner()
     result = runner.invoke(
-        yml2block.__main__.main, ["check", "tests/invalid/whitespace_in_key.yml"]
+        yml2block.__main__.main,
+        ["check", "--warn-ec 2", "tests/invalid/whitespace_in_key.yml"],
     )
-    assert result.exit_code == 1, result.output
+    assert result.exit_code == 2, result.output
 
-    runner = CliRunner()
     result = runner.invoke(
-        yml2block.__main__.main, ["check", "tests/invalid/whitespace_in_key.tsv"]
+        yml2block.__main__.main,
+        ["check", "--warn-ec 2", "tests/invalid/whitespace_in_key.tsv"],
     )
-    assert result.exit_code == 1, result.output
+    assert result.exit_code == 2, result.output
 
 
 def test_wrong_extensions_fail():
@@ -125,3 +130,30 @@ def test_wrong_extensions_fail():
         yml2block.__main__.main, ["check", "tests/invalid/minimal_example.xlsx"]
     )
     assert result.exit_code == 1, result.output
+
+
+def test_nested_compound_metadata():
+    """Ensure nested compound metadata are detected and classified correctly."""
+
+    runner = CliRunner()
+    result = runner.invoke(
+        yml2block.__main__.main, ["check", "tests/invalid/nested_compound_metadata.yml"]
+    )
+    assert result.exit_code == 1, result.output
+
+    result = runner.invoke(
+        yml2block.__main__.main, ["check", "tests/invalid/nested_compound_metadata.tsv"]
+    )
+    assert result.exit_code == 1, result.output
+
+    result = runner.invoke(
+        yml2block.__main__.main,
+        ["check", "--warn-ec 2", "tests/valid/nested_compound_metadata.yml"],
+    )
+    assert result.exit_code == 2, result.output
+
+    result = runner.invoke(
+        yml2block.__main__.main,
+        ["check", "--warn-ec 2", "tests/valid/nested_compound_metadata.tsv"],
+    )
+    assert result.exit_code == 2, result.output
