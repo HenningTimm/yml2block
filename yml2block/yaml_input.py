@@ -8,7 +8,7 @@ from yml2block.datatypes import MDBlockList, MDBlockDict, MDBlockNode
 from yml2block import validation
 
 
-def to_md_block_types(data):
+def to_md_block_types(data, parent=None, parent_key=None):
     """This function takes a ruamel YAML structure and wraps its
     content into custom types that support annotation with line and column
     numbers to be compatible with the tsv input.
@@ -16,7 +16,10 @@ def to_md_block_types(data):
     match data:
         case dict():
             return MDBlockDict(
-                {key: to_md_block_types(val) for key, val in data.items()},
+                {
+                    key: to_md_block_types(val, parent=data, parent_key=key)
+                    for key, val in data.items()
+                },
                 line=data.lc.line,
                 column=data.lc.col,
             )
@@ -27,7 +30,17 @@ def to_md_block_types(data):
                 column=data.lc.col,
             )
         case _:
-            return MDBlockNode(data)
+            # Non-collection entries do not have the lc attribute but can
+            # get their line and column numbers from the lc object of their
+            # parent collection.
+            if parent and parent_key:
+                return MDBlockNode(
+                    data,
+                    line=parent.lc.key(parent_key)[0],
+                    column=parent.lc.key(parent_key)[1],
+                )
+            else:
+                return MDBlockNode(data)
 
 
 def read_yaml(file_path, lint_conf, verbose):
