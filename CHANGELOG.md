@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 0.8.0 (2025-01-01)
+## Version 0.8.0 (2025-01-03)
 
 ### Lint Changes
 
@@ -14,14 +14,11 @@
 
 - Add `--error` flag that allows warnings to be treated as errors instead.
 
-### Test Changes
-
-- Fixed multi version tests not working properly
-
 ### Other Changes
 
+- Fixed multi version tests not working properly
 - Dropped support for Python versions below 3.12 for better string formatting (cf. [PEP 701](https://peps.python.org/pep-0701/))
-
+- Line and column numbers are now reported for "leaves" in yaml input files.
 
 
 ## Version 0.7.0 (2024-12-10)
