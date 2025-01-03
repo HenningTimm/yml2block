@@ -74,3 +74,6 @@ class MDBlockNode:
 
     def __repr__(self):
         return f"({self.line}, {self.column}) {self.value}"
+
+    def __str__(self):
+        return f"'{self.value}' (l:{self.line},c:{self.column})"

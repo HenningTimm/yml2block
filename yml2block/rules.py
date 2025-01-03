@@ -449,7 +449,7 @@ def no_trailing_spaces(list_item, tsv_keyword, level=Level.WARNING):
                 LintViolation(
                     level,
                     "no_trailing_spaces",
-                    f"The entry '{value}' has one or more trailing spaces.",
+                    f"The entry {value} has one or more trailing spaces.",
                     list_item[entry].line,
                     list_item[entry].column,
                 )
@@ -480,7 +480,7 @@ def nested_compound_metadata(list_item, tsv_keyword, level=Level.WARNING):
             LintViolation(
                 level,
                 "nested_compound_metadata",
-                f"The entry '{list_item["name"]}' allows multiple entries in a nested field.",
+                f"The entry {list_item["name"]} allows multiple entries in a nested field.",
                 list_item["allowmultiples"].line,
                 list_item["allowmultiples"].column,
             )
@@ -514,7 +514,7 @@ def nested_compound_metadata_controlled_vocab(
             LintViolation(
                 level,
                 "nested_compound_metadata_controlled_vocab",
-                f"The entry '{list_item["name"]}' allows multiple entries in a nested field.",
+                f"The entry {list_item["name"]} allows multiple entries in a nested field.",
                 list_item["allowmultiples"].line,
                 list_item["allowmultiples"].column,
             )
