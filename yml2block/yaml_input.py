@@ -16,7 +16,10 @@ def to_md_block_types(data, parent=None, parent_key=None):
     match data:
         case dict():
             return MDBlockDict(
-                {key: to_md_block_types(val, parent=data, parent_key=key) for key, val in data.items()},
+                {
+                    key: to_md_block_types(val, parent=data, parent_key=key)
+                    for key, val in data.items()
+                },
                 line=data.lc.line,
                 column=data.lc.col,
             )
@@ -38,6 +41,7 @@ def to_md_block_types(data, parent=None, parent_key=None):
                 )
             else:
                 return MDBlockNode(data)
+
 
 def read_yaml(file_path, lint_conf, verbose):
     """Read in a yaml file and convert it into a python dictionary structure."""
