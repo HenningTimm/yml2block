@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 0.8.1 (2025-01-05)
+
+- Fixed a bug where changing a lint level to WARNING using the `--warn` flag resulted in an error.
+- Added tests for lint level flags.
+
+
 ## Version 0.8.0 (2025-01-03)
 
 ### Lint Changes
