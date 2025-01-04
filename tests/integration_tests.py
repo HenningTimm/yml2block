@@ -45,7 +45,7 @@ def test_minimal_valid_example_convert():
 
 
 def test_duplicate_names_detected():
-    """This test ensures that duplicate names are detected."""
+    """This test ensures that duplicate names are detected. (b001)"""
     runner = CliRunner()
     result = runner.invoke(
         yml2block.__main__.main,
@@ -108,7 +108,7 @@ def test_typo_in_keyword_detected():
 
 
 def test_trailing_whitespace_detected():
-    """This test ensures that typos in keys are detected."""
+    """This test ensures that trailing whitespaces in keys are detected. (e004)"""
     runner = CliRunner()
     result = runner.invoke(
         yml2block.__main__.main,
@@ -157,3 +157,58 @@ def test_nested_compound_metadata():
         ["check", "--warn-ec 2", "tests/valid/nested_compound_metadata.tsv"],
     )
     assert result.exit_code == 2, result.output
+
+
+def test_warn_flag():
+    """This test ensures that the warn flag is operational."""
+    runner = CliRunner()
+    result = runner.invoke(
+        yml2block.__main__.main,
+        ["check", "tests/invalid/duplicate_datasetfield_name.yml"],
+    )
+    assert result.exit_code == 1, result.output
+
+    result = runner.invoke(
+        yml2block.__main__.main,
+        [
+            "check",
+            "--warn",
+            "b001",
+            "--warn-ec",
+            "42",
+            "tests/invalid/duplicate_datasetfield_name.yml",
+        ],
+    )
+    assert result.exit_code == 42, result.output
+
+
+def test_skip_flag():
+    """This test ensures that the skip flag is operational."""
+    runner = CliRunner()
+    result = runner.invoke(
+        yml2block.__main__.main,
+        ["check", "tests/invalid/duplicate_datasetfield_name.yml"],
+    )
+    assert result.exit_code == 1, result.output
+
+    result = runner.invoke(
+        yml2block.__main__.main,
+        ["check", "--skip", "b001", "tests/invalid/duplicate_datasetfield_name.yml"],
+    )
+    assert result.exit_code == 0, result.output
+
+
+def test_error_flag():
+    """This test ensures that the error flag is operational."""
+    runner = CliRunner()
+    result = runner.invoke(
+        yml2block.__main__.main,
+        ["check", "--warn-ec 2", "tests/invalid/whitespace_in_key.yml"],
+    )
+    assert result.exit_code == 2, result.output
+
+    result = runner.invoke(
+        yml2block.__main__.main,
+        ["check", "--error", "e004", "tests/invalid/whitespace_in_key.yml"],
+    )
+    assert result.exit_code == 1, result.output
