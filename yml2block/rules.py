@@ -92,7 +92,7 @@ class LintConfig:
 
         for lint, apply_level in (
             [(e, conf.error) for e in error]
-            + [(w, conf.warn) for w in warn]
+            + [(w, conf.warning) for w in warn]
             + [(s, conf.skip) for s in skip]
         ):
             try:
