@@ -1,4 +1,4 @@
-from yml2block.__main__ import guess_input_type
+from yml2block.__main__ import guess_type
 from yml2block.rules import Level
 from yml2block.tsv_input import _identify_break_points
 
@@ -23,7 +23,7 @@ def test_input_guessing_valid_tsv():
         "/bar/foo.TSV",
     ]
     for path in valid_tsv_paths:
-        guessed_type, violations = guess_input_type(path)
+        guessed_type, violations = guess_type(path)
         assert len(violations) == 0
         assert guessed_type == "tsv"
 
@@ -48,7 +48,7 @@ def test_input_guessing_valid_csv():
         "/bar/foo.CSV",
     ]
     for path in valid_csv_paths:
-        guessed_type, violations = guess_input_type(path)
+        guessed_type, violations = guess_type(path)
         assert len(violations) == 1
         assert violations[0].level == Level.WARNING
         assert guessed_type == "csv"
@@ -89,7 +89,7 @@ def test_input_guessing_valid_yaml():
         "/bar/foo.YAML",
     ]
     for path in valid_yml_paths:
-        guessed_type, violations = guess_input_type(path)
+        guessed_type, violations = guess_type(path)
         assert len(violations) == 0
         assert guessed_type == "yaml"
 
@@ -114,7 +114,7 @@ def test_input_guessing_invalid_extension():
         "/bar/foo.foo",
     ]
     for path in invalid_extension_paths:
-        guessed_type, violations = guess_input_type(path)
+        guessed_type, violations = guess_type(path)
         assert len(violations) == 1
         assert violations[0].level == Level.ERROR
         assert guessed_type is False

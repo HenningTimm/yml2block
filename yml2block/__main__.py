@@ -88,9 +88,9 @@ class ViolationsByFile:
                 raise ValueError(f"Unexpected severity level {max_severity}.")
 
 
-def guess_input_type(input_path):
-    """Guess the input type from the file name."""
-    _, ext = os.path.splitext(input_path)
+def guess_type(path):
+    """Guess the input or output file type from the file name."""
+    _, ext = os.path.splitext(path)
     ext = ext.lower()
     if ext == ".tsv":
         return ("tsv", [])
@@ -100,7 +100,7 @@ def guess_input_type(input_path):
             [
                 rules.LintViolation(
                     Level.WARNING,
-                    "guess_input_type",
+                    "guess_type",
                     f"Invalid file extension '{ext}'. Will be treated as tsv. Currently non-tab separators are not supported.",
                 )
             ],
@@ -113,7 +113,7 @@ def guess_input_type(input_path):
             [
                 rules.LintViolation(
                     Level.ERROR,
-                    "guess_input_type",
+                    "guess_type",
                     f"Invalid file extension '{ext}'. Only .tsv and .yaml/.yml files are supported.",
                 )
             ],
@@ -204,7 +204,7 @@ def check(file_paths, error, warn, skip, warn_ec, verbose):
         if verbose:
             print(f"\n{80*'-'}\nChecking input file: {file_path}\n{80*'-'}")
 
-        input_type, file_ext_violations = guess_input_type(file_path)
+        input_type, file_ext_violations = guess_type(file_path)
         lint_violations.extend_for(file_path, file_ext_violations)
 
         if input_type == "yaml":
@@ -271,7 +271,7 @@ def convert(file_path, error, warn, skip, warn_ec, strict, verbose, outfile):
     lint_violations = ViolationsByFile()
     lint_conf = LintConfig.from_cli_args(error, warn, skip)
 
-    input_type, file_ext_violations = guess_input_type(file_path)
+    input_type, file_ext_violations = guess_type(file_path)
     lint_violations.extend_for(file_path, file_ext_violations)
 
     if input_type == "yaml":
