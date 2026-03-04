@@ -36,6 +36,10 @@ def write_metadata_block(yml_metadata, output_path, longest_line, verbose):
                         # This catches empty values, which yaml reports
                         # as a Python None
                         new_line.append("")
+                    elif value == "":
+                        # Quoted empty strings in YAML are valid values and
+                        # must produce an empty TSV cell without shifting columns.
+                        new_line.append("")
                     elif str(value):
                         # This could be more specific using int() and float()
                         # The conversion of `value` to a string happens to
