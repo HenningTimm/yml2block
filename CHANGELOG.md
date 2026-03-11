@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 0.9.0 (2026-03-11)
+
+- Fixed a bug where empty string values, e.g. for the watermark, were not processed correctly
+  resulting in error and shifts in columns in the generfated TSV file cf.
+  https://github.com/HenningTimm/yml2block/issues/29. Thanks @Athemis
+
 ## Version 0.8.1 (2025-01-05)
 
 - Fixed a bug where changing a lint level to WARNING using the `--warn` flag resulted in an error.

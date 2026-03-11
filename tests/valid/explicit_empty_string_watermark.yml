@@ -1,0 +1,20 @@
+metadataBlock:
+  - name: Example
+    dataverseAlias:
+    displayName: Example
+datasetField:
+  - name: Foo
+    title: Foo
+    description: Some field
+    watermark: ""
+    fieldType: text
+    displayOrder: 1
+    displayFormat:
+    advancedSearchField: true
+    allowControlledVocabulary: false
+    allowmultiples: false
+    facetable: false
+    displayoncreate: true
+    required: true
+    parent:
+    metadatablock_id: Example
