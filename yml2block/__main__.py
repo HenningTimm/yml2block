@@ -273,6 +273,9 @@ def convert(file_path, error, warn, skip, warn_ec, strict, verbose, outfile):
 
     input_type, file_ext_violations = guess_type(file_path)
     lint_violations.extend_for(file_path, file_ext_violations)
+    output_type, file_ext_violations = guess_type(outfile)
+    lint_violations.extend_for(outfile, file_ext_violations)
+
 
     if input_type == "yaml":
         # This call invokes YAML validation internally
