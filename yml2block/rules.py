@@ -523,6 +523,32 @@ def nested_compound_metadata_controlled_vocab(
     return violations
 
 
+def display_order_keys(yaml_chunk, tsv_keyword, level=Level.WARNING):
+    """Make sure that display order keys are unique, contiguous, non-negative intergers.
+
+    block content level lint
+    """
+    if tsv_keyword not in ["datasetField", "controlledVocabulary"]:
+        return []
+
+    display_order_keys = [
+        item["displayOrder"].value for item in yaml_chunk if item["displayOrder"].value
+    ]
+
+    errors = []
+
+    if not all((isinstance(key, int) for key in display_order_keys)):
+        errors.append(
+            LintViolation(
+                level,
+                "display_order_keys",
+                f"At least one key is not an integer",
+            )
+        )
+
+    return errors
+
+
 LINT_NAMES = {
     "unique_names": unique_names,
     "b001": unique_names,

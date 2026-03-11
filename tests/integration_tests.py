@@ -240,3 +240,23 @@ def test_convert_preserves_explicit_empty_string_fields():
     assert row[header.index("watermark")] == ""
     assert row[header.index("fieldType")] == "text"
     assert row[header.index("displayOrder")] == "1"
+
+
+def test_valid_display_order():
+    """Ensure valid display orders are detected as such."""
+    runner = CliRunner()
+    result = runner.invoke(
+        yml2block.__main__.main,
+        ["check", "tests/valid/display_order.yml"],
+    )
+    assert result.exit_code == 0, result.output
+
+
+def test_display_order_types():
+    """Ensure display order keys are integers."""
+    runner = CliRunner()
+    result = runner.invoke(
+        yml2block.__main__.main,
+        ["check", "tests/invalid/display_order.yml"],
+    )
+    assert result.exit_code == 0, result.output
