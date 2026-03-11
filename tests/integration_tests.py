@@ -212,3 +212,31 @@ def test_error_flag():
         ["check", "--error", "e004", "tests/invalid/whitespace_in_key.yml"],
     )
     assert result.exit_code == 1, result.output
+
+
+def test_convert_preserves_explicit_empty_string_fields():
+    """Ensure quoted empty strings do not shift TSV columns during conversion."""
+    runner = CliRunner()
+    input_file = "tests/valid/explicit_empty_string_watermark.yml"
+    output_file = "/tmp/y2b_explicit_empty_string_watermark.tsv"
+    result = runner.invoke(
+        yml2block.__main__.main,
+        ["convert", input_file, "-o", output_file],
+    )
+
+    assert result.exit_code == 0, result.output
+    assert "Invalid entry ''" not in result.output
+
+    with open(output_file, "r") as tsv_file:
+        lines = tsv_file.readlines()
+
+    header_idx = next(
+        idx for idx, line in enumerate(lines) if line.startswith("#datasetField")
+    )
+    header = lines[header_idx].rstrip("\n").split("\t")
+    row = lines[header_idx + 1].rstrip("\n").split("\t")
+
+    assert len(header) == len(row)
+    assert row[header.index("watermark")] == ""
+    assert row[header.index("fieldType")] == "text"
+    assert row[header.index("displayOrder")] == "1"
