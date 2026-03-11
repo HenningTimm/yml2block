@@ -277,7 +277,6 @@ def convert(file_path, error, warn, skip, warn_ec, strict, verbose, outfile):
     output_type, file_ext_violations = guess_type(outfile)
     lint_violations.extend_for(outfile, file_ext_violations)
 
-
     if input_type == "yaml":
         # This call invokes YAML validation internally
         data, longest_row, file_lint_violations = yaml_input.read_yaml(
