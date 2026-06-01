@@ -9,7 +9,6 @@ datasetField:
     watermark: First watermark
     fieldType: text
     displayOrder: 1
-    displayFormat:
     advancedSearchField: true
     allowControlledVocabulary: false
     allowmultiples: false
@@ -18,6 +17,7 @@ datasetField:
     required: true
     parent:
     metadatablock_id: MixedOrder
+    termURI: https://example.org/first
   - fieldType: textbox
     watermark: Second watermark
     name: Second

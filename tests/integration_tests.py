@@ -264,3 +264,8 @@ def test_convert_aligns_rows_to_header_order(tmp_path):
     assert row[header.index("name")] == "Second"
     assert row[header.index("watermark")] == "Second watermark"
     assert row[header.index("fieldType")] == "textbox"
+
+    expected_width = len(header)
+    assert expected_width > 0
+    for line in lines:
+        assert len(line.split("\t")) == expected_width
