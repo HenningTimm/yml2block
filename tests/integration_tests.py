@@ -240,3 +240,65 @@ def test_convert_preserves_explicit_empty_string_fields():
     assert row[header.index("watermark")] == ""
     assert row[header.index("fieldType")] == "text"
     assert row[header.index("displayOrder")] == "1"
+
+
+def test_convert_aligns_rows_to_header_order(tmp_path):
+    """Ensure item key order does not shift values into wrong TSV columns."""
+    input_file = tmp_path / "mixed_key_order.yml"
+    output_file = tmp_path / "mixed_key_order.tsv"
+    input_file.write_text(
+        """---
+metadataBlock:
+  - name: MixedOrder
+    displayName: Mixed Order
+datasetField:
+  - name: First
+    title: First
+    description: First description
+    watermark: First watermark
+    fieldType: text
+    displayOrder: 1
+    displayFormat:
+    advancedSearchField: true
+    allowControlledVocabulary: false
+    allowmultiples: false
+    facetable: false
+    displayoncreate: true
+    required: true
+    parent:
+    metadatablock_id: MixedOrder
+  - fieldType: textbox
+    watermark: Second watermark
+    name: Second
+    title: Second
+    description: Second description
+    displayOrder: 2
+    displayFormat:
+    advancedSearchField: false
+    allowControlledVocabulary: false
+    allowmultiples: false
+    facetable: false
+    displayoncreate: false
+    required: false
+    parent:
+    metadatablock_id: MixedOrder
+"""
+    )
+    runner = CliRunner()
+
+    result = runner.invoke(
+        yml2block.__main__.main,
+        ["convert", str(input_file), "-o", str(output_file)],
+    )
+
+    assert result.exit_code == 0, result.output
+    lines = output_file.read_text().splitlines()
+    header_idx = next(
+        idx for idx, line in enumerate(lines) if line.startswith("#datasetField")
+    )
+    header = lines[header_idx].split("\t")
+    row = lines[header_idx + 2].split("\t")
+
+    assert row[header.index("name")] == "Second"
+    assert row[header.index("watermark")] == "Second watermark"
+    assert row[header.index("fieldType")] == "textbox"
