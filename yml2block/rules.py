@@ -231,7 +231,7 @@ def unique_titles(yaml_chunk, tsv_keyword, level=Level.ERROR):
         # Use title parent tuple to allow identical titles
         # in different compound fields
         item_title = item["title"].value
-        item_parent = item["parent"].value
+        item_parent = item["parent"].value if "parent" in item.keys() else None
         titles.update([(item_title, item_parent)])
         occurrences[item_title].append(item)
 
@@ -472,7 +472,8 @@ def nested_compound_metadata(list_item, tsv_keyword, level=Level.WARNING):
         return []
 
     if (
-        list_item["parent"].value is not None
+        "parent" in list_item.keys()
+        and list_item["parent"].value is not None
         and list_item["allowmultiples"].value is True
         and list_item["allowControlledVocabulary"].value is False
     ):
@@ -506,7 +507,8 @@ def nested_compound_metadata_controlled_vocab(
         return []
 
     if (
-        list_item["parent"].value is not None
+        "parent" in list_item.keys()
+        and list_item["parent"].value is not None
         and list_item["allowmultiples"].value is True
         and list_item["allowControlledVocabulary"].value is True
     ):
