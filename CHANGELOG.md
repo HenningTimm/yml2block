@@ -1,9 +1,20 @@
 # Changelog
 
+## Version 0.10.0 (2026-06-17)
+
+- Fixed a bug where explicitly defined empty strings caused an erroneous error.
+  (https://github.com/HenningTimm/yml2block/issues/29) Thanks @Athemis
+- Fixed a bug where having different order of keys in the yaml definition of
+  a metadata block caused the columns in the generated TSV file to be misaligned.
+  https://github.com/HenningTimm/yml2block/issues/31 Thanks @Athemis
+- Made the parent keyword optional. While no parent had to be specified, the entry
+  still had to be present in the yaml file. Now empty parent entries can be omitted.
+
+
 ## Version 0.9.0 (2026-03-11)
 
 - Fixed a bug where empty string values, e.g. for the watermark, were not processed correctly
-  resulting in error and shifts in columns in the generfated TSV file cf.
+  resulting in error and shifts in columns in the generated TSV file cf.
   https://github.com/HenningTimm/yml2block/issues/29. Thanks @Athemis
 
 ## Version 0.8.1 (2025-01-05)
@@ -49,10 +60,10 @@
   This parser is also "safe", i.e. does not allow code execution. 
 - Added line numbers and columns to error messages where possible.
   For yaml files, these are taken from the ruamel.yaml round trip parser.
-  For tsv files, the column names within the specified block are reported.
+  For TSV files, the column names within the specified block are reported.
 - Added `--strict` flag to the `convert` sub-command that prevents converting files that produced warnings.
 - The rules `keys_valid` and `keys_unique` now correctly report their name in output.
-- Added integration tests checking tsv files.
+- Added integration tests checking TSV files.
 - Improved user feedback for parameters dealing with rule names, e.g. `--skip`.
 
 
