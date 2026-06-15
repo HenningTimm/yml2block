@@ -85,11 +85,17 @@ def validate_entry(yaml_chunk, tsv_keyword, lint_conf, verbose):
             lint = lint_conf.get(lint)
             violations.extend(lint(item, tsv_keyword))
 
-        # Compute the highest number of columns in the block
-        row_length = (
-            len(item.keys()) if tsv_keyword == "metadataBlock" else len(item.keys()) + 1
-        )
-        longest_row = max(longest_row, row_length)
+    # Compute the highest number of columns in the block
+    block_headers = []
+    for item in yaml_chunk:
+        for key in item.keys():
+            if key not in block_headers:
+                block_headers.append(key)
+
+    row_length = (
+        len(block_headers) if tsv_keyword == "metadataBlock" else len(block_headers) + 1
+    )
+    longest_row = max(longest_row, row_length)
 
     if verbose and len(violations) == 0:
         print("SUCCESS!" if verbose == 1 else "SUCCESS!\n")
