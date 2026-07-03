@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 0.10.0 (2026-06-17)
+## Version 0.10.0 (2026-07-03)
 
 - Fixed a bug where explicitly defined empty strings caused an erroneous error.
   (https://github.com/HenningTimm/yml2block/issues/29) Thanks @Athemis
