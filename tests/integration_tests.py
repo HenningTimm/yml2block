@@ -271,7 +271,7 @@ def test_convert_aligns_rows_to_header_order(tmp_path):
         assert len(line.split("\t")) == expected_width
 
 
-def test_valid_display_order():
+def test_display_order_valid():
     """Ensure valid display orders are detected as such."""
     runner = CliRunner()
     result = runner.invoke(
@@ -281,11 +281,27 @@ def test_valid_display_order():
     assert result.exit_code == 0, result.output
 
 
-def test_display_order_types():
-    """Ensure display order keys are integers."""
+def test_display_order_unique():
+    """Ensure duplicate display orders calues are detected."""
     runner = CliRunner()
     result = runner.invoke(
         yml2block.__main__.main,
-        ["check", "tests/invalid/display_order.yml"],
+        ["check", "--warn-ec 2", "tests/invalid/display_order_duplicate.yml"],
     )
-    assert result.exit_code == 0, result.output
+    assert result.exit_code == 2, result.output
+
+
+def test_display_order_types():
+    """Ensure display order keys are non-negative integers."""
+    runner = CliRunner()
+    result = runner.invoke(
+        yml2block.__main__.main,
+        ["check", "--warn-ec 2", "tests/invalid/display_order_non-int.yml"],
+    )
+    assert result.exit_code == 2, result.output
+
+    result = runner.invoke(
+        yml2block.__main__.main,
+        ["check", "--warn-ec 2", "tests/invalid/display_order_non-negative.yml"],
+    )
+    assert result.exit_code == 2, result.output
