@@ -9,7 +9,7 @@ datasetField:
     description: This field describes.
     watermark:
     fieldType: textbox
-    displayOrder: 1
+    displayOrder: 0
     displayFormat:
     advancedSearchField: true
     allowControlledVocabulary: false
@@ -24,7 +24,7 @@ datasetField:
     description:
     watermark:
     fieldType: text
-    displayOrder: 2
+    displayOrder: -1
     displayFormat:
     advancedSearchField: true
     allowControlledVocabulary: true
@@ -38,7 +38,7 @@ controlledVocabulary:
   - DatasetField: AnswerYes
     Value: "Yes"
     identifier: answer_positive
-    displayOrder: 3
+    displayOrder: -3
   - DatasetField: AnswerNo
     Value: "No"
     identifier: answer_negative
