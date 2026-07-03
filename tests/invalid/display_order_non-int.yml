@@ -24,7 +24,7 @@ datasetField:
     description:
     watermark:
     fieldType: text
-    displayOrder: 2
+    displayOrder: "two"
     displayFormat:
     advancedSearchField: true
     allowControlledVocabulary: true
@@ -38,12 +38,12 @@ controlledVocabulary:
   - DatasetField: AnswerYes
     Value: "Yes"
     identifier: answer_positive
-    displayOrder: 3
+    displayOrder: 
   - DatasetField: AnswerNo
     Value: "No"
     identifier: answer_negative
-    displayOrder: 2
+    displayOrder: false
   - DatasetField: AnswerMaybeSo
     Value: "Maybe"
     identifier: answer_unclear
-    displayOrder: 1
+    displayOrder: 1.0
