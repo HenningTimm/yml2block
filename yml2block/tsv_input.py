@@ -52,6 +52,8 @@ def read_tsv(tsv_path):
     # Split metadata schema into blocks
     split_blocks, break_point_violations = _identify_break_points(full_file)
     violations.extend(break_point_violations)
+    if break_point_violations:
+        return data, violations
 
     def _parse(block):
         """Parse a CSV block into a dictionary."""
