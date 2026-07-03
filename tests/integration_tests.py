@@ -270,6 +270,7 @@ def test_convert_aligns_rows_to_header_order(tmp_path):
     for line in lines:
         assert len(line.split("\t")) == expected_width
 
+
 def test_valid_display_order():
     """Ensure valid display orders are detected as such."""
     runner = CliRunner()

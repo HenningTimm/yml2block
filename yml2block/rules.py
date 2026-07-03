@@ -525,28 +525,55 @@ def nested_compound_metadata_controlled_vocab(
     return violations
 
 
-def display_order_keys(yaml_chunk, tsv_keyword, level=Level.WARNING):
-    """Make sure that display order keys are unique, contiguous, non-negative intergers.
+def display_order_unique_non_negative(yaml_chunk, tsv_keyword, level=Level.WARNING):
+    """Make sure that display order values are unique, non-negative integers.
 
     block content level lint
     """
     if tsv_keyword not in ["datasetField", "controlledVocabulary"]:
         return []
 
-    display_order_keys = [
-        item["displayOrder"].value for item in yaml_chunk if item["displayOrder"].value
+    # Only keep items with a display order value
+    display_order_values = [
+        (item["displayOrder"].value, item) for item in yaml_chunk if item["displayOrder"].value is not None
     ]
-
+    occurrences = defaultdict(list)
     errors = []
 
-    if not all((isinstance(key, int) for key in display_order_keys)):
-        errors.append(
-            LintViolation(
-                level,
-                "display_order_keys",
-                f"At least one key is not an integer",
+    for do_val, item in display_order_values:
+        occurrences[do_val].append(item)
+
+        if not isinstance(do_val, int) or isinstance(do_val, bool):
+            # handle bools here since bools are a subclass int in python
+            errors.append(
+                LintViolation(
+                    level,
+                    "display_order_keys",
+                    f"The display order value '{do_val}' in line {item.line} is not an integer.",
+                )
             )
-        )
+        elif do_val < 0:
+            errors.append(
+                LintViolation(
+                    level,
+                    "display_order_keys",
+                    f"The display order value '{do_val}' in line {item.line} needs to be non-negative.",
+                )
+            )
+
+    value_counts = Counter()
+    value_counts.update((do_val for do_val, _ in display_order_values))
+
+    for do_val, count in value_counts.items():
+        if count > 1:
+            occs = [f"line {o.line}" for o in occurrences[do_val]]
+            errors.append(
+                LintViolation(
+                    level,
+                    "display_order_values",
+                    f"Display order value '{do_val}' occurs {count} times in block '{tsv_keyword}': {', '.join(occs) if occs else ''}. Display order values have to be unique.",
+                )
+            )
 
     return errors
 
@@ -558,6 +585,8 @@ LINT_NAMES = {
     "b002": block_is_list,
     "unique_titles": unique_titles,
     "b003": unique_titles,
+    "display_order_unique_non_negative": display_order_unique_non_negative,
+    "b004": display_order_unique_non_negative,
     "keywords_valid": keywords_valid,
     "k001": keywords_valid,
     "keywords_unique": keywords_unique,
