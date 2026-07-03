@@ -62,20 +62,45 @@ def fix_required_keys_present(missing_keys, list_item, tsv_keyword):
 
 def fix_identify_breaking_points(full_file, break_points):
     """Suggest fixes for too little or too many detected blocks."""
+    lines = full_file.splitlines() if isinstance(full_file, str) else full_file
+
+    def _line_index(break_point):
+        if isinstance(full_file, str):
+            return full_file.count("\n", 0, break_point)
+        return break_point
+
     match len(break_points):
         case 0:
-            # No line starts with #
-            # are you passing the right file?
-            ...
+            return (
+                "Unable to split TSV file into blocks. No block headers were found. "
+                "Make sure this is a Dataverse TSV metadata block file and that it "
+                "contains lines starting with '#metadataBlock' and '#datasetField' "
+                "(plus optional '#controlledVocabulary')."
+            )
         case 1:
-            # Only one line starts with #
-            # At least two blocks are required for a reasonable metadata schema
-            ...
+            header_index = _line_index(break_points[0])
+            line_no = header_index + 1
+            header = lines[header_index].strip()
+            return (
+                "Unable to split TSV file into blocks. Only one block header was "
+                f"found at line {line_no}: '{header}'. A valid TSV metadata block "
+                "needs at least '#metadataBlock' and '#datasetField' headers."
+            )
         case 2 | 3:
             # This case should never be reached, those files are fine
             # Raise an exception if I get here in error handling
-            ...
+            raise ValueError(
+                "Breakpoint suggestions are only needed for invalid TSV block counts."
+            )
         case _:
-            # More than the required number of blocks is present.
-            # Identify what is going on.
-            ...
+            extra_headers = [
+                f"line {header_index + 1}: '{lines[header_index].strip()}'"
+                for header_index in (_line_index(bp) for bp in break_points[3:])
+            ]
+            return (
+                "Unable to split TSV file into blocks. Expected 2 or 3 block headers "
+                f"but found {len(break_points)}. Extra header candidates: "
+                f"{', '.join(extra_headers)}. Remove stray lines starting with '#' "
+                "or keep only '#metadataBlock', '#datasetField', and optional "
+                "'#controlledVocabulary' as block headers."
+            )
