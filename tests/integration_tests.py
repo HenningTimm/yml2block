@@ -242,6 +242,34 @@ def test_convert_preserves_explicit_empty_string_fields():
     assert row[header.index("displayOrder")] == "1"
 
 
+def test_convert_aligns_rows_to_header_order(tmp_path):
+    """Ensure item key order does not shift values into wrong TSV columns."""
+    input_file = "tests/valid/mixed_key_order.yml"
+    output_file = tmp_path / "mixed_key_order.tsv"
+    runner = CliRunner()
+
+    result = runner.invoke(
+        yml2block.__main__.main,
+        ["convert", input_file, "-o", str(output_file)],
+    )
+
+    assert result.exit_code == 0, result.output
+    lines = output_file.read_text().splitlines()
+    header_idx = next(
+        idx for idx, line in enumerate(lines) if line.startswith("#datasetField")
+    )
+    header = lines[header_idx].split("\t")
+    row = lines[header_idx + 2].split("\t")
+
+    assert row[header.index("name")] == "Second"
+    assert row[header.index("watermark")] == "Second watermark"
+    assert row[header.index("fieldType")] == "textbox"
+
+    expected_width = len(header)
+    assert expected_width > 0
+    for line in lines:
+        assert len(line.split("\t")) == expected_width
+
 def test_valid_display_order():
     """Ensure valid display orders are detected as such."""
     runner = CliRunner()

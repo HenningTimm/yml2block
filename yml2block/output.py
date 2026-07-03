@@ -15,11 +15,19 @@ def write_metadata_block(yml_metadata, output_path, longest_line, verbose):
             block_lines = []
 
             for block_line in content:
-                new_line = [""]
-
-                for key, entry in block_line.items():
+                for key in block_line.keys():
                     if key not in block_headers:
                         block_headers.append(key)
+
+            for block_line in content:
+                new_line = [""]
+
+                for key in block_headers:
+                    if key not in block_line:
+                        new_line.append("")
+                        continue
+
+                    entry = block_line[key]
 
                     value = entry.value
                     # TODO: Consider screening for True, False, None
