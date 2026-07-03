@@ -1,21 +1,16 @@
 # Changelog
 
-## Version 0.10.0 (2026-07-03)
+## Version 0.9.0 (2026-07-03)
 
-- Fixed a bug where explicitly defined empty strings caused an erroneous error.
-  (https://github.com/HenningTimm/yml2block/issues/29) Thanks @Athemis
+- Fixed a bug where empty string values, e.g. for the watermark, were not processed correctly
+  resulting in error and shifts in columns in the generated TSV file cf.
+  https://github.com/HenningTimm/yml2block/issues/29. Thanks @Athemis
 - Fixed a bug where having different order of keys in the yaml definition of
   a metadata block caused the columns in the generated TSV file to be misaligned.
   https://github.com/HenningTimm/yml2block/issues/31 Thanks @Athemis
 - Made the parent keyword optional. While no parent had to be specified, the entry
   still had to be present in the yaml file. Now empty parent entries can be omitted.
 
-
-## Version 0.9.0 (2026-03-11)
-
-- Fixed a bug where empty string values, e.g. for the watermark, were not processed correctly
-  resulting in error and shifts in columns in the generated TSV file cf.
-  https://github.com/HenningTimm/yml2block/issues/29. Thanks @Athemis
 
 ## Version 0.8.1 (2025-01-05)
 
