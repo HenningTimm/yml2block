@@ -8,6 +8,7 @@ import itertools
 
 from yml2block.rules import LintViolation, Level
 from yml2block.datatypes import MDBlockList, MDBlockDict, MDBlockNode
+from yml2block import suggestions
 
 
 def _identify_break_points(full_file):
@@ -29,13 +30,12 @@ def _identify_break_points(full_file):
             None,
         )
     else:
-        # TODO: suggest better fix for this
         split_blocks = full_file
         violations.append(
             LintViolation(
                 Level.WARNING,
                 "identify_break_points",
-                "Unable to split TSV file into blocks. Check tsv file formatting.",
+                suggestions.fix_identify_breaking_points(full_file, break_points),
             )
         )
     return split_blocks, violations
@@ -52,6 +52,8 @@ def read_tsv(tsv_path):
     # Split metadata schema into blocks
     split_blocks, break_point_violations = _identify_break_points(full_file)
     violations.extend(break_point_violations)
+    if break_point_violations:
+        return data, violations
 
     def _parse(block):
         """Parse a CSV block into a dictionary."""

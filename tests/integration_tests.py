@@ -132,6 +132,34 @@ def test_wrong_extensions_fail():
     assert result.exit_code == 1, result.output
 
 
+def test_tsv_breakpoint_suggestions_are_reported():
+    """Ensure malformed TSV block headers produce actionable suggestions."""
+    runner = CliRunner()
+    test_cases = [
+        (
+            "tests/invalid/no_block_headers.tsv",
+            "No block headers were found",
+        ),
+        (
+            "tests/invalid/one_block_header.tsv",
+            "Only one block header was found",
+        ),
+        (
+            "tests/invalid/too_many_block_headers.tsv",
+            "Expected 2 or 3 block headers but found 4",
+        ),
+    ]
+
+    for input_file, expected_message in test_cases:
+        result = runner.invoke(
+            yml2block.__main__.main,
+            ["check", "--warn-ec", "2", input_file],
+        )
+        assert result.exit_code != 0, result.output
+        assert "identify_break_points" in result.output
+        assert expected_message in result.output
+
+
 def test_nested_compound_metadata():
     """Ensure nested compound metadata are detected and classified correctly."""
 

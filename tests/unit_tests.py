@@ -157,6 +157,7 @@ def test_breakpoint_identification():
                 {
                     "level": Level.WARNING,
                     "rule": "identify_break_points",
+                    "message_contains": "Only one block header was found",
                 }
             ],
         },
@@ -167,6 +168,7 @@ def test_breakpoint_identification():
                 {
                     "level": Level.WARNING,
                     "rule": "identify_break_points",
+                    "message_contains": "Expected 2 or 3 block headers but found 4",
                 }
             ],
         },
@@ -185,3 +187,4 @@ def test_breakpoint_identification():
         for vio, exp_vio in zip(violations, test_case["expected_violations"]):
             assert vio.level == exp_vio["level"]
             assert vio.rule == exp_vio["rule"]
+            assert exp_vio["message_contains"] in vio.message
